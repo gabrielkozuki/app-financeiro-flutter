@@ -75,28 +75,14 @@ class SeletorMes extends ConsumerWidget {
   }
 }
 
-/// Barra usada como `AppBar.bottom` nas abas Contas e Gráfico, envolvendo
-/// [SeletorMes]. A altura preferida é recebida já calculada pelo chamador a
-/// partir de `MediaQuery.textScalerOf(context).scale(48)` — com fonte grande
-/// (RNF-05), os 48dp fixos anteriores cortavam o rótulo do mês. Não limitamos
-/// o textScaler do usuário: só ajustamos a altura da barra a ele.
-class SeletorMesBar extends StatelessWidget implements PreferredSizeWidget {
-  // O parâmetro precisa se chamar `preferredSize` na API pública (é assim que
-  // os chamadores o nomeiam), mas o campo não pode ter o mesmo nome do getter
-  // que `PreferredSizeWidget` exige logo abaixo — por isso a formal não é
-  // inicializadora.
-  const SeletorMesBar({super.key, required Size preferredSize})
-      // ignore: prefer_initializing_formals
-      : _preferredSize = preferredSize;
-
-  final Size _preferredSize;
-
-  @override
-  Size get preferredSize => _preferredSize;
-
-  @override
-  Widget build(BuildContext context) => const SeletorMes();
-}
+/// [SeletorMes] pronto para `AppBar.bottom`. A altura acompanha o textScaler do
+/// usuário (RNF-05): 48dp fixos cortavam o rótulo do mês em fontes grandes.
+/// Nunca limitamos o textScaler — só ajustamos a barra a ele.
+PreferredSizeWidget seletorMesBar(BuildContext context) => PreferredSize(
+      preferredSize:
+          Size.fromHeight(MediaQuery.textScalerOf(context).scale(48)),
+      child: const SeletorMes(),
+    );
 
 /// Abre um seletor de mês/ano e devolve o primeiro dia do mês escolhido (ou
 /// nulo se cancelado). Preferimos um seletor de mês ao `showDatePicker` padrão,

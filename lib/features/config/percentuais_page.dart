@@ -23,7 +23,10 @@ class PercentuaisPage extends ConsumerStatefulWidget {
 }
 
 class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
-  final _controllers = <Grupo, TextEditingController>{};
+  /// Percentuais digitados. Guardar o número (e não um `TextEditingController`)
+  /// deixa o próprio `TextFormField` criar e descartar o controller dele —
+  /// nada para vazar, nada para inicializar dentro do `build`.
+  final _valores = <Grupo, double>{};
   bool _carregado = false;
   bool _salvando = false;
 
@@ -31,18 +34,9 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
   /// na aba Contas (RN-06). A tela não fala de mês nenhum, então gravar com a
   /// vigência do mês visitado reescreveria meses passados — ou, se já houvesse
   /// vigência posterior, viraria um no-op silencioso.
-  String get _mesVigencia => mesReferencia(DateTime.now());
+  String get _mesVigencia => mesCorrente();
 
-  @override
-  void dispose() {
-    for (final c in _controllers.values) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  double _valor(Grupo g) =>
-      double.tryParse(_controllers[g]?.text.replaceAll(',', '.') ?? '') ?? 0;
+  double _valor(Grupo g) => _valores[g] ?? 0;
 
   /// Configuração montada com o que está digitado agora — a mesma que valida
   /// (via [ValidarPercentuais]) e que é gravada, sem regra duplicada na tela.
@@ -100,12 +94,9 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
           ),
           data: (config) {
             if (!_carregado) {
-              _controllers[Grupo.necessidade] = TextEditingController(
-                  text: _formatarPercentual(config.percentualNecessidades));
-              _controllers[Grupo.desejo] = TextEditingController(
-                  text: _formatarPercentual(config.percentualDesejos));
-              _controllers[Grupo.investimento] = TextEditingController(
-                  text: _formatarPercentual(config.percentualPoupanca));
+              _valores[Grupo.necessidade] = config.percentualNecessidades;
+              _valores[Grupo.desejo] = config.percentualDesejos;
+              _valores[Grupo.investimento] = config.percentualPoupanca;
               _carregado = true;
             }
             final digitada = _configDigitada;
@@ -126,10 +117,13 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: AppTheme.spaceXs),
-                    child: TextField(
-                      controller: _controllers[g],
+                    child: TextFormField(
+                      initialValue: _formatarPercentual(_valor(g)),
                       keyboardType: TextInputType.number,
-                      onChanged: (_) => setState(() {}),
+                      onChanged: (t) => setState(() =>
+                          _valores[g] = double.tryParse(
+                                  t.replaceAll(',', '.')) ??
+                              0),
                       decoration: InputDecoration(
                         labelText: g.rotulo,
                         prefixIcon: Icon(g.icone, color: g.cor),
@@ -176,18 +170,10 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
                   ),
                 ),
                 const SizedBox(height: AppTheme.spaceXl),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: (somaOk && !_salvando) ? _salvar : null,
-                    child: _salvando
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Salvar percentuais'),
-                  ),
+                BotaoSalvar(
+                  salvando: _salvando,
+                  onPressed: somaOk ? _salvar : null,
+                  rotulo: 'Salvar percentuais',
                 ),
               ],
             );

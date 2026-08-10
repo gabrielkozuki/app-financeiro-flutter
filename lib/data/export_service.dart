@@ -104,9 +104,15 @@ class ExportService {
         ]);
         continue;
       }
-      // O rateio é feito sobre o total informado; quando o valor pago difere do
-      // total, cada grupo entra proporcionalmente — a mesma proporção que o
-      // painel usa para distribuir o valor efetivo da fatura.
+      // Planejado por grupo = a linha do rateio (que soma o total, RN-08).
+      // Pago por grupo = o valor pago rateado na mesma proporção.
+      //
+      // Atenção: o painel NÃO faz essa proporção — `RatearFatura` soma os
+      // valores brutos das linhas. Os dois coincidem porque salvar a fatura
+      // força `valorPago == valorTotal` (`fatura_sheet`), e marcar pela
+      // checklist não informa valor. Se algum dia der para pagar a fatura por
+      // um valor diferente do total, os dois passam a divergir — e aí a regra
+      // certa é a do painel, que é a testada (`ratear_fatura_test`).
       final somaRateios = rateios.fold<double>(0, (s, r) => s + r.valor);
       for (final r in rateios) {
         final proporcao = somaRateios == 0 ? 0.0 : r.valor / somaRateios;

@@ -17,8 +17,21 @@ final dbProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
-/// Repositórios expostos por interface — nos testes são substituídos por fakes
-/// via `ProviderContainer(overrides: [...])`.
+/// Executa várias escritas como uma unidade: ou tudo grava, ou nada.
+///
+/// Existe para as duas gravações compostas do app — cadastro de conta
+/// parcelada (1 conta + N ocorrências) e conclusão do onboarding (rendas +
+/// percentuais + contas). Sem isso, uma falha no meio deixa estado parcial que
+/// nenhuma tela corrige: no onboarding, por exemplo, gravar só as rendas faz
+/// `precisaOnboarding` virar false e o usuário cai no app com metade do que
+/// cadastrou.
+final emTransacaoProvider =
+    Provider<Future<void> Function(Future<void> Function())>(
+        (ref) => ref.watch(dbProvider).transaction);
+
+/// Repositórios expostos por interface: o domínio declara o contrato, a camada
+/// de dados implementa. Os testes não passam por aqui — instanciam o
+/// repositório drift direto sobre um banco em memória.
 final contasRepoProvider = Provider<ContasRepository>(
     (ref) => DriftContasRepository(ref.watch(dbProvider)));
 

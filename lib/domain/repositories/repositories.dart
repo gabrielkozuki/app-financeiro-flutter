@@ -4,9 +4,13 @@ import '../entities/configuracao.dart';
 import '../entities/entrada.dart';
 import '../entities/enums.dart';
 
-/// Contratos de acesso a dados (camada de domínio). As implementações concretas
-/// (drift) ficam em `data/repositories/` e são substituíveis por fakes nos
-/// testes. Nenhum destes tipos depende de Flutter ou drift.
+/// Contratos de acesso a dados (camada de domínio); a implementação é drift, em
+/// `data/repositories/`. Nenhum destes tipos depende de Flutter ou drift.
+///
+/// Os testes de persistência NÃO usam fakes: instanciam o repositório drift
+/// sobre um banco em memória (`NativeDatabase.memory()`), porque o SQL faz parte
+/// da regra testada — a unicidade do mês, o "deste mês em diante" e a vigência
+/// por `orderBy desc` só existem lá.
 
 abstract interface class ContasRepository {
   Future<List<Conta>> listarAtivas();
@@ -30,7 +34,6 @@ abstract interface class ContasRepository {
   });
   Future<void> marcarPaga(int ocorrenciaId, {double? valorPago});
   Future<void> desmarcar(int ocorrenciaId);
-  Future<void> excluirOcorrencia(int ocorrenciaId);
 
   /// Remove a ocorrência apenas deste mês (soft-delete): some da checklist mas
   /// permanece gravada para a virada não recriá-la (RF-07).
@@ -52,6 +55,14 @@ abstract interface class ContasRepository {
   /// de parcelas (RN-03).
   Future<void> excluirOcorrenciasDaContaAPartirDe(
       int contaId, String mesReferencia);
+
+  /// Aplica um novo valor planejado às ocorrências PENDENTES de uma conta a
+  /// partir de um mês (inclusive). É o que faz o "aplicar aos próximos meses"
+  /// (RF-07) valer também para os meses que a virada já materializou — sem ele,
+  /// mudar o valor só afetava meses que o usuário ainda não tinha aberto.
+  /// Nunca toca em mês anterior nem em ocorrência já paga (RN-03/RN-04).
+  Future<void> atualizarValorOcorrenciasAPartirDe(
+      int contaId, String mesReferencia, double valorPlanejado);
 }
 
 abstract interface class EntradasRepository {
@@ -76,6 +87,20 @@ abstract interface class CartoesRepository {
   Future<List<Cartao>> listarAtivos();
   Future<int> criar(Cartao cartao);
   Future<void> atualizar(Cartao cartao);
+
+  /// Desativa o cartão: ele some da lista e a virada para de gerar faturas,
+  /// mas as faturas dos meses já fechados continuam no histórico (RF-18).
+  /// Espelha o `definirAtiva` de conta — é o par de `excluirFaturasAPartirDe`.
+  Future<void> definirAtivo(int cartaoId, bool ativo);
+
+  /// Apaga as faturas (e o rateio delas) de um cartão a partir de um mês,
+  /// inclusive — sem tocar em meses anteriores. É o "deste mês em diante" do
+  /// cartão, análogo ao de conta.
+  Future<void> excluirFaturasAPartirDe(int cartaoId, String mesReferencia);
+
+  /// Remoção total (cartão, faturas e rateios de TODOS os meses). Reservado ao
+  /// "apagar todos os dados" (RF-20) — a exclusão pela tela usa o par acima,
+  /// que preserva o histórico.
   Future<void> excluir(int cartaoId);
 
   Future<List<FaturaCartao>> faturasDoMes(String mesReferencia);

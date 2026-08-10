@@ -39,6 +39,35 @@ class DriftCartoesRepository implements CartoesRepository {
   }
 
   @override
+  Future<void> definirAtivo(int cartaoId, bool ativo) {
+    return (_db.update(_db.cartoes)..where((c) => c.id.equals(cartaoId)))
+        .write(CartoesCompanion(ativa: Value(ativo)));
+  }
+
+  @override
+  Future<void> excluirFaturasAPartirDe(int cartaoId, String mesReferencia) {
+    // A comparação textual de `YYYY-MM` coincide com a cronológica: meses
+    // anteriores (fechados) ficam intactos no histórico.
+    return _db.transaction(() async {
+      final faturas = await (_db.select(_db.faturasCartao)
+            ..where((f) =>
+                f.cartaoId.equals(cartaoId) &
+                f.mesReferencia.isBiggerOrEqualValue(mesReferencia)))
+          .get();
+      for (final f in faturas) {
+        await (_db.delete(_db.rateiosFatura)
+              ..where((r) => r.faturaCartaoId.equals(f.id)))
+            .go();
+      }
+      await (_db.delete(_db.faturasCartao)
+            ..where((f) =>
+                f.cartaoId.equals(cartaoId) &
+                f.mesReferencia.isBiggerOrEqualValue(mesReferencia)))
+          .go();
+    });
+  }
+
+  @override
   Future<void> excluir(int cartaoId) {
     // Remove rateios e faturas filhas antes do cartão (FK sem cascade).
     return _db.transaction(() async {

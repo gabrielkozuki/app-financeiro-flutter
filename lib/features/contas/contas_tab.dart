@@ -22,18 +22,16 @@ class ContasTab extends ConsumerWidget {
     final mes = ref.watch(mesReferenciaProvider);
     final async = ref.watch(panoramaMesProvider(mes));
     final somenteLeitura = ref.watch(mesSomenteLeituraProvider);
+    // Reabrir um mês serve para corrigir o que já existe nele, não para
+    // lançar conta nova (RN-05) — por isso o FAB some nos dois casos.
+    final editandoFechado = ref.watch(mesEditandoFechadoProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meu mês'),
-        // Altura calculada a partir do textScaler do usuário (RNF-05): 48dp
-        // fixos cortavam o rótulo do mês em fontes grandes. Ver SeletorMesBar.
-        bottom: SeletorMesBar(
-          preferredSize:
-              Size.fromHeight(MediaQuery.textScalerOf(context).scale(48)),
-        ),
+        bottom: seletorMesBar(context),
       ),
-      floatingActionButton: somenteLeitura
+      floatingActionButton: (somenteLeitura || editandoFechado)
           ? null
           : FloatingActionButton.extended(
               onPressed: () => abrirNovaConta(context),

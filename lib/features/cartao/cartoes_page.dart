@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/feedback.dart';
+import '../../core/format/dates.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_kit.dart';
@@ -119,7 +120,10 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _salvando = true);
     final repo = ref.read(cartoesRepoProvider);
-    final mes = ref.read(mesReferenciaProvider);
+    // O mês CORRENTE, nunca o mês navegado nas abas: esta tela não é de
+    // histórico, e herdar o mês global criaria a fatura de um mês fechado
+    // (RN-05) só porque o usuário estava olhando março.
+    final mes = mesCorrente();
 
     final ok = await executarComFeedback(context, () async {
       if (_edicao) {
@@ -149,7 +153,8 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
       builder: (ctx) => AlertDialog(
         title: const Text('Excluir cartão?'),
         content: Text(
-            'O cartão "${widget.cartao!.nome}" e suas faturas serão removidos.'),
+            'O cartão "${widget.cartao!.nome}" sai da lista e para de gerar '
+            'faturas. As faturas dos meses já fechados continuam no histórico.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -162,9 +167,17 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
     );
     if (ok != true || !mounted) return;
     setState(() => _salvando = true);
+    final repo = ref.read(cartoesRepoProvider);
+    final emTransacao = ref.read(emTransacaoProvider);
+    // Mesmo contrato do "excluir conta": desativa e limpa do mês corrente em
+    // diante, preservando o histórico (RF-18). Apagar tudo, inclusive meses
+    // fechados, ficou reservado ao RF-20 ("apagar todos os dados").
     final excluiu = await executarComFeedback(
       context,
-      () => ref.read(cartoesRepoProvider).excluir(widget.cartao!.id),
+      () => emTransacao(() async {
+        await repo.excluirFaturasAPartirDe(widget.cartao!.id, mesCorrente());
+        await repo.definirAtivo(widget.cartao!.id, false);
+      }),
       mensagemErro: 'Não foi possível excluir este cartão.',
     );
     _concluir(excluiu);
@@ -221,18 +234,10 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
               },
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _salvando ? null : _salvar,
-                child: _salvando
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(_edicao ? 'Salvar' : 'Adicionar'),
-              ),
+            BotaoSalvar(
+              salvando: _salvando,
+              onPressed: _salvar,
+              rotulo: _edicao ? 'Salvar' : 'Adicionar',
             ),
           ],
         ),

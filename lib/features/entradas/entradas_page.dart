@@ -28,12 +28,7 @@ class EntradasPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rendas'),
-        // Altura calculada a partir do textScaler do usuário (RNF-05): 48dp
-        // fixos cortavam o rótulo do mês em fontes grandes. Ver SeletorMesBar.
-        bottom: SeletorMesBar(
-          preferredSize:
-              Size.fromHeight(MediaQuery.textScalerOf(context).scale(48)),
-        ),
+        bottom: seletorMesBar(context),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _abrirForm(context),
@@ -197,7 +192,10 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
     setState(() => _salvando = true);
 
     final repo = ref.read(entradasRepoProvider);
-    final mes = ref.read(mesReferenciaProvider);
+    // Entrada pontual nova nasce no mês CORRENTE, não no mês navegado nas
+    // abas: senão registrar uma renda enquanto se olha março criaria uma
+    // entrada num mês fechado (RN-05). Ao editar, o mês original é preservado.
+    final mes = mesCorrente();
     final recorrente = _tipo == TipoEntrada.recorrente;
     final entrada = Entrada(
       id: widget.entrada?.id ?? 0,
@@ -299,18 +297,10 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
               Text('Entra apenas em ${mesAno(mes)}.',
                   style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _salvando ? null : _salvar,
-                child: _salvando
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(_edicao ? 'Salvar' : 'Adicionar'),
-              ),
+            BotaoSalvar(
+              salvando: _salvando,
+              onPressed: _salvar,
+              rotulo: _edicao ? 'Salvar' : 'Adicionar',
             ),
           ],
         ),

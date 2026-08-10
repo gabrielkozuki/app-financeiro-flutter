@@ -114,6 +114,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
     setState(() => _salvando = true);
 
     final repo = ref.read(contasRepoProvider);
+    final emTransacao = ref.read(emTransacaoProvider);
     final mesData = ref.read(mesSelecionadoProvider);
     final mes = ref.read(mesReferenciaProvider);
     final valor = parseMoeda(_valor.text);
@@ -133,6 +134,14 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                 _aplicarProximos ? valor : widget.conta!.valorPlanejado,
             diaVencimento: dia,
           ));
+          // Mudar o modelo só afeta os meses que a virada AINDA não gerou.
+          // Como navegar para um mês futuro já o materializa, sem isto o
+          // switch prometia "próximos meses" e entregava "os que você ainda
+          // não abriu" — e em conta parcelada não fazia nada.
+          if (_aplicarProximos) {
+            await repo.atualizarValorOcorrenciasAPartirDe(
+                widget.conta!.id, mes, valor);
+          }
         }
         // Campo de valor pago apagado numa ocorrência paga = "voltar a usar o
         // planejado". Sem o flag isso seria lido como "não informado" e o valor
@@ -148,29 +157,34 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
         );
       } else if (_parcelada) {
         final total = int.parse(_parcelas.text);
-        final id = await repo.criar(Conta(
-          id: 0,
-          nome: _nome.text.trim(),
-          grupo: _grupo,
-          valorPlanejado: valor,
-          diaVencimento: dia,
-          recorrencia: Recorrencia.parcelada,
-          totalParcelas: total,
-        ));
-        final parcelas = const GerarParcelas()(
-          anoInicial: mesData.year,
-          mesInicial: mesData.month,
-          valorParcela: valor,
-          totalParcelas: total,
-        );
-        for (final p in parcelas) {
-          await repo.inserirOcorrencia(
-            contaId: id,
-            mesReferencia: p.mesReferencia,
-            valorPlanejado: p.valorPlanejado,
-            parcelaAtual: p.parcelaAtual,
+        // Conta + N ocorrências como unidade: uma falha no meio de 60 parcelas
+        // deixaria uma conta com totalParcelas=60 e parte das parcelas —
+        // estado que nenhuma tela corrige e que a virada não reconstrói.
+        await emTransacao(() async {
+          final id = await repo.criar(Conta(
+            id: 0,
+            nome: _nome.text.trim(),
+            grupo: _grupo,
+            valorPlanejado: valor,
+            diaVencimento: dia,
+            recorrencia: Recorrencia.parcelada,
+            totalParcelas: total,
+          ));
+          final parcelas = const GerarParcelas()(
+            anoInicial: mesData.year,
+            mesInicial: mesData.month,
+            valorParcela: valor,
+            totalParcelas: total,
           );
-        }
+          for (final p in parcelas) {
+            await repo.inserirOcorrencia(
+              contaId: id,
+              mesReferencia: p.mesReferencia,
+              valorPlanejado: p.valorPlanejado,
+              parcelaAtual: p.parcelaAtual,
+            );
+          }
+        });
       } else {
         final id = await repo.criar(Conta(
           id: 0,
@@ -443,18 +457,10 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                 ),
               ],
               const SizedBox(height: AppTheme.spaceXl),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _salvando ? null : _salvar,
-                  child: _salvando
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(_edicao ? 'Salvar alterações' : 'Salvar'),
-                ),
+              BotaoSalvar(
+                salvando: _salvando,
+                onPressed: _salvar,
+                rotulo: _edicao ? 'Salvar alterações' : 'Salvar',
               ),
             ],
           ),

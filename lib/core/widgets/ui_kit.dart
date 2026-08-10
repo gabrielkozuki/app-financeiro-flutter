@@ -15,13 +15,11 @@ class SheetHeader extends StatelessWidget {
     required this.titulo,
     this.subtitulo,
     this.onExcluir,
-    this.tooltipExcluir = 'Excluir',
   });
 
   final String titulo;
   final String? subtitulo;
   final VoidCallback? onExcluir;
-  final String tooltipExcluir;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +47,7 @@ class SheetHeader extends StatelessWidget {
             IconButton(
               onPressed: onExcluir,
               icon: const Icon(Icons.delete_outline),
-              tooltip: tooltipExcluir,
+              tooltip: 'Excluir',
               color: context.colors.error,
             ),
         ],
@@ -61,17 +59,15 @@ class SheetHeader extends StatelessWidget {
 /// Rótulo de seção em versalete (ex.: "COMO ESTÁ DIVIDIDO"), usado para
 /// agrupar conteúdo em listas longas.
 class SectionLabel extends StatelessWidget {
-  const SectionLabel(this.texto, {super.key, this.padding});
+  const SectionLabel(this.texto, {super.key});
 
   final String texto;
-  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding ??
-          const EdgeInsets.fromLTRB(
-              AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceXs),
+      padding: const EdgeInsets.fromLTRB(
+          AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceXs),
       child: Text(
         texto.toUpperCase(),
         style: context.texts.labelMedium
@@ -89,13 +85,11 @@ class EmptyState extends StatelessWidget {
     required this.icone,
     required this.titulo,
     this.descricao,
-    this.acao,
   });
 
   final IconData icone;
   final String titulo;
   final String? descricao;
-  final Widget? acao;
 
   @override
   Widget build(BuildContext context) {
@@ -129,10 +123,6 @@ class EmptyState extends StatelessWidget {
                       ?.copyWith(color: scheme.onSurfaceVariant),
                   textAlign: TextAlign.center),
             ],
-            if (acao != null) ...[
-              const SizedBox(height: AppTheme.spaceLg),
-              acao!,
-            ],
           ],
         ),
       ),
@@ -149,12 +139,10 @@ class ErrorState extends StatelessWidget {
     super.key,
     required this.onTentarNovamente,
     this.titulo,
-    this.descricao,
   });
 
   final VoidCallback onTentarNovamente;
   final String? titulo;
-  final String? descricao;
 
   @override
   Widget build(BuildContext context) {
@@ -180,9 +168,8 @@ class ErrorState extends StatelessWidget {
                 textAlign: TextAlign.center),
             const SizedBox(height: AppTheme.spaceSm),
             Text(
-              descricao ??
-                  'Algo deu errado ao ler os dados deste aparelho. Nada foi '
-                      'perdido — tente de novo.',
+              'Algo deu errado ao ler os dados deste aparelho. Nada foi '
+              'perdido — tente de novo.',
               style: context.texts.bodyMedium
                   ?.copyWith(color: scheme.onSurfaceVariant),
               textAlign: TextAlign.center,
@@ -209,14 +196,43 @@ Widget erroAsync(
   required String contexto,
   required VoidCallback onTentarNovamente,
   String? titulo,
-  String? descricao,
 }) {
   debugPrint('[$contexto] falha ao carregar: $erro\n$stack');
-  return ErrorState(
-    onTentarNovamente: onTentarNovamente,
-    titulo: titulo,
-    descricao: descricao,
-  );
+  return ErrorState(onTentarNovamente: onTentarNovamente, titulo: titulo);
+}
+
+/// Botão de confirmação padrão das folhas de formulário: ocupa a largura toda,
+/// fica desabilitado enquanto [salvando] e troca o rótulo por um spinner do
+/// tamanho do texto. Centraliza aqui a geometria do indicador, que estava
+/// copiada em seis telas.
+class BotaoSalvar extends StatelessWidget {
+  const BotaoSalvar({
+    super.key,
+    required this.salvando,
+    required this.onPressed,
+    required this.rotulo,
+  });
+
+  final bool salvando;
+  final VoidCallback? onPressed;
+  final String rotulo;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: salvando ? null : onPressed,
+        child: salvando
+            ? const SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Text(rotulo),
+      ),
+    );
+  }
 }
 
 /// Fundo tingido de `primary` sobre `surfaceContainerHigh`, usado nos cards e

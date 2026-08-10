@@ -33,8 +33,9 @@ class ItemFatura {
   final Cartao cartao;
   final List<RateioFatura> rateios;
 
-  /// Valor que entra nos cálculos: pago, se houver; senão o total informado.
-  double get valorEfetivo => fatura.valorPago ?? fatura.valorTotal ?? 0;
+  /// Valor que entra nos cálculos (invariante: fatura pendente não tem
+  /// `valorPago`). Delegado para não espalhar a regra — ver [FaturaCartao].
+  double get valorEfetivo => fatura.valorEfetivo;
 }
 
 /// Panorama consolidado do mês selecionado — alimenta a aba Contas (checklist +
@@ -80,13 +81,13 @@ final panoramaMesProvider =
   final configRepo = ref.watch(configRepoProvider);
   final fechRepo = ref.watch(fechamentoRepoProvider);
   final reaberto = ref.watch(mesesReabertosProvider);
-  final ehPassado = _ehMesPassado(mes);
+  final ehPassado = ehMesPassado(mes);
 
   // Ao visualizar o mês corrente, fecha (tira o retrato) os meses passados que
   // têm dados e ainda não foram fechados — exceto os reabertos nesta sessão.
   // Os repositórios vão por parâmetro: nada de `ref.read` depois de um await,
   // que quebraria a execução antiga se o provider fosse invalidado no meio.
-  if (mes == mesReferencia(DateTime.now())) {
+  if (mes == mesCorrente()) {
     await _garantirFechamentos(
       mesAtual: mes,
       reaberto: reaberto,
@@ -104,57 +105,19 @@ final panoramaMesProvider =
   // serve para corrigir o que já existe naquele mês, não para injetar nele as
   // contas de hoje.
   if (!ehPassado) {
-    await _garantirMesGerado(mes,
-        contasRepo: contasRepo, cartoesRepo: cartoesRepo);
+    await _gerarMes(mes, contasRepo: contasRepo, cartoesRepo: cartoesRepo);
   }
 
-  // Junta por TODAS as contas (não só ativas): assim as ocorrências de meses
-  // passados de uma conta desativada ("excluir daqui em diante") continuam no
-  // histórico.
-  final todasContas = await contasRepo.listarTodas();
-  final porId = {for (final c in todasContas) c.id: c};
-  final ocorrencias = await contasRepo.ocorrenciasDoMes(mes);
+  final linhas = await _linhasDoMes(mes,
+      contasRepo: contasRepo, cartoesRepo: cartoesRepo);
+  final itens = linhas.itens;
+  final faturas = linhas.faturas;
 
-  final comprometido = <Grupo, double>{};
-  final itens = <ItemChecklist>[];
-  for (final o in ocorrencias) {
-    final conta = porId[o.contaId];
-    if (conta == null) continue;
-    itens.add(ItemChecklist(ocorrencia: o, conta: conta));
-    comprometido[conta.grupo] =
-        (comprometido[conta.grupo] ?? 0) + o.valorEfetivo;
-  }
-  itens.sort((a, b) {
-    if (a.ocorrencia.paga != b.ocorrencia.paga) {
-      return a.ocorrencia.paga ? 1 : -1;
-    }
-    return a.conta.diaVencimento.compareTo(b.conta.diaVencimento);
-  });
-
-  // Faturas de cartão do mês + rateio entre grupos.
-  const rateador = RatearFatura();
-  final cartoes = {for (final c in await cartoesRepo.listarAtivos()) c.id: c};
-  final faturasRows = await cartoesRepo.faturasDoMes(mes);
-  final faturas = <ItemFatura>[];
-  for (final f in faturasRows) {
-    final cartao = cartoes[f.cartaoId];
-    if (cartao == null) continue;
-    final rateios = await cartoesRepo.rateiosDaFatura(f.id);
-    faturas.add(ItemFatura(fatura: f, cartao: cartao, rateios: rateios));
-    final porGrupo = rateador.comprometidoPorGrupo(
-        valorTotal: f.valorPago ?? f.valorTotal, rateios: rateios);
-    for (final entry in porGrupo.entries) {
-      comprometido[entry.key] = (comprometido[entry.key] ?? 0) + entry.value;
-    }
-  }
-  faturas.sort((a, b) {
-    if (a.fatura.paga != b.fatura.paga) return a.fatura.paga ? 1 : -1;
-    return a.cartao.diaVencimento.compareTo(b.cartao.diaVencimento);
-  });
-
-  // Fonte da renda/percentuais: num mês fechado (passado, com retrato e não
-  // reaberto), lê do snapshot imutável — assim mudar a renda hoje NÃO reescreve
-  // o histórico. Caso contrário, calcula ao vivo.
+  // Num mês fechado (passado, com retrato e não reaberto) TUDO que alimenta o
+  // painel vem do snapshot imutável — renda, percentuais e o comprometido por
+  // grupo. É o que torna o histórico de fato congelado (RN-06): recalcular ao
+  // vivo faria o passado se mexer sempre que a conta de origem mudasse.
+  // Fora daí, calcula ao vivo.
   FechamentoMensal? snapshot;
   if (ehPassado && !reaberto.contains(mes)) {
     snapshot = await fechRepo.doMes(mes);
@@ -163,36 +126,84 @@ final panoramaMesProvider =
   final config = snapshot?.snapshotPercentuais ?? await configRepo.vigenteEm(mes);
   final metodologia = const CalcularMetodologia()(
     renda: renda,
-    comprometidoPorGrupo: comprometido,
+    comprometidoPorGrupo:
+        snapshot?.totalPorGrupo ?? _comprometidoPorGrupo(itens, faturas),
     config: config,
   );
 
   return PanoramaMes(itens: itens, faturas: faturas, metodologia: metodologia);
 });
 
-/// Viradas em andamento, por mês. O provider é invalidado a cada alteração e
-/// pode ser observado por duas abas ao mesmo tempo: sem isso, duas execuções
-/// concorrentes fariam a mesma virada em paralelo. Quem chega depois espera a
-/// escrita que já está em voo.
-final Map<String, Future<void>> _viradasEmVoo = {};
-
-/// Executa a virada do mês (uma vez por mês, mesmo com chamadas concorrentes),
-/// inserindo as ocorrências e faturas que faltam.
-Future<void> _garantirMesGerado(
+/// Carrega as linhas do mês já ordenadas para a checklist: ocorrências (com a
+/// conta de origem) e faturas dos cartões ativos (com o rateio).
+///
+/// Junta por TODAS as contas, não só as ativas — assim as ocorrências de meses
+/// passados de uma conta desativada ("excluir daqui em diante") continuam no
+/// histórico.
+Future<({List<ItemChecklist> itens, List<ItemFatura> faturas})> _linhasDoMes(
   String mes, {
   required ContasRepository contasRepo,
   required CartoesRepository cartoesRepo,
-}) {
-  final emVoo = _viradasEmVoo[mes];
-  if (emVoo != null) return emVoo;
+}) async {
+  final porId = {for (final c in await contasRepo.listarTodas()) c.id: c};
+  final itens = <ItemChecklist>[];
+  for (final o in await contasRepo.ocorrenciasDoMes(mes)) {
+    final conta = porId[o.contaId];
+    if (conta != null) itens.add(ItemChecklist(ocorrencia: o, conta: conta));
+  }
+  itens.sort((a, b) {
+    if (a.ocorrencia.paga != b.ocorrencia.paga) {
+      return a.ocorrencia.paga ? 1 : -1;
+    }
+    return a.conta.diaVencimento.compareTo(b.conta.diaVencimento);
+  });
 
-  final futuro =
-      _gerarMes(mes, contasRepo: contasRepo, cartoesRepo: cartoesRepo);
-  _viradasEmVoo[mes] = futuro;
-  // Limpa ao concluir (inclusive em erro) para o mapa não virar cache eterno.
-  return futuro.whenComplete(() => _viradasEmVoo.remove(mes));
+  final cartoes = {for (final c in await cartoesRepo.listarAtivos()) c.id: c};
+  final faturas = <ItemFatura>[];
+  for (final f in await cartoesRepo.faturasDoMes(mes)) {
+    final cartao = cartoes[f.cartaoId];
+    if (cartao == null) continue;
+    faturas.add(ItemFatura(
+      fatura: f,
+      cartao: cartao,
+      rateios: await cartoesRepo.rateiosDaFatura(f.id),
+    ));
+  }
+  faturas.sort((a, b) {
+    if (a.fatura.paga != b.fatura.paga) return a.fatura.paga ? 1 : -1;
+    return a.cartao.diaVencimento.compareTo(b.cartao.diaVencimento);
+  });
+
+  return (itens: itens, faturas: faturas);
 }
 
+/// Comprometido por grupo: as ocorrências entram pelo grupo da conta; a fatura
+/// entra rateada (RN-08). Uma implementação só para a tela e para o retrato do
+/// fechamento — se divergissem, o histórico congelaria um número diferente do
+/// que o usuário viu no mês.
+Map<Grupo, double> _comprometidoPorGrupo(
+    List<ItemChecklist> itens, List<ItemFatura> faturas) {
+  final comprometido = <Grupo, double>{};
+  for (final i in itens) {
+    comprometido[i.conta.grupo] =
+        (comprometido[i.conta.grupo] ?? 0) + i.ocorrencia.valorEfetivo;
+  }
+  const rateador = RatearFatura();
+  for (final f in faturas) {
+    final porGrupo = rateador.comprometidoPorGrupo(
+        valorTotal: f.valorEfetivo, rateios: f.rateios);
+    porGrupo.forEach(
+        (g, v) => comprometido[g] = (comprometido[g] ?? 0) + v);
+  }
+  return comprometido;
+}
+
+/// Executa a virada do mês, inserindo as ocorrências e faturas que faltam.
+///
+/// Não precisa de trava contra execução concorrente: a idempotência é do banco
+/// (índice único por conta/mês e cartão/mês + `DoNothing`), coberta por
+/// `test/persistence/esquema_test.dart`. Duas abas observam a MESMA instância
+/// do family, então o Riverpod já compartilha uma única computação por mês.
 Future<void> _gerarMes(
   String mes, {
   required ContasRepository contasRepo,
@@ -256,25 +267,13 @@ Future<void> fecharMes({
   required ConfigRepository configRepo,
   required FechamentoRepository fechRepo,
 }) async {
-  final contas = {for (final c in await contasRepo.listarTodas()) c.id: c};
-  final comprometido = <Grupo, double>{};
-  for (final o in await contasRepo.ocorrenciasDoMes(mes)) {
-    final c = contas[o.contaId];
-    if (c == null) continue;
-    comprometido[c.grupo] = (comprometido[c.grupo] ?? 0) + o.valorEfetivo;
-  }
-  const rateador = RatearFatura();
-  for (final f in await cartoesRepo.faturasDoMes(mes)) {
-    final rateios = await cartoesRepo.rateiosDaFatura(f.id);
-    final porGrupo = rateador.comprometidoPorGrupo(
-        valorTotal: f.valorPago ?? f.valorTotal, rateios: rateios);
-    porGrupo.forEach((k, v) => comprometido[k] = (comprometido[k] ?? 0) + v);
-  }
+  final linhas = await _linhasDoMes(mes,
+      contasRepo: contasRepo, cartoesRepo: cartoesRepo);
 
   await fechRepo.salvar(FechamentoMensal(
     mesReferencia: mes,
     rendaTotal: await entradasRepo.rendaDoMes(mes),
-    totalPorGrupo: comprometido,
+    totalPorGrupo: _comprometidoPorGrupo(linhas.itens, linhas.faturas),
     snapshotPercentuais: await configRepo.vigenteEm(mes),
   ));
 }
@@ -342,18 +341,13 @@ Future<void> concluirEdicaoMesSelecionado(
 final mesEditandoFechadoProvider = Provider<bool>((ref) {
   final mes = ref.watch(mesReferenciaProvider);
   final reaberto = ref.watch(mesesReabertosProvider);
-  return _ehMesPassado(mes) && reaberto.contains(mes);
+  return ehMesPassado(mes) && reaberto.contains(mes);
 });
-
-/// Um mês é "passado" (candidato a fechado) quando começa antes do mês atual.
-/// A chave `YYYY-MM` é zero-padded, então a comparação textual serve de ordem.
-bool _ehMesPassado(String mes) =>
-    mes.compareTo(mesReferencia(DateTime.now())) < 0;
 
 /// Somente leitura na UI (RN-05/RF-18): mês passado que NÃO foi reaberto nesta
 /// sessão. Reabrir um mês o torna editável até ser fechado de novo.
 final mesSomenteLeituraProvider = Provider<bool>((ref) {
   final mes = ref.watch(mesReferenciaProvider);
   final reaberto = ref.watch(mesesReabertosProvider);
-  return _ehMesPassado(mes) && !reaberto.contains(mes);
+  return ehMesPassado(mes) && !reaberto.contains(mes);
 });

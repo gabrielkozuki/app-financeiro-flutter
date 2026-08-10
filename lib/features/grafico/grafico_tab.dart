@@ -25,12 +25,7 @@ class GraficoTab extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Direcionamento'),
-        // Altura calculada a partir do textScaler do usuário (RNF-05): 48dp
-        // fixos cortavam o rótulo do mês em fontes grandes. Ver SeletorMesBar.
-        bottom: SeletorMesBar(
-          preferredSize:
-              Size.fromHeight(MediaQuery.textScalerOf(context).scale(48)),
-        ),
+        bottom: seletorMesBar(context),
       ),
       body: SafeArea(
         child: Center(
@@ -129,10 +124,22 @@ class _Rosca extends StatelessWidget {
         ),
     ];
 
+    // Quando o mês estoura, a fatia "Livre" some e a rosca fica visualmente
+    // idêntica à de um mês dentro do orçamento. O texto central passa a dizer
+    // o quanto da renda foi comprometido — informativo, sem cor de erro nem
+    // ícone de alerta (RF-13): o cenário do Rafael (renda variável) é o que o
+    // app existe para tornar visível, não para repreender.
+    final estourou = metodologia.livreParaGastar < 0 && metodologia.renda > 0;
+    final percentualComprometido =
+        metodologia.renda > 0 ? metodologia.totalComprometido / metodologia.renda * 100 : 0.0;
+
     return Semantics(
-      label: 'Renda do mês: ${brl(metodologia.renda)}, dividida entre '
-          '${[for (final i in metodologia.itens) i.grupo.rotulo].join(", ")} '
-          'e Livre',
+      label: estourou
+          ? 'Comprometido ${percentualComprometido.round()}% da renda do mês, '
+              '${brl(metodologia.totalComprometido)} de ${brl(metodologia.renda)}'
+          : 'Renda do mês: ${brl(metodologia.renda)}, dividida entre '
+              '${[for (final i in metodologia.itens) i.grupo.rotulo].join(", ")} '
+              'e Livre',
       // Sem isso, o leitor de tela lê o rótulo-resumo e depois os dois Text
       // internos ("Renda do mês" / valor) de novo, em sequência.
       excludeSemantics: true,
@@ -159,12 +166,14 @@ class _Rosca extends StatelessWidget {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Renda do mês',
+                Text(estourou ? 'Comprometido' : 'Renda do mês',
                     style: context.texts.labelMedium
                         ?.copyWith(color: scheme.onSurfaceVariant)),
                 const SizedBox(height: 2),
                 Text(
-                  brl(metodologia.renda),
+                  estourou
+                      ? '${percentualComprometido.round()}% da renda'
+                      : brl(metodologia.renda),
                   style: context.texts.headlineSmall,
                 ),
               ],

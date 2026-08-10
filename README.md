@@ -23,11 +23,14 @@ exportação em CSV e JSON.
 
 ```
 lib/
-  core/      # tema, formatadores, providers Riverpod
-  domain/    # entidades e casos de uso puros (metodologia, virada, parcelas, rateio)
+  core/      # tema, formatadores, providers Riverpod, feedback de erro
+  domain/    # entidades e regras puras (metodologia, geração do mês, parcelas, rateio)
   data/      # drift (SQLite): tabelas, repositórios, exportação
-  features/  # UI: shell, onboarding, contas, gráfico, config, cartão, entradas
+  features/  # UI: shell, onboarding, contas, mes, gráfico, config, cartão, entradas
 ```
+
+`features/mes` é o coração do ciclo mensal: o panorama que alimenta as duas abas, a virada e o
+fechamento que congela o histórico.
 
 Estado com **Riverpod**, persistência local em **SQLite via drift** (fonte de verdade) e
 navegação por `Navigator` sobre uma barra de **3 menus fixos** — formulários e detalhes abrem

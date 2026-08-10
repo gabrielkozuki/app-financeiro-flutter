@@ -145,13 +145,6 @@ class DriftContasRepository implements ContasRepository {
   }
 
   @override
-  Future<void> excluirOcorrencia(int ocorrenciaId) {
-    return (_db.delete(_db.ocorrenciasConta)
-          ..where((o) => o.id.equals(ocorrenciaId)))
-        .go();
-  }
-
-  @override
   Future<void> removerOcorrenciaDoMes(int ocorrenciaId) {
     return (_db.update(_db.ocorrenciasConta)
           ..where((o) => o.id.equals(ocorrenciaId)))
@@ -190,5 +183,19 @@ class DriftContasRepository implements ContasRepository {
               o.mesReferencia.isBiggerOrEqualValue(mesReferencia)))
         .go();
   }
-}
 
+  @override
+  Future<void> atualizarValorOcorrenciasAPartirDe(
+      int contaId, String mesReferencia, double valorPlanejado) {
+    // Só ocorrências PENDENTES: uma parcela já paga guarda o que foi pago de
+    // fato (RN-04), e mês anterior é recorte fechado (RN-05) — daí o
+    // `isBiggerOrEqualValue` sobre a chave textual, que é cronológica.
+    return (_db.update(_db.ocorrenciasConta)
+          ..where((o) =>
+              o.contaId.equals(contaId) &
+              o.mesReferencia.isBiggerOrEqualValue(mesReferencia) &
+              o.status.equalsValue(StatusPagamento.pendente)))
+        .write(OcorrenciasContaCompanion(
+            valorPlanejado: Value(valorPlanejado)));
+  }
+}

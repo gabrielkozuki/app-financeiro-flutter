@@ -106,10 +106,32 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         _contas.add(_ContaRascunho(sugestaoNome, valor, grupo, dia)));
   }
 
+  /// Diálogo "quanto custa?" das sugestões de conta. Sem controller: o valor é
+  /// lido pelo `onChanged` e vive no escopo deste Future, então não há nada
+  /// para descartar cedo demais — é o que causava o "TextEditingController was
+  /// used after being disposed" na animação de fechamento (ver `config_tab`).
   Future<double?> _perguntarValor(String nome) {
+    var valor = 0.0;
     return showDialog<double>(
       context: context,
-      builder: (_) => _DialogoValor(nome: nome),
+      builder: (ctx) => AlertDialog(
+        title: Text(nome),
+        content: CampoMoeda(
+          labelText: 'Valor',
+          autofocus: true,
+          onChanged: (texto) => valor = parseMoeda(texto),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, valor > 0 ? valor : null),
+            child: const Text('Adicionar'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -119,8 +141,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     final entradasRepo = ref.read(entradasRepoProvider);
     final contasRepo = ref.read(contasRepoProvider);
     final configRepo = ref.read(configRepoProvider);
+    final emTransacao = ref.read(emTransacaoProvider);
 
-    final ok = await executarComFeedback(context, () async {
+    // Tudo ou nada: se as rendas gravassem e as contas não, o
+    // `precisaOnboarding` viraria false e o usuário cairia no app na próxima
+    // abertura com metade do que cadastrou, sem aviso.
+    final ok = await executarComFeedback(context, () => emTransacao(() async {
       for (final r in _rendas) {
         await entradasRepo.criar(Entrada(
           id: 0,
@@ -147,7 +173,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         await contasRepo.inserirOcorrencia(
             contaId: id, mesReferencia: mes, valorPlanejado: c.valor);
       }
-    }, mensagemErro: 'Não foi possível concluir seu cadastro.');
+    }), mensagemErro: 'Não foi possível concluir seu cadastro.');
 
     if (!mounted) return;
     setState(() => _salvando = false);
@@ -222,32 +248,17 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
-  Widget _indicadorProgresso() {
-    final scheme = context.colors;
-    return Semantics(
-      label: 'Passo ${_pagina + 1} de $_totalPaginasOnboarding',
-      child: Row(
-        children: [
-          for (var i = 0; i < _totalPaginasOnboarding; i++)
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(right: i == _totalPaginasOnboarding - 1 ? 0 : 6),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: i <= _pagina
-                        ? scheme.primary
-                        : scheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
+  Widget _indicadorProgresso() => Semantics(
+        label: 'Passo ${_pagina + 1} de $_totalPaginasOnboarding',
+        excludeSemantics: true,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: (_pagina + 1) / _totalPaginasOnboarding,
+            minHeight: 4,
+          ),
+        ),
+      );
 
   Widget _paginaBoasVindas() {
     final textTheme = Theme.of(context).textTheme;
@@ -503,8 +514,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _rodape() {
-    final podeAvancarRenda = _rendas.isNotEmpty;
-    final podeConcluir = _contas.isNotEmpty && !_salvando;
+    // 0 = boas-vindas, 1 = renda, 2 = metodologia, 3 = contas. Só a última
+    // página conclui; as demais apenas avançam, e a de renda exige ao menos
+    // uma entrada cadastrada.
+    final ultima = _pagina == _totalPaginasOnboarding - 1;
+    final podeAvancar = switch (_pagina) {
+      1 => _rendas.isNotEmpty,
+      3 => _contas.isNotEmpty,
+      _ => true,
+    };
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -516,81 +534,24 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               child: const Text('Voltar'),
             ),
           const Spacer(),
-          switch (_pagina) {
-            // 0 = boas-vindas, 1 = renda, 2 = metodologia, 3 = contas.
-            0 => FilledButton(
-                onPressed: () => _irPara(1),
-                child: const Text('Começar'),
-              ),
-            1 => FilledButton(
-                onPressed: podeAvancarRenda ? () => _irPara(2) : null,
-                child: const Text('Continuar'),
-              ),
-            2 => FilledButton(
-                onPressed: () => _irPara(3),
-                child: const Text('Continuar'),
-              ),
-            _ => FilledButton(
-                onPressed: podeConcluir ? _concluir : null,
-                child: _salvando
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Concluir'),
-              ),
-          },
+          FilledButton(
+            onPressed: (podeAvancar && !_salvando)
+                ? (ultima ? _concluir : () => _irPara(_pagina + 1))
+                : null,
+            child: _salvando
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(switch (_pagina) {
+                    0 => 'Começar',
+                    3 => 'Concluir',
+                    _ => 'Continuar',
+                  }),
+          ),
         ],
       ),
-    );
-  }
-}
-
-/// Diálogo "quanto custa?" das sugestões de conta. É dono do próprio
-/// [TextEditingController] e o descarta em [State.dispose] — descartá-lo no
-/// `.then` do `showDialog` causa o crash "TextEditingController was used after
-/// being disposed" durante a animação de fechamento (ver `config_tab.dart`).
-class _DialogoValor extends StatefulWidget {
-  const _DialogoValor({required this.nome});
-
-  final String nome;
-
-  @override
-  State<_DialogoValor> createState() => _DialogoValorState();
-}
-
-class _DialogoValorState extends State<_DialogoValor> {
-  final _valor = TextEditingController();
-
-  @override
-  void dispose() {
-    _valor.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.nome),
-      content: CampoMoeda(
-        controller: _valor,
-        labelText: 'Valor',
-        autofocus: true,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-        FilledButton(
-          onPressed: () {
-            final v = parseMoeda(_valor.text);
-            Navigator.pop(context, v > 0 ? v : null);
-          },
-          child: const Text('Adicionar'),
-        ),
-      ],
     );
   }
 }

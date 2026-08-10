@@ -177,18 +177,10 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
             const SizedBox(height: AppTheme.spaceMd),
             _feedback(validacao, textTheme),
             const SizedBox(height: AppTheme.spaceLg),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: (_valido && !_salvando) ? _salvar : null,
-                child: _salvando
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Salvar fatura'),
-              ),
+            BotaoSalvar(
+              salvando: _salvando,
+              onPressed: _valido ? _salvar : null,
+              rotulo: 'Salvar fatura',
             ),
             const SizedBox(height: 4),
             TextButton.icon(

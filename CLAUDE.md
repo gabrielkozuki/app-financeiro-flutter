@@ -41,8 +41,10 @@ muda só aquele mês.
 `YYYY-MM` que ESCREVE no banco durante a leitura** — executa a virada e o fechamento dos meses
 passados. É um desenho deliberado, aprovado, não um descuido. Consequências ao mexer nele:
 
-- A geração é memoizada em `_viradasEmVoo` (mapa `mês → Future`), para duas execuções
-  concorrentes não duplicarem linhas. A chave é removida no `whenComplete`, inclusive em erro.
+- A virada não tem trava em memória e não precisa: a idempotência é do banco (invariante 3) e
+  duas abas observam a MESMA instância da family, então o Riverpod já compartilha uma computação
+  por mês. Não reintroduza um mapa de "viradas em voo" — ele fica obsoleto e ainda serve resultado
+  velho a quem chega durante o voo.
 - Nenhum `ref.read` depois de um `await` dentro do provider: os repositórios são capturados antes
   do primeiro await e passados por parâmetro. Invalidação durante a computação lançaria.
 - Os ~13 pontos de escrita do app fazem `ref.invalidate(panoramaMesProvider)` na **family
@@ -58,9 +60,10 @@ passados. É um desenho deliberado, aprovado, não um descuido. Consequências a
    backup JSON. Travado por `test/persistence/esquema_test.dart`.
 3. **Uma conta tem no máximo uma ocorrência por mês** (e um cartão, uma fatura), garantido por
    `uniqueKeys` + `onConflict: DoNothing`. É o que torna a virada idempotente.
-4. **Migração drift é real e data-safe.** `schemaVersion = 3`; o `onUpgrade` **deduplica antes**
-   de criar os índices únicos — `CREATE UNIQUE INDEX` falha com duplicatas e o app não abre.
-   Coberto por `test/persistence/migracao_v3_test.dart`, que monta um banco v2 em disco.
+4. **Enquanto o app está em desenvolvimento, o banco tem VERSÃO ÚNICA** (`schemaVersion = 1`, sem
+   `onUpgrade`). Mudou tabela? Desinstale o app no aparelho de teste — não escreva migração, e
+   não suba a versão. Depois de publicar isso se inverte: aí existem bancos de usuários reais e
+   toda alteração exige `onUpgrade` data-safe.
 5. **Fatura pendente nunca tem `valorPago`.** `desmarcarFatura` limpa o campo; use
    `FaturaCartao.valorEfetivo`, não `valorPago ?? valorTotal` espalhado.
 6. **O rateio da fatura precisa somar exatamente o total** (RN-08) — use
@@ -91,9 +94,9 @@ na aba Gráfico; Firebase Auth + Realtime Database para o backup (M8, ainda não
 pastas `core`/`domain`/`data`/`features`.
 
 **Testes cobrem apenas regra de negócio** — `test/unit/` (regras puras) e `test/persistence/`
-(drift em memória, fakes; sem `mocktail`). **Não escreva testes de widget/UI**: foi excluído por
-decisão expressa. O README menciona "fluxos principais de UI" na seção de testes; está
-desatualizado.
+(drift em memória, sem `mocktail` e **sem fakes** — o SQL faz parte da regra testada, então o
+*test double* é o próprio banco). **Não escreva testes de widget/UI**: foi excluído por
+decisão expressa.
 
 *"Simplicidade acima de completude"* é princípio de produto: proposta que adiciona complexidade
 precisa justificar o ganho.

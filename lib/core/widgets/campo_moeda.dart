@@ -14,35 +14,29 @@ import '../format/money.dart';
 class CampoMoeda extends StatelessWidget {
   const CampoMoeda({
     super.key,
-    required this.controller,
+    this.controller,
     required this.labelText,
-    this.hintText,
     this.prefixIcon,
     this.autofocus = false,
     this.obrigatorioPositivo = false,
-    this.validator,
     this.onChanged,
     this.onSubmitted,
-    this.textInputAction,
   });
 
-  final TextEditingController controller;
+  /// Opcional: sem controller, o próprio [TextFormField] cria e descarta o
+  /// dele. É o que evita o "used after being disposed" quando o campo vive
+  /// dentro de um diálogo — leia o valor pelo [onChanged], não por um
+  /// controller externo.
+  final TextEditingController? controller;
   final String labelText;
-  final String? hintText;
   final Widget? prefixIcon;
   final bool autofocus;
 
-  /// Atalho para o validador mais comum: exige um valor maior que zero. Ignorado
-  /// quando um [validator] explícito é informado.
+  /// Atalho para o validador mais comum: exige um valor maior que zero.
   final bool obrigatorioPositivo;
-
-  /// Validador customizado; recebe o valor já convertido para double (0 quando
-  /// o campo está vazio).
-  final String? Function(double valor)? validator;
 
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
-  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
@@ -51,27 +45,16 @@ class CampoMoeda extends StatelessWidget {
       autofocus: autofocus,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [MoedaInputFormatter()],
-      textInputAction: textInputAction,
       onChanged: onChanged,
       onFieldSubmitted: onSubmitted,
       decoration: InputDecoration(
         labelText: labelText,
-        hintText: hintText,
         prefixIcon: prefixIcon,
         prefixText: r'R$ ',
       ),
-      validator: _resolverValidator(),
+      validator: obrigatorioPositivo
+          ? (texto) => parseMoeda(texto ?? '') <= 0 ? 'Valor inválido' : null
+          : null,
     );
-  }
-
-  String? Function(String?)? _resolverValidator() {
-    if (validator != null) {
-      return (texto) => validator!(parseMoeda(texto ?? ''));
-    }
-    if (obrigatorioPositivo) {
-      return (texto) =>
-          parseMoeda(texto ?? '') <= 0 ? 'Valor inválido' : null;
-    }
-    return null;
   }
 }

@@ -8,8 +8,8 @@
 
 **M0–M7 concluídos.** App funcional offline no Android: onboarding, três abas, contas e
 ocorrências mensais, entradas, cartões com fatura e rateio, virada de mês com `FechamentoMensal`,
-percentuais configuráveis, exportação CSV/XLSX/JSON e exclusão total. `flutter analyze` sem
-issues; 47 testes de regra de negócio passando.
+percentuais configuráveis, exportação CSV/JSON e exclusão total. `flutter analyze` sem
+issues; 43 testes de regra de negócio passando.
 
 **M8 pendente**, dividido em duas partes:
 - **Auth + backup na nuvem** — bloqueado pela configuração do projeto Firebase, que depende da
@@ -28,11 +28,11 @@ Divergências deliberadas, aprovadas ao longo do desenvolvimento:
 | `core/routes.dart` com `onGenerateRoute` e rotas nomeadas | Um helper único em `config_tab.dart:99` com `Navigator.push(MaterialPageRoute(...))`; o resto abre em `showModalBottomSheet`/`showDialog` | Com 3 menus fixos e formulários sobrepostos, uma tabela de rotas nomeadas não se pagava. CE-02 continua atendido (roteamento por `Navigator` entre páginas) |
 | `data/db/daos/` com DAOs por agregado | Repositórios drift acessando o banco direto | Camada a mais sem ganho: os repositórios já são a fronteira de persistência |
 | `data/sync/backup_service.dart` | `data/export_service.dart` (`exportarJson`/`importarJson`), que será a base do backup | O mesmo serializador atende RF-19 e o backup do M8 |
-| `mocktail` nos testes | Fakes e drift em memória | Decisão do usuário; o pacote foi removido do `pubspec.yaml` |
+| `mocktail` nos testes | Drift em memória, **sem fakes** | Decisão do usuário; o pacote foi removido do `pubspec.yaml`. O SQL faz parte da regra testada, então o *test double* é o próprio banco |
 | "testes de widget das abas principais" na verificação | Somente testes de regra de negócio (`test/unit/`, `test/persistence/`) | Decisão expressa do usuário: sem testes de widget/UI |
 | Casos de uso `AplicarPagamento` e `AtualizarPercentuais` | Regra de pagamento (RN-04) nos repositórios; `ValidarPercentuais` em `usecases/percentuais.dart` | Consolidação; a validação de soma virou usecase testado, o pagamento não precisou de um |
 | `features/auth/` | Ainda não existe | Faz parte do M8 pendente |
-| Painel 50-30-20 "rosca na aba Gráfico (não barras na home)" | Rosca na aba Gráfico **e** barras por grupo (`contas_tab.dart:342`, `grafico_tab.dart:253`) | As barras atendem o RF-12 literalmente; a rosca é o painel de diagnóstico |
+| Painel 50-30-20 "rosca na aba Gráfico (não barras na home)" | Rosca na aba Gráfico, com barra de progresso por grupo nas linhas abaixo dela. A aba Contas tem só a barra de "pago este mês" | Cumprido como planejado. O RF-12 pede planejado/comprometido/limite por grupo; hoje a linha do grupo mostra comprometido, % realizado e meta% — o `limite` em R$ é calculado (`calcular_metodologia.dart`) e não exibido |
 
 Decisões posteriores ao plano (histórico de meses, reabertura, esquema) estão registradas em
 `.claude/requisitos-app-financas.md` e no histórico de decisões do projeto.
@@ -124,8 +124,8 @@ lib/
 ```
 
 Providers Riverpod expõem `AppDatabase`, repositórios e casos de uso; os notifiers de tela
-consomem casos de uso. Nos testes, repositórios são substituídos por fakes via
-`ProviderContainer(overrides: [...])`.
+consomem casos de uso. Nos testes, os repositórios drift são instanciados direto sobre um
+banco em memória (`NativeDatabase.memory()`) — não há fakes.
 
 ### Navegação (3 menus fixos)
 `ShellPage` = `Scaffold` com `NavigationBar` de 3 destinos e `IndexedStack` das 3 abas. Um
@@ -204,7 +204,7 @@ acesso do novo mês: gera ocorrências, grava `FechamentoMensal` (snapshot) e mo
 do mês fechado (RF-16..18). Histórico = seletor de meses em modo leitura nas abas Contas/Gráfico.
 
 **M7 — Configurações + Exportação + Backup.** Percentuais configuráveis (soma 100%, RF-15);
-exportação CSV/XLSX no formato da checklist + JSON de backup (RF-19); apagar todos os dados com
+exportação CSV no formato da checklist + JSON de backup (RF-19); apagar todos os dados com
 dupla confirmação (RF-20). **`BackupService`**: push/restore do backup no Realtime Database por
 UID (botão manual, push no logout, oferta de restauração ao logar em novo aparelho) + regras de
 segurança por UID.

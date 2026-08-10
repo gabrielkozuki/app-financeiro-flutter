@@ -89,6 +89,29 @@ void main() {
       expect(await contas.listarAtivas(), isEmpty);
       expect((await contas.listarTodas()).length, 1); // segue no histórico
     });
+
+    test('aplicar aos próximos meses atinge só pendentes futuros (RF-07/RN-03)',
+        () async {
+      final id = await contas.criar(contaFixa('Energia', Grupo.necessidade, 200));
+      for (final mes in ['2026-06', '2026-07', '2026-08', '2026-09']) {
+        await contas.inserirOcorrencia(
+            contaId: id, mesReferencia: mes, valorPlanejado: 200);
+      }
+      // Julho já foi pago com valor próprio: o realizado não pode ser reescrito.
+      final julho = (await contas.ocorrenciasDoMes('2026-07')).single;
+      await contas.marcarPaga(julho.id, valorPago: 210);
+
+      await contas.atualizarValorOcorrenciasAPartirDe(id, '2026-07', 350);
+
+      // Mês anterior é recorte fechado — intocado.
+      expect((await contas.ocorrenciasDoMes('2026-06')).single.valorPlanejado, 200);
+      // Paga preserva o que foi pago de fato (RN-04).
+      expect((await contas.ocorrenciasDoMes('2026-07')).single.valorEfetivo, 210);
+      // Pendentes daqui em diante recebem o novo valor — inclusive meses que a
+      // virada já havia materializado, que era o buraco do switch.
+      expect((await contas.ocorrenciasDoMes('2026-08')).single.valorPlanejado, 350);
+      expect((await contas.ocorrenciasDoMes('2026-09')).single.valorPlanejado, 350);
+    });
   });
 
   group('Entradas e configuração', () {
@@ -158,6 +181,28 @@ void main() {
       expect(await cartoes.listarAtivos(), isEmpty);
       expect(await cartoes.faturasDoMes('2026-07'), isEmpty);
       expect(await cartoes.rateiosDaFatura(faturaId), isEmpty);
+    });
+
+    test('excluir pela tela preserva as faturas de meses fechados (RF-18)',
+        () async {
+      final cartaoId = await cartoes.criar(
+          const Cartao(id: 0, nome: 'Nubank', diaVencimento: 15));
+      final junho =
+          await cartoes.criarFatura(cartaoId: cartaoId, mesReferencia: '2026-06');
+      await cartoes.definirValorFatura(junho, 900);
+      await cartoes.salvarRateio(junho, {Grupo.necessidade: 900});
+      await cartoes.criarFatura(cartaoId: cartaoId, mesReferencia: '2026-08');
+
+      // O que a tela faz: desativa e limpa do mês corrente em diante.
+      await cartoes.excluirFaturasAPartirDe(cartaoId, '2026-08');
+      await cartoes.definirAtivo(cartaoId, false);
+
+      expect(await cartoes.listarAtivos(), isEmpty, reason: 'some da lista');
+      expect(await cartoes.faturasDoMes('2026-08'), isEmpty);
+      expect((await cartoes.faturasDoMes('2026-06')).single.valorTotal, 900,
+          reason: 'mês fechado continua no histórico');
+      expect(await cartoes.rateiosDaFatura(junho), hasLength(1),
+          reason: 'o rateio do mês fechado acompanha a fatura');
     });
   });
 

@@ -72,7 +72,7 @@ Rafael tem uma renda base previsível e ganhos extras que variam mês a mês. Me
 6. Painel 50-30-20 com barras de progresso por grupo (referência educativa, nunca restrição).
 7. Virada de mês com geração automática das contas recorrentes.
 8. Persistência local dos dados no dispositivo (offline-first).
-9. Exportação como planilha (CSV/XLSX) no formato da checklist.
+9. Exportação como planilha (CSV) no formato da checklist.
 
 ### 3.2 Fora do escopo (MVP)
 
@@ -150,7 +150,7 @@ O cartão é tratado no nível da **fatura**, nunca da transação individual �
 
 ### Módulo G — Configurações e dados
 
-- **RF-19:** O usuário pode exportar seus dados como planilha (CSV/XLSX) no formato da checklist mensal — espelhando a planilha manual que o app substitui — além de JSON para backup completo.
+- **RF-19:** O usuário pode exportar seus dados como planilha (CSV, que abre no Excel e no Google Sheets) no formato da checklist mensal — espelhando a planilha manual que o app substitui — além de JSON para backup completo.
 - **RF-20:** O usuário pode apagar todos os dados do app (com confirmação dupla).
 
 ---
@@ -230,10 +230,10 @@ Como projeto de estudo, as métricas servem para simular a visão de produto:
 
 - **Framework:** Flutter (decisão tomada), com publicação inicial no **Android**, distribuído como APK/AAB por link público no GitHub Releases (CE-03/CE-04) — o desenvolvimento é feito no Windows e não depende de conta Apple Developer para entregar. **iOS/App Store** fica para fase seguinte, quando o autor usar o Mac; exige conta Apple Developer (US$ 99/ano) e revisão da Apple.
 - **Persistência local:** SQLite via **drift** (type-safe, com migrações e boa testabilidade) — alinhado ao offline-first (RNF-01). Uma conta tem no máximo uma ocorrência por mês (e um cartão, uma fatura), garantido por restrição de unicidade no banco: é o que torna a virada do mês idempotente (RF-16/RN-05).
-- **Estado:** **Riverpod**, com os repositórios expostos por interface e substituídos por fakes nos testes.
+- **Estado:** **Riverpod**, com os repositórios expostos por interface (o domínio declara o contrato, a camada de dados implementa). Nos testes o *test double* é o próprio banco em memória, não um fake: o SQL faz parte da regra testada.
 - **Navegação:** **exatamente 3 menus fixos** (Contas | Gráfico | Configurações). Formulários e detalhes abrem sobrepostos com `Navigator` nativo, folhas modais e diálogos — nunca viram um 4º menu. Sem pacote de rotas (`go_router`), por simplicidade (CE-02 é atendido pelo `Navigator`).
 - **Arquitetura:** camadas UI → casos de uso → repositórios → persistência, com a lógica de domínio (cálculos da metodologia, geração do mês, parcelas, rateio de fatura) isolada da UI e coberta por testes unitários (RNF-06). Essa separação rende bom material de README para o portfólio.
-- **Exportação:** geração de CSV/XLSX no dispositivo; na fase 2, upload para o Google Drive via API oficial.
+- **Exportação:** geração de CSV no dispositivo; na fase 2, upload para o Google Drive via API oficial.
 
 ## 14. Critérios obrigatórios de entrega
 
