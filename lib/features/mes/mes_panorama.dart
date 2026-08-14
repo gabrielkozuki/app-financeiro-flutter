@@ -101,12 +101,23 @@ final panoramaMesProvider =
     );
   }
 
+  // O retrato é lido antes da virada porque também DECIDE a virada: existir
+  // retrato significa que este mês já foi congelado, e mês congelado nunca é
+  // gerado — nem que o relógio do aparelho diga que ele é o mês corrente.
+  final retrato = await fechRepo.doMes(mes);
+
   // Virada de mês (RF-16): só o mês corrente e os futuros geram as ocorrências
   // das contas fixas e as faturas que ainda não existem. Mês passado NUNCA é
   // gerado — é recorte histórico (RN-05), inclusive quando reaberto: reabrir
   // serve para corrigir o que já existe naquele mês, não para injetar nele as
   // contas de hoje.
-  if (!ehPassado) {
+  //
+  // A segunda condição protege de um relógio atrasado: voltando a data do
+  // aparelho para um mês já fechado, ele voltaria a parecer "corrente" e a
+  // virada injetaria ocorrências nele. A checklist passaria a mostrá-las e o
+  // painel continuaria lendo o retrato antigo — divergência silenciosa e
+  // permanente entre as duas visões do mesmo mês.
+  if (!ehPassado && retrato == null) {
     await _gerarMes(mes,
         contasRepo: contasRepo,
         cartoesRepo: cartoesRepo,
@@ -123,10 +134,9 @@ final panoramaMesProvider =
   // grupo. É o que torna o histórico de fato congelado (RN-06): recalcular ao
   // vivo faria o passado se mexer sempre que a conta de origem mudasse.
   // Fora daí, calcula ao vivo.
-  FechamentoMensal? snapshot;
-  if (ehPassado && !reaberto.contains(mes)) {
-    snapshot = await fechRepo.doMes(mes);
-  }
+  // Reaberto lê ao vivo: é justamente a correção que está sendo feita.
+  final snapshot =
+      (ehPassado && !reaberto.contains(mes)) ? retrato : null;
   final renda = snapshot?.rendaTotal ?? await entradasRepo.rendaDoMes(mes);
   final config = snapshot?.snapshotPercentuais ?? await configRepo.vigenteEm(mes);
   final metodologia = const CalcularMetodologia()(

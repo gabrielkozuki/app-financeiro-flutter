@@ -99,6 +99,11 @@ passados. É um desenho deliberado, aprovado, não um descuido. Consequências a
   arrisca rejeição na publicação.
 - **Excluir conta** (diretriz 5.1.1(v) da App Store) é diferente de "apagar dados locais":
   precisa remover o `backups/{uid}` e a conta no Firebase, não só o banco.
+- **Não existe "restaurar de arquivo".** O backup de verdade é o da nuvem; um
+  segundo canal de restauração seria uma segunda fonte para a mesma coisa. O
+  JSON exportado em Configurações é portabilidade do dado (RF-19), não canal de
+  restauração. `BackupService.importarJson` existe e é testado — quem o chama é
+  o restore da nuvem.
 - **Backup:** blob JSON por UID no Realtime Database, *last-wins*. Perguntar no
   logout antes de enviar; ao logar com UID diferente do último visto, perguntar
   "usar os dados deste aparelho" vs "restaurar os da conta" com a data do backup.
@@ -117,8 +122,10 @@ pastas `core`/`domain`/`data`/`features`.
 
 **Testes cobrem apenas regra de negócio** — `test/unit/` (regras puras) e `test/persistence/`
 (drift em memória, sem `mocktail` e **sem fakes** — o SQL faz parte da regra testada, então o
-*test double* é o próprio banco). **Não escreva testes de widget/UI**: foi excluído por
-decisão expressa.
+*test double* é o próprio banco). Testes de widget e de integração são permitidos desde
+04/08/2026 — a restrição anterior existia para manter a suíte enxuta, não por princípio.
+`integration_test/` roda o app de verdade num emulador Android (`flutter test integration_test`),
+e é o único lugar que exercita navegação, tradução e os fluxos ponta a ponta.
 
 *"Simplicidade acima de completude"* é princípio de produto: proposta que adiciona complexidade
 precisa justificar o ganho.

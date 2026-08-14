@@ -505,7 +505,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           Expanded(
             child: _contas.isEmpty
                 ? Center(
-                    child: Text('Nenhuma conta adicionada ainda.',
+                    child: Text(l10n.onboardingContasVazio,
                         style: textTheme.bodyMedium),
                   )
                 : ListView.builder(
@@ -518,7 +518,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           leading: GroupAvatar(
                               icone: c.grupo.icone, cor: c.grupo.cor, tamanho: 36),
                           title: Text(c.nome),
-                          subtitle: Text('Vence dia ${c.dia}'),
+                          subtitle: Text(l10n.venceDia(c.dia)),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -561,7 +561,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           if (_pagina > 0)
             TextButton(
               onPressed: _salvando ? null : () => _irPara(_pagina - 1),
-              child: const Text('Voltar'),
+              child: Text(l10n.acaoVoltar),
             ),
           const Spacer(),
           FilledButton(

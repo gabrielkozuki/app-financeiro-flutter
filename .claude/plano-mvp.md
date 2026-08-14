@@ -24,7 +24,10 @@ qualidade e distribuição; virou três marcos com um propósito cada):
   projeto Firebase, que depende da conta do usuário — guia em `docs/configurar-firebase.md`
   (as dependências foram REMOVIDAS do `pubspec.yaml` até aqui; ver passo 4 do guia).
   Inclui a exclusão de conta que a diretriz 5.1.1(v) da App Store exige: apagar o
-  `backups/{uid}` e a conta em si, não só o dado local.
+  `backups/{uid}` e a conta em si, não só o dado local. **Restaurar só da nuvem**
+  — a restauração por arquivo foi descartada em 04/08/2026 (duas fontes para o
+  mesmo backup), e o `file_picker` saiu do projeto: nem a v11 nem a v12-beta
+  convivem com o Kotlin embutido do Flutter 3.44 e o `share_plus`.
 - **M10 — Publicação (CE-03/CE-04).** Keystore de release e assinatura própria, ícone e
   splash reais, política de privacidade, `flutter build apk --release` e GitHub Release.
   A parte de acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos ≥44dp,
@@ -43,7 +46,7 @@ Divergências deliberadas, aprovadas ao longo do desenvolvimento:
 | `data/db/daos/` com DAOs por agregado | Repositórios drift acessando o banco direto | Camada a mais sem ganho: os repositórios já são a fronteira de persistência |
 | `data/sync/backup_service.dart` | `data/export_service.dart` (`exportarJson`/`importarJson`), que será a base do backup | O mesmo serializador atende RF-19 e o backup do M8 |
 | `mocktail` nos testes | Drift em memória, **sem fakes** | Decisão do usuário; o pacote foi removido do `pubspec.yaml`. O SQL faz parte da regra testada, então o *test double* é o próprio banco |
-| "testes de widget das abas principais" na verificação | Somente testes de regra de negócio (`test/unit/`, `test/persistence/`) | Decisão expressa do usuário: sem testes de widget/UI |
+| "testes de widget das abas principais" na verificação | Regra de negócio em `test/unit/` e `test/persistence/`; fluxos ponta a ponta em `integration_test/` sobre emulador | A restrição a testes de UI foi levantada em 04/08/2026 — existia para manter a suíte enxuta, não por princípio |
 | Casos de uso `AplicarPagamento` e `AtualizarPercentuais` | Regra de pagamento (RN-04) nos repositórios; `ValidarPercentuais` em `usecases/percentuais.dart` | Consolidação; a validação de soma virou usecase testado, o pagamento não precisou de um |
 | `features/auth/` | Ainda não existe | Faz parte do M8 pendente |
 | Painel 50-30-20 "rosca na aba Gráfico (não barras na home)" | Rosca na aba Gráfico, com barra de progresso por grupo nas linhas abaixo dela. A aba Contas tem só a barra de "pago este mês" | Cumprido como planejado. O RF-12 pede planejado/comprometido/limite por grupo; hoje a linha do grupo mostra comprometido, % realizado e meta% — o `limite` em R$ é calculado (`calcular_metodologia.dart`) e não exibido |

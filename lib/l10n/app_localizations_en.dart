@@ -357,10 +357,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'When off, the amount changes for this month only';
 
   @override
-  String get contaFormRecorrenciaFixa => 'Recurring';
+  String get contaFormRecorrenciaFixa => 'Monthly';
 
   @override
-  String get contaFormRecorrenciaPontual => 'This month only';
+  String get contaFormRecorrenciaPontual => 'One-time';
 
   @override
   String get contaFormRecorrenciaParcelada => 'Installments';
@@ -517,7 +517,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rendaTipoRecorrente => 'Recurring';
 
   @override
-  String get rendaTipoPontual => 'This month only';
+  String get rendaTipoPontual => 'One-time';
 
   @override
   String get rendaDiaRecebimento => 'Day you get paid';
@@ -708,19 +708,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupNuvemSubtitulo => 'Available once you sign in';
 
   @override
-  String get backupRestaurarArquivo => 'Restore from a file';
-
-  @override
-  String get backupRestaurarArquivoSubtitulo =>
-      'Pick a JSON backup exported by the app';
-
-  @override
-  String get backupEscolherArquivo => 'Choose the backup (.json)';
-
-  @override
-  String get backupErroLerArquivo => 'We couldn\'t read that file.';
-
-  @override
   String get backupRestaurarTitulo => 'Restore backup?';
 
   @override
@@ -839,4 +826,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingErroConcluir => 'We couldn\'t finish your setup.';
+
+  @override
+  String get rendaExcluirTitulo => 'Delete this income?';
+
+  @override
+  String rendaExcluirTexto(String nome) {
+    return 'The income \"$nome\" is removed from this month and the next ones. Closed months are not affected.';
+  }
 }

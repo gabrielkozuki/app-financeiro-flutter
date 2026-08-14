@@ -271,4 +271,26 @@ void main() {
     expect(BackupService.geradoEm('{"contas":[]}'), isNull);
     expect(BackupService.geradoEm('lixo'), isNull);
   });
+
+  test('backup vazio é recusado — não apaga os dados do aparelho', () async {
+    await semear();
+    final antes = await retrato();
+
+    // Tem as chaves certas e o envelope certo, mas nenhuma linha: é o formato
+    // de um arquivo truncado ou de um app recém-instalado. Restaurar isso
+    // apagaria tudo e relataria sucesso.
+    final vazio = jsonEncode({
+      'formatoBackup': BackupService.formatoBackupAtual,
+      'geradoEm': DateTime.now().toUtc().toIso8601String(),
+      'contas': <dynamic>[],
+      'entradas': <dynamic>[],
+    });
+    await expectLater(
+        service.importarJson(vazio), throwsA(isA<BackupInvalidoException>()));
+
+    for (final tabela in antes.keys) {
+      expect((await retrato())[tabela], antes[tabela],
+          reason: 'nada pode ter sido apagado');
+    }
+  });
 }

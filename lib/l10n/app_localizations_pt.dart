@@ -709,19 +709,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get backupNuvemSubtitulo => 'Disponível depois de entrar na conta';
 
   @override
-  String get backupRestaurarArquivo => 'Restaurar de um arquivo';
-
-  @override
-  String get backupRestaurarArquivoSubtitulo =>
-      'Escolha um backup JSON exportado pelo app';
-
-  @override
-  String get backupEscolherArquivo => 'Escolha o backup (.json)';
-
-  @override
-  String get backupErroLerArquivo => 'Não foi possível ler o arquivo.';
-
-  @override
   String get backupRestaurarTitulo => 'Restaurar backup?';
 
   @override
@@ -841,4 +828,12 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get onboardingErroConcluir =>
       'Não foi possível concluir seu cadastro.';
+
+  @override
+  String get rendaExcluirTitulo => 'Excluir esta renda?';
+
+  @override
+  String rendaExcluirTexto(String nome) {
+    return 'A renda \"$nome\" sai do cálculo deste mês e dos próximos. Meses já fechados não são afetados.';
+  }
 }

@@ -26,7 +26,15 @@ class RootGate extends ConsumerWidget {
           s,
           contexto: 'RootGate',
           titulo: AppLocalizations.of(context).erroAbrirDados,
-          onTentarNovamente: () => ref.invalidate(precisaOnboardingProvider),
+          // Invalida o BANCO, não só a leitura: a conexão é preguiçosa
+          // (`DatabaseConnection.delayed`), então tentar de novo sobre a mesma
+          // instância repetiria exatamente a falha. Recriando o `dbProvider`,
+          // uma falha transitória (permissão, arquivo em uso) tem chance real
+          // de se recuperar.
+          onTentarNovamente: () {
+            ref.invalidate(dbProvider);
+            ref.invalidate(precisaOnboardingProvider);
+          },
         ),
       ),
       data: (precisaOnboarding) =>

@@ -512,10 +512,6 @@
   "backupSecao": "Backup",
   "backupNuvem": "Backup na nuvem",
   "backupNuvemSubtitulo": "Disponível depois de entrar na conta",
-  "backupRestaurarArquivo": "Restaurar de um arquivo",
-  "backupRestaurarArquivoSubtitulo": "Escolha um backup JSON exportado pelo app",
-  "backupEscolherArquivo": "Escolha o backup (.json)",
-  "backupErroLerArquivo": "Não foi possível ler o arquivo.",
   "backupRestaurarTitulo": "Restaurar backup?",
   "backupRestaurarTituloComData": "Restaurar backup de {data}?",
   "@backupRestaurarTituloComData": {
@@ -574,5 +570,14 @@
   "onboardingSugestaoReserva": "Reserva de emergência",
   "onboardingSairTitulo": "Sair e perder o que você já digitou?",
   "onboardingSairTexto": "Suas rendas e contas ainda não foram salvas. Você pode continuar de onde parou.",
-  "onboardingErroConcluir": "Não foi possível concluir seu cadastro."
+  "onboardingErroConcluir": "Não foi possível concluir seu cadastro.",
+  "rendaExcluirTitulo": "Excluir esta renda?",
+  "rendaExcluirTexto": "A renda \"{nome}\" sai do cálculo deste mês e dos próximos. Meses já fechados não são afetados.",
+  "@rendaExcluirTexto": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  }
 }

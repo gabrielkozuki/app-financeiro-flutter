@@ -137,6 +137,20 @@ class BackupService {
     final faturas = semDuplicatasDeMes(lista('faturas'), 'cartaoId');
     final idsDeFatura = {for (final f in faturas) f['id']};
 
+    // Restaurar começa apagando TUDO. Um arquivo truncado ou de um app recém
+    // instalado tem as chaves certas e nenhuma linha — sem esta checagem, ele
+    // apagaria os dados do usuário e ainda relataria sucesso, sem desfazer.
+    const tabelas = [
+      'entradas', 'contas', 'cartoes', 'rateios', 'configuracoes', 'fechamentos'
+    ];
+    final totalLinhas = ocorrencias.length +
+        faturas.length +
+        tabelas.fold<int>(0, (s, t) => s + lista(t).length);
+    if (totalLinhas == 0) {
+      throw const BackupInvalidoException(
+          'Este backup está vazio — não há nada para restaurar.');
+    }
+
     await _db.transaction(() async {
       await apagarTudo();
       for (final m in lista('entradas')) {

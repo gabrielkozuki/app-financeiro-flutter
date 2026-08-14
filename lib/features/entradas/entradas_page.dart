@@ -218,11 +218,31 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
   }
 
   Future<void> _excluir() async {
+    final l10n = AppLocalizations.of(context);
+    // Confirmação como em conta e cartão: a exclusão é imediata e sem desfazer,
+    // e o ícone de lixeira fica no cabeçalho da folha, fácil de tocar sem querer.
+    final confirmou = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.rendaExcluirTitulo),
+        content: Text(l10n.rendaExcluirTexto(widget.entrada!.nome)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.acaoCancelar)),
+          FilledButton.tonal(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.acaoExcluir)),
+        ],
+      ),
+    );
+    if (confirmou != true || !mounted) return;
+
     setState(() => _salvando = true);
     final ok = await executarComFeedback(
       context,
       () => ref.read(entradasRepoProvider).excluir(widget.entrada!.id),
-      mensagemErro: AppLocalizations.of(context).rendaErroExcluir,
+      mensagemErro: l10n.rendaErroExcluir,
     );
     _concluir(ok);
   }

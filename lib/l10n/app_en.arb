@@ -258,8 +258,8 @@
   "contaFormValorPago": "Amount paid (if different from planned)",
   "contaFormAplicarProximos": "Apply this amount to the coming months",
   "contaFormAplicarProximosDescricao": "When off, the amount changes for this month only",
-  "contaFormRecorrenciaFixa": "Recurring",
-  "contaFormRecorrenciaPontual": "This month only",
+  "contaFormRecorrenciaFixa": "Monthly",
+  "contaFormRecorrenciaPontual": "One-time",
   "contaFormRecorrenciaParcelada": "Installments",
   "contaFormNumeroParcelas": "Number of installments",
   "contaFormValidacaoParcelas": "Between 1 and 120",
@@ -400,7 +400,7 @@
   "rendasTotalDoMes": "MONTHLY TOTAL",
   "rendaNomeHint": "e.g. Salary",
   "rendaTipoRecorrente": "Recurring",
-  "rendaTipoPontual": "This month only",
+  "rendaTipoPontual": "One-time",
   "rendaDiaRecebimento": "Day you get paid",
   "rendaEntraApenasEm": "Counts in {mes} only.",
   "@rendaEntraApenasEm": {
@@ -506,10 +506,6 @@
   "backupSecao": "Backup",
   "backupNuvem": "Cloud backup",
   "backupNuvemSubtitulo": "Available once you sign in",
-  "backupRestaurarArquivo": "Restore from a file",
-  "backupRestaurarArquivoSubtitulo": "Pick a JSON backup exported by the app",
-  "backupEscolherArquivo": "Choose the backup (.json)",
-  "backupErroLerArquivo": "We couldn't read that file.",
   "backupRestaurarTitulo": "Restore backup?",
   "backupRestaurarTituloComData": "Restore the backup from {data}?",
   "@backupRestaurarTituloComData": {
@@ -568,5 +564,14 @@
   "onboardingSugestaoReserva": "Emergency fund",
   "onboardingSairTitulo": "Leave and lose what you've entered?",
   "onboardingSairTexto": "Your income and bills haven't been saved yet. You can pick up right where you left off.",
-  "onboardingErroConcluir": "We couldn't finish your setup."
+  "onboardingErroConcluir": "We couldn't finish your setup.",
+  "rendaExcluirTitulo": "Delete this income?",
+  "rendaExcluirTexto": "The income \"{nome}\" is removed from this month and the next ones. Closed months are not affected.",
+  "@rendaExcluirTexto": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  }
 }

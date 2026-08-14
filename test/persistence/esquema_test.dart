@@ -166,4 +166,28 @@ void main() {
       expect(await cartoes.faturasDoMes('2026-07'), hasLength(1));
     });
   });
+
+  group('Chaves estrangeiras aplicadas', () {
+    test('ocorrência órfã é recusada pelo banco, não gravada em silêncio',
+        () async {
+      // O SQLite ignora FK por padrão; o `beforeOpen` liga o PRAGMA. Sem isso,
+      // um backup adulterado gravaria uma ocorrência apontando para conta
+      // inexistente: ela sumiria da checklist (que junta por conta) e ainda
+      // ocuparia a chave única (conta, mês) para sempre.
+      await expectLater(
+        contas.inserirOcorrencia(
+            contaId: 999, mesReferencia: '2026-07', valorPlanejado: 100),
+        throwsA(anything),
+      );
+      expect(await contas.ocorrenciasDoMes('2026-07'), isEmpty);
+    });
+
+    test('fatura órfã também é recusada', () async {
+      await expectLater(
+        cartoes.criarFatura(cartaoId: 999, mesReferencia: '2026-07'),
+        throwsA(anything),
+      );
+      expect(await cartoes.faturasDoMes('2026-07'), isEmpty);
+    });
+  });
 }

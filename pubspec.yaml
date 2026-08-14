@@ -50,15 +50,18 @@ dependencies:
   intl: ^0.20.2
   fl_chart: ^1.2.0
   csv: ^8.0.0
-  # share_plus preso na 12.x e file_picker na 11.x porque as duas divergem em
-  # `win32` (13.x pede ^6, o picker pede ^5.9). O app só tem Android e iOS, onde
-  # win32 nunca é compilado — a API usada (`SharePlus.instance.share`) é a mesma
-  # nas duas. Se algum dia houver target Windows, isto precisa ser revisto.
+  # share_plus preso na 12.x: a 13.x não compila com o Kotlin embutido do
+  # Flutter 3.44 (`:share_plus:compileDebugKotlin` falha). A API usada
+  # (`SharePlus.instance.share`) é a mesma nas duas.
   share_plus: ^12.0.2
-  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  # Testes ponta a ponta rodando o app de verdade num emulador Android:
+  # `flutter test integration_test -d <emulador>`. Não roda em `flutter test`
+  # comum, que é headless — a suíte de regra de negócio segue separada.
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to

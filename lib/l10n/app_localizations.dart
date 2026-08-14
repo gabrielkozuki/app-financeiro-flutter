@@ -1290,30 +1290,6 @@ abstract class AppLocalizations {
   /// **'Disponível depois de entrar na conta'**
   String get backupNuvemSubtitulo;
 
-  /// No description provided for @backupRestaurarArquivo.
-  ///
-  /// In pt, this message translates to:
-  /// **'Restaurar de um arquivo'**
-  String get backupRestaurarArquivo;
-
-  /// No description provided for @backupRestaurarArquivoSubtitulo.
-  ///
-  /// In pt, this message translates to:
-  /// **'Escolha um backup JSON exportado pelo app'**
-  String get backupRestaurarArquivoSubtitulo;
-
-  /// No description provided for @backupEscolherArquivo.
-  ///
-  /// In pt, this message translates to:
-  /// **'Escolha o backup (.json)'**
-  String get backupEscolherArquivo;
-
-  /// No description provided for @backupErroLerArquivo.
-  ///
-  /// In pt, this message translates to:
-  /// **'Não foi possível ler o arquivo.'**
-  String get backupErroLerArquivo;
-
   /// No description provided for @backupRestaurarTitulo.
   ///
   /// In pt, this message translates to:
@@ -1523,6 +1499,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Não foi possível concluir seu cadastro.'**
   String get onboardingErroConcluir;
+
+  /// No description provided for @rendaExcluirTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir esta renda?'**
+  String get rendaExcluirTitulo;
+
+  /// No description provided for @rendaExcluirTexto.
+  ///
+  /// In pt, this message translates to:
+  /// **'A renda \"{nome}\" sai do cálculo deste mês e dos próximos. Meses já fechados não são afetados.'**
+  String rendaExcluirTexto(String nome);
 }
 
 class _AppLocalizationsDelegate

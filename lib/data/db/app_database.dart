@@ -37,6 +37,20 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration =>
-      MigrationStrategy(onCreate: (m) => m.createAll());
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        // O SQLite ignora as chaves estrangeiras por padrão: as `references`
+        // de `tables.dart` seriam só documentação. Ligar aqui (e não no
+        // `driftDatabase`) faz valer também nos testes, que constroem o banco
+        // em memória.
+        //
+        // Importa sobretudo no restore, que aceita um JSON arbitrário: sem
+        // isto, uma ocorrência apontando para conta inexistente entrava calada,
+        // sumia da checklist e ocupava a chave (conta, mês) para sempre. Agora
+        // o insert falha e a transação inteira volta atrás, com erro visível.
+        // Todas as exclusões do app já removem filhos antes do pai.
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+        },
+      );
 }
