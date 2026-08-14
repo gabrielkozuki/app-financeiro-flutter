@@ -49,4 +49,4 @@ flutter test                  # regras de negócio e persistência
 
 MVP funcional rodando offline, em pt-BR e en-US, com ícone e identidade visual próprios.
 Em andamento: autenticação e backup na nuvem com Firebase (`docs/m9-auth-backup.md`).
-A publicação é o último passo — ver `docs/distribuicao.md`.
+A publicação na App Store é o último passo — ver `docs/distribuicao.md`.

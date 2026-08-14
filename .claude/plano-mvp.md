@@ -4,18 +4,46 @@
 > decisão. O texto abaixo da seção "Status" é o original e **não** foi reescrito conforme a
 > implementação avançou — leia-o como o que foi planejado, e esta seção como o que foi feito.
 
+## O caminho crítico até publicar
+
+**Destino: App Store** (decidido em 14/08/2026). Sem Play Store e sem APK por GitHub Releases.
+O projeto **continua compilando e sendo testado no Android** — `integration_test/` roda em
+emulador Android; o que mudou é o destino, não o alvo de build.
+
+Toda a **preparação** está feita: identidade, ícone, splash, tradução, acessibilidade, os
+assets de iOS que não exigem Xcode e os roteiros em `docs/`. Restam quatro coisas.
+
+| # | O quê | Quem começa | Bloqueia |
+|---|---|---|---|
+| 1 | Configurar o Firebase (`docs/m9-auth-backup.md`, Parte 1) | **Você** — console + `flutterfire configure` | O M9 inteiro, e o CE-06 |
+| 2 | Mac com Xcode + Apple Developer Program (US$ 99/ano) | **Você** | Todo o resto de iOS |
+| 3 | Política de privacidade (`docs/politica-privacidade.md`) | Depois do M9 | Envio à loja |
+| 4 | Envio (`docs/distribuicao.md`) | Depois de 1–3 | — |
+
+**1 e 2 são independentes** e podem correr em paralelo, mas o `flutterfire configure` precisa
+ser rodado **de novo com iOS marcado** quando o Mac existir — o `GoogleService-Info.plist` e o
+*URL scheme* do Google Sign-In no iOS não saem da configuração de Android.
+
+**Consequência aceita da decisão:** CE-03 e CE-04 passam a depender de hardware Apple,
+mensalidade anual e revisão humana. Eram os dois critérios que um APK no GitHub Releases
+fecharia sem custo. Publicar deixou de ser um passo de meia hora e virou um marco com
+dependência externa.
+
+O caminho Android está preservado em `docs/assinar-release.md`, marcado como fora do caminho
+atual, caso a decisão volte atrás.
+
 ## Status da execução
 
-**M0–M7 concluídos.** App funcional offline no Android: onboarding, três abas, contas e
-ocorrências mensais, entradas, cartões com fatura e rateio, virada de mês com `FechamentoMensal`,
-percentuais configuráveis, exportação CSV/JSON e exclusão total. `flutter analyze` sem
-issues; 43 testes de regra de negócio passando.
+**M0–M8 concluídos.** App funcional offline no Android, em pt-BR e en-US: onboarding, três
+abas, contas e ocorrências mensais, entradas, cartões com fatura e rateio, virada de mês com
+`FechamentoMensal`, percentuais configuráveis, exportação CSV/JSON e exclusão total.
+`flutter analyze` sem issues; 66 testes de regra de negócio e 9 de integração sobre emulador.
 
-**Marcos restantes** (renumerados em 04/08/2026 — o M8 original agrupava auth,
+**Os marcos** (renumerados em 04/08/2026 — o M8 original agrupava auth,
 qualidade e distribuição; virou três marcos com um propósito cada):
 
-- **M8 — Tradução (pt-BR + en-US).** `flutter_localizations` + ARB, as ~133 strings de UI
-  saem dos widgets, e o nome exibido passa a ser localizado: "Conta em Dia" / "Bills on
+- **M8 — Tradução (pt-BR + en-US). Feito.** `flutter_localizations` + ARB (235 chaves), as
+  strings de UI saem dos widgets, e o nome exibido passa a ser localizado: "Conta em Dia" / "Bills on
   Track". Vem ANTES do auth de propósito: as telas de login, backup e exclusão de conta são
   as mais textuais do app e nasceriam em português para serem traduzidas depois.
   *Código, comentários e documentação seguem em pt-BR* — só o texto visível ao usuário é
@@ -28,13 +56,13 @@ qualidade e distribuição; virou três marcos com um propósito cada):
   — a restauração por arquivo foi descartada em 04/08/2026 (duas fontes para o
   mesmo backup), e o `file_picker` saiu do projeto: nem a v11 nem a v12-beta
   convivem com o Kotlin embutido do Flutter 3.44 e o `share_plus`.
-- **M10 — Publicação (CE-03/CE-04).** Ícone, splash e identidade visual estão **prontos**
-  (`assets/marca/`). Falta a assinatura de release — hoje o APK sai com `CN=Android Debug`
-  (`docs/assinar-release.md`) —, a política de privacidade (`docs/politica-privacidade.md`)
-  e a publicação em si (`docs/distribuicao.md`), que por decisão é o **último passo**: sai
-  só depois do M9, senão o app iria à loja com "Entrar" desabilitado, reprovando na
-  diretriz 2.1. A acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos
-  ≥44dp, rótulos semânticos).
+- **M10 — Publicação na App Store (CE-03/CE-04).** Ícone, splash, identidade visual
+  (`assets/marca/`) e os assets de iOS que não exigem Xcode estão **prontos**. Falta a
+  política de privacidade (`docs/politica-privacidade.md`) e o envio em si
+  (`docs/distribuicao.md`), que por decisão é o **último passo**: sai só depois do M9, senão
+  o app iria à loja com "Entrar" desabilitado, reprovando na diretriz 2.1. Depende de Mac com
+  Xcode e de conta no Apple Developer Program. A acessibilidade do antigo M8 já foi antecipada
+  (contraste ≥4,5:1, alvos ≥44dp, rótulos semânticos).
 
 Identidade definida: **`br.com.gabrielkozuki.contaemdia`** (permanente — é a chave de
 atualização do Android), nome exibido "Conta em Dia".
@@ -47,11 +75,11 @@ Divergências deliberadas, aprovadas ao longo do desenvolvimento:
 |---|---|---|
 | `core/routes.dart` com `onGenerateRoute` e rotas nomeadas | Um helper único em `config_tab.dart:99` com `Navigator.push(MaterialPageRoute(...))`; o resto abre em `showModalBottomSheet`/`showDialog` | Com 3 menus fixos e formulários sobrepostos, uma tabela de rotas nomeadas não se pagava. CE-02 continua atendido (roteamento por `Navigator` entre páginas) |
 | `data/db/daos/` com DAOs por agregado | Repositórios drift acessando o banco direto | Camada a mais sem ganho: os repositórios já são a fronteira de persistência |
-| `data/sync/backup_service.dart` | `data/export_service.dart` (`exportarJson`/`importarJson`), que será a base do backup | O mesmo serializador atende RF-19 e o backup do M8 |
+| `data/sync/backup_service.dart` | `data/export_service.dart` (CSV/JSON de portabilidade, RF-19) e `data/backup_service.dart` (banco inteiro, base do M9) | Acabaram sendo duas coisas: exportar é para o usuário ler na planilha, o backup é para a máquina restaurar. Separados quando o segundo ganhou envelope e validação |
 | `mocktail` nos testes | Drift em memória, **sem fakes** | Decisão do usuário; o pacote foi removido do `pubspec.yaml`. O SQL faz parte da regra testada, então o *test double* é o próprio banco |
 | "testes de widget das abas principais" na verificação | Regra de negócio em `test/unit/` e `test/persistence/`; fluxos ponta a ponta em `integration_test/` sobre emulador | A restrição a testes de UI foi levantada em 04/08/2026 — existia para manter a suíte enxuta, não por princípio |
 | Casos de uso `AplicarPagamento` e `AtualizarPercentuais` | Regra de pagamento (RN-04) nos repositórios; `ValidarPercentuais` em `usecases/percentuais.dart` | Consolidação; a validação de soma virou usecase testado, o pagamento não precisou de um |
-| `features/auth/` | Ainda não existe | Faz parte do M8 pendente |
+| `features/auth/` | Ainda não existe; a tela já está em `features/config/conta_backup_page.dart` | Login não é porta de entrada, então mora em Configurações — uma pasta `auth/` só para isso não se paga. Faz parte do M9 |
 | Painel 50-30-20 "rosca na aba Gráfico (não barras na home)" | Rosca na aba Gráfico, com barra de progresso por grupo nas linhas abaixo dela. A aba Contas tem só a barra de "pago este mês" | Cumprido como planejado. O RF-12 pede planejado/comprometido/limite por grupo; hoje a linha do grupo mostra comprometido, % realizado e meta% — o `limite` em R$ é calculado (`calcular_metodologia.dart`) e não exibido |
 
 Decisões posteriores ao plano (histórico de meses, reabertura, esquema) estão registradas em

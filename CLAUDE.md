@@ -137,6 +137,8 @@ precisa justificar o ganho.
 - `.claude/plano-mvp.md` — plano dos marcos M0–M10, status atual e onde a execução divergiu.
 - `docs/m9-auth-backup.md` — o M9 inteiro: o que só o usuário faz no console do Firebase e o
   que fica para implementar. Substitui o antigo `configurar-firebase.md`.
-- `docs/assinar-release.md` — keystore, `key.properties` e o bloco de assinatura do Gradle.
-- `docs/distribuicao.md` — o passo final: split por ABI, GitHub Release e App Store.
+- `docs/assinar-release.md` — keystore do Android. **Fora do caminho atual**, mantido caso a
+  decisão de publicar só na App Store volte atrás.
+- `docs/distribuicao.md` — o passo final: App Store. Destino único desde 14/08/2026 (sem
+  Play Store, sem APK avulso); o projeto segue compilando e sendo testado no Android.
 - `docs/politica-privacidade.md` — o que a página precisa responder e onde ela mora.

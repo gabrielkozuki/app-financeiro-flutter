@@ -1,5 +1,12 @@
 # Assinar o release (Android)
 
+> **Fora do caminho atual.** Desde 14/08/2026 o destino é a App Store, sem Play Store e sem
+> APK por GitHub Releases — nada aqui é necessário para publicar. O documento fica porque a
+> decisão pode voltar atrás e porque o projeto continua compilando para Android.
+>
+> **Assinatura de iOS não tem relação com isto.** Lá são certificados e perfis de
+> provisionamento da Apple, gerenciados pelo Xcode; ver [`distribuicao.md`](distribuicao.md).
+
 Hoje o `build.gradle.kts` ainda tem o bloco do template:
 
 ```kotlin
@@ -133,10 +140,17 @@ Três coisas, no mesmo lugar seguro (gerenciador de senhas com anexo, ou cofre o
 
 Se um dia publicar no Google Play, ative o **Play App Signing**: o Google passa a guardar a
 chave de assinatura final e o seu keystore vira apenas a chave de *upload*, que pode ser
-substituída em caso de perda. Para distribuição fora da loja (APK no GitHub Releases) essa
-rede de proteção não existe.
+substituída em caso de perda. Para distribuição fora da loja (APK avulso) essa rede de
+proteção não existe.
 
-## Depois disso
+## Se a decisão voltar atrás
 
-Ver [`distribuicao.md`](distribuicao.md) — o release em si (split por ABI, AAB, App Store)
-é o último passo do projeto.
+Duas coisas que só aparecem quando o Android volta ao caminho:
+
+- **O APK sai com 58 MB** porque empacota `arm64-v8a`, `armeabi-v7a` e `x86_64`. Fora do Play
+  não existe intermediário montando o pacote por aparelho, então a divisão tem que acontecer
+  no build: `flutter build apk --release --split-per-abi`, publicando o `arm64-v8a` (~20 MB).
+  O `x86_64` é emulador e não serve a nenhum celular.
+- **O SHA-1 do keystore de release** precisa ser registrado no Firebase, além do de debug
+  (passo 1.6 de [`m9-auth-backup.md`](m9-auth-backup.md)). Esquecer faz o Google Sign-In
+  funcionar em desenvolvimento e falhar em silêncio no APK publicado.

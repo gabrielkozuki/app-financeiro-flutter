@@ -1,6 +1,6 @@
 # Política de privacidade
 
-As duas lojas exigem **uma URL pública** — não um PDF anexado, não um texto dentro do app.
+A App Store exige **uma URL pública** — não um PDF anexado, não um texto dentro do app.
 Precisa estar no ar antes do envio e continuar no ar depois.
 
 O plano é uma página estática única, no seu domínio, versionada aqui no repositório e
@@ -69,9 +69,11 @@ de finanças quer saber primeiro.
 - O backup fica em `backups/{uid}` até ser sobrescrito (*last-wins*) ou excluído.
 - **Excluir a conta dentro do app** remove `backups/{uid}` e a conta no Firebase Auth
   (diretriz 5.1.1(v)). Diga que existe e onde fica.
-- Desinstalar o app apaga o banco local — e, com `allowBackup="false"`, o Android **não**
-  guarda cópia. Quem desinstalar sem backup na nuvem perde os dados. Isso precisa estar
-  escrito; é a consequência que mais surpreende usuário.
+- **Desinstalar o app apaga o banco local.** Quem desinstalar sem backup na nuvem perde os
+  dados. Isso precisa estar escrito; é a consequência que mais surpreende usuário.
+  No Android o app usa `allowBackup="false"`, então o sistema também não guarda cópia.
+  **Conferir no iOS antes de publicar:** o diretório do banco pode entrar no backup do iCloud
+  por padrão — se entrar, a frase acima fica imprecisa e o texto precisa dizer isso.
 
 ### Direitos do titular (LGPD)
 Acesso, correção, portabilidade e eliminação. Na prática: os dados já estão no aparelho da
@@ -94,9 +96,9 @@ Sugestão de URL: `https://gabrielkozuki.com.br/conta-em-dia/privacidade`.
 
 Depois de publicar:
 
-1. Cole a URL no **App Store Connect** e, se for o caso, no **Google Play Console**.
-2. Coloque um link para ela dentro do app, em Configurações. Não é obrigatório na Apple, mas é
-   o primeiro lugar onde a pessoa procura — e a Play exige um link acessível na ficha.
+1. Cole a URL no **App Store Connect**.
+2. Coloque um link para ela dentro do app, em Configurações. Não é obrigatório, mas é o
+   primeiro lugar onde a pessoa procura.
 3. Confirme que a URL responde **sem login e sem redirecionamento** — o revisor abre direto.
 
 ## Ressalva
