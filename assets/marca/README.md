@@ -66,6 +66,8 @@ tema Material You).
 | `ic_launcher_monochrome.png` | `mipmap-*` | Silhueta de UMA cor. O Material You descarta a cor e usa só o alfa — reaproveitar a camada colorida acopla as duas sem querer |
 | `splash_marca[_escura].png` | `mipmap-*` | Marca do splash, sem fundo. `drawable-night-v21/` escolhe a escura |
 | `icone.svg` | `assets/marca/` | Vetor |
+| `Icon-App-*.png` (15) | `ios/.../AppIcon.appiconset` | Tamanhos lidos do próprio `Contents.json`. **RGB, sem alfa** — iOS recusa ícone com transparência, o inverso do adaptativo do Android |
+| `LaunchImage[@2x,@3x].png` | `ios/.../LaunchImage.imageset` | Marca do launch screen, com transparência (o fundo vem do storyboard) |
 
 **O Android não troca ícone de launcher por tema claro/escuro** — não existe
 `mipmap-night`. O único caminho ciente de tema é a camada `monochrome`. O splash

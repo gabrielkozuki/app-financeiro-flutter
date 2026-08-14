@@ -138,6 +138,35 @@ def marca_svg(t=512, com_fundo=True, escuro=False):
     return '\n'.join(linhas)
 
 
+def gerar_ios():
+    """Lê os tamanhos do próprio `Contents.json` em vez de repetir a lista aqui:
+    o catálogo é a fonte da verdade e muda entre versões do Xcode.
+
+    **Ícone de iOS não pode ter canal alfa** — o envio é recusado. É o oposto do
+    adaptativo do Android, que exige transparência na camada de frente. Daí o
+    `convert('RGB')` no fim, e não um `com_fundo` diferente.
+    """
+    import json
+    base = 'ios/Runner/Assets.xcassets'
+    cat = f'{base}/AppIcon.appiconset'
+    with open(f'{cat}/Contents.json', encoding='utf-8') as f:
+        imagens = json.load(f)['images']
+
+    tamanhos = {}
+    for i in imagens:
+        px = round(float(i['size'].split('x')[0]) * int(i['scale'][0]))
+        tamanhos[i['filename']] = px
+    for nome, px in sorted(tamanhos.items(), key=lambda x: x[1]):
+        marca(px).convert('RGB').save(f'{cat}/{nome}')
+
+    # Launch screen: a marca sobre a cor de fundo do storyboard, então aqui SIM
+    # com transparência. 1x = 128 pt, as mesmas do splash do Android.
+    for sufixo, px in [('', 128), ('@2x', 256), ('@3x', 384)]:
+        marca(px, com_fundo=False).save(
+            f'{base}/LaunchImage.imageset/LaunchImage{sufixo}.png')
+    return len(tamanhos)
+
+
 if __name__ == '__main__':
     with open('assets/marca/icone.svg', 'w', encoding='utf-8') as f:
         f.write(marca_svg() + '\n')
@@ -163,4 +192,6 @@ if __name__ == '__main__':
         marca(px, com_fundo=False, escuro=True).save(
             f'android/app/src/main/res/mipmap-{pasta}/splash_marca_escura.png')
 
-    print('ícone, monochrome e splash gerados em todas as densidades')
+    n = gerar_ios()
+    print(f'ícone, monochrome e splash gerados em todas as densidades '
+          f'(+{n} ícones de iOS e a LaunchImage)')

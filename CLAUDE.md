@@ -135,4 +135,8 @@ precisa justificar o ganho.
 - `.claude/requisitos-app-financas.md` — requisitos (RF/RN/RNF) e os critérios de entrega
   CE-01..CE-06. É a fonte da verdade; amarre mudanças a ele.
 - `.claude/plano-mvp.md` — plano dos marcos M0–M10, status atual e onde a execução divergiu.
-- `docs/configurar-firebase.md` — o que falta para o M9 (auth + backup).
+- `docs/m9-auth-backup.md` — o M9 inteiro: o que só o usuário faz no console do Firebase e o
+  que fica para implementar. Substitui o antigo `configurar-firebase.md`.
+- `docs/assinar-release.md` — keystore, `key.properties` e o bloco de assinatura do Gradle.
+- `docs/distribuicao.md` — o passo final: split por ABI, GitHub Release e App Store.
+- `docs/politica-privacidade.md` — o que a página precisa responder e onde ela mora.

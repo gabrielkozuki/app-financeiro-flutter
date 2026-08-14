@@ -21,17 +21,20 @@ qualidade e distribuição; virou três marcos com um propósito cada):
   *Código, comentários e documentação seguem em pt-BR* — só o texto visível ao usuário é
   localizado.
 - **M9 — Auth Firebase + backup na nuvem (CE-05/CE-06).** Bloqueado pela configuração do
-  projeto Firebase, que depende da conta do usuário — guia em `docs/configurar-firebase.md`
-  (as dependências foram REMOVIDAS do `pubspec.yaml` até aqui; ver passo 4 do guia).
+  projeto Firebase, que depende da conta do usuário — guia em `docs/m9-auth-backup.md`
+  (as dependências foram REMOVIDAS do `pubspec.yaml` até aqui; ver o passo 1.4 do guia).
   Inclui a exclusão de conta que a diretriz 5.1.1(v) da App Store exige: apagar o
   `backups/{uid}` e a conta em si, não só o dado local. **Restaurar só da nuvem**
   — a restauração por arquivo foi descartada em 04/08/2026 (duas fontes para o
   mesmo backup), e o `file_picker` saiu do projeto: nem a v11 nem a v12-beta
   convivem com o Kotlin embutido do Flutter 3.44 e o `share_plus`.
-- **M10 — Publicação (CE-03/CE-04).** Keystore de release e assinatura própria, ícone e
-  splash reais, política de privacidade, `flutter build apk --release` e GitHub Release.
-  A parte de acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos ≥44dp,
-  rótulos semânticos).
+- **M10 — Publicação (CE-03/CE-04).** Ícone, splash e identidade visual estão **prontos**
+  (`assets/marca/`). Falta a assinatura de release — hoje o APK sai com `CN=Android Debug`
+  (`docs/assinar-release.md`) —, a política de privacidade (`docs/politica-privacidade.md`)
+  e a publicação em si (`docs/distribuicao.md`), que por decisão é o **último passo**: sai
+  só depois do M9, senão o app iria à loja com "Entrar" desabilitado, reprovando na
+  diretriz 2.1. A acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos
+  ≥44dp, rótulos semânticos).
 
 Identidade definida: **`br.com.gabrielkozuki.contaemdia`** (permanente — é a chave de
 atualização do Android), nome exibido "Conta em Dia".
