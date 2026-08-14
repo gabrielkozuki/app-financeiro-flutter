@@ -468,9 +468,16 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           Text(grupo.rotulo(context),
               style: Theme.of(context).textTheme.titleMedium),
           const Spacer(),
+          // Sem `grupo.cor` aqui: era o ÚNICO lugar do app que usava a cor de
+          // grupo como texto, e no tema escuro ela fica em ~3,4:1 — passa como
+          // elemento gráfico, reprova o piso de 4,5:1 de texto (RNF-05). O
+          // GroupAvatar e o rótulo na mesma linha já atribuem o grupo, então a
+          // cor aqui era redundante.
           Text('$pct%',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: grupo.cor, fontWeight: FontWeight.bold)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
         ],
       ),
     );

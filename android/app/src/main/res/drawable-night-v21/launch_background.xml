@@ -6,6 +6,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/splash_marca" />
+            android:src="@mipmap/splash_marca_escura" />
     </item>
 </layer-list>

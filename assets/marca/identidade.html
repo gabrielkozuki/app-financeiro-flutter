@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conta em Dia — identidade visual</title>
+<link rel="icon" href="icone.svg">
+<style>
+  /* Reset mínimo: o arquivo é autossuficiente, para abrir direto no navegador. */
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+  img, svg { display: block; max-width: 100%; }
+</style>
+<style>
+  :root {
+    --papel: #F7F9F9;
+    --carta: #FFFFFF;
+    --tinta: #16211F;
+    --meia-tinta: #5D6B68;
+    --fio: #DCE4E2;
+
+    --necessidade: #0F766E;
+    --desejo: #8C661C;
+    --investimento: #497949;
+    --livre: #787D7D;
+    --acento: var(--necessidade);
+
+    --serifa: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+
+    --passo-1: 0.75rem;
+    --passo-2: 0.875rem;
+    --passo-3: 1rem;
+    --passo-4: 1.35rem;
+    --passo-5: 1.9rem;
+    --passo-6: 2.8rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #0E1514;
+      --carta: #16211F;
+      --tinta: #E7EFED;
+      --meia-tinta: #93A29F;
+      --fio: #24322F;
+      --necessidade: #2FAA9E;
+      --desejo: #C99A3F;
+      --investimento: #7DB57D;
+      --livre: #A4ACAB;
+    }
+  }
+  :root[data-theme="dark"] {
+    --papel: #0E1514;
+    --carta: #16211F;
+    --tinta: #E7EFED;
+    --meia-tinta: #93A29F;
+    --fio: #24322F;
+    --necessidade: #2FAA9E;
+    --desejo: #C99A3F;
+    --investimento: #7DB57D;
+    --livre: #A4ACAB;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--sans);
+    font-size: var(--passo-3);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .folha {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3rem) 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 7vw, 5rem);
+  }
+
+  .capa { display: flex; flex-direction: column; gap: 1.5rem; }
+  .marca { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+  .marca svg { width: 84px; height: 84px; flex: none; border-radius: 20px; }
+  .nome {
+    font-family: var(--serifa);
+    font-size: var(--passo-6);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .nome span { display: block; font-size: var(--passo-4); color: var(--meia-tinta); font-weight: 400; letter-spacing: 0; }
+  .lede { max-width: 42rem; color: var(--meia-tinta); font-size: var(--passo-4); margin: 0; text-wrap: pretty; }
+
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .rotulo {
+    font-family: var(--sans);
+    font-size: var(--passo-1);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--meia-tinta);
+    margin: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--fio);
+  }
+  h2 { font-family: var(--serifa); font-size: var(--passo-5); font-weight: 600; margin: 0; letter-spacing: -0.015em; }
+  p { margin: 0; max-width: 42rem; text-wrap: pretty; }
+  .nota { color: var(--meia-tinta); font-size: var(--passo-2); }
+
+  .grade-cor { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; }
+  .cor {
+    background: var(--carta);
+    border: 1px solid var(--fio);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .amostra { height: 5.5rem; display: flex; align-items: flex-end; padding: 0.75rem; }
+  .amostra b { font-family: var(--mono); font-size: var(--passo-1); color: #FFFFFF; letter-spacing: 0.04em; }
+  .cor dl { margin: 0; padding: 0.9rem; display: grid; grid-template-columns: auto 1fr; gap: 0.15rem 0.75rem; align-items: baseline; }
+  .cor dt { font-size: var(--passo-1); color: var(--meia-tinta); text-transform: uppercase; letter-spacing: 0.08em; }
+  .cor dd { margin: 0; font-family: var(--mono); font-size: var(--passo-2); font-variant-numeric: tabular-nums; text-align: right; }
+  .cor .papel-nome { grid-column: 1 / -1; font-family: var(--sans); font-size: var(--passo-3); font-weight: 600; text-align: left; margin-bottom: 0.35rem; }
+
+  .razao { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; }
+  .barra { width: 3.5rem; height: 5px; border-radius: 3px; background: var(--fio); overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--acento); }
+
+  .escala { display: flex; flex-direction: column; gap: 1.1rem; }
+  .linha-tipo { display: grid; grid-template-columns: 9rem 1fr; gap: 1.25rem; align-items: baseline; padding-bottom: 1.1rem; border-bottom: 1px solid var(--fio); }
+  .linha-tipo code { font-family: var(--mono); font-size: var(--passo-1); color: var(--meia-tinta); }
+  .espec { font-family: var(--sans); }
+
+  .ritmo { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: flex-end; }
+  .tijolo { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+  .tijolo i { display: block; background: var(--acento); border-radius: 3px; height: 1.6rem; opacity: 0.85; }
+  .tijolo code { font-family: var(--mono); font-size: var(--passo-1); color: var(--meia-tinta); }
+
+  .pecas { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+  .peca { background: var(--carta); border: 1px solid var(--fio); border-radius: 16px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.9rem; }
+  .peca > .rot { font-size: var(--passo-1); text-transform: uppercase; letter-spacing: 0.12em; color: var(--meia-tinta); font-weight: 600; }
+
+  .item { display: flex; align-items: center; gap: 0.85rem; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  .avatar svg { width: 20px; height: 20px; }
+  .item .txt { min-width: 0; flex: 1; }
+  .item .txt b { display: block; font-weight: 600; font-size: var(--passo-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .txt small { color: var(--meia-tinta); font-size: var(--passo-2); }
+  .item .val { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .destaque { border-radius: 16px; padding: 1.1rem; border: 1px solid color-mix(in srgb, var(--acento) 20%, transparent); background: color-mix(in srgb, var(--acento) 7%, var(--carta)); display: flex; flex-direction: column; gap: 0.6rem; }
+  .destaque .cabeca { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .destaque b { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--passo-4); }
+  .trilha { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--acento) 18%, var(--carta)); overflow: hidden; }
+  .trilha i { display: block; height: 100%; background: var(--acento); border-radius: 4px; }
+
+  .aviso { border-radius: 14px; padding: 0.9rem 1rem; background: color-mix(in srgb, var(--meia-tinta) 12%, var(--carta)); color: var(--meia-tinta); font-size: var(--passo-2); display: flex; gap: 0.6rem; align-items: flex-start; }
+  .aviso svg { width: 18px; height: 18px; flex: none; margin-top: 2px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: var(--passo-2); }
+  .rolagem { overflow-x: auto; }
+  th, td { text-align: left; padding: 0.6rem 0.9rem 0.6rem 0; border-bottom: 1px solid var(--fio); vertical-align: top; }
+  th { font-size: var(--passo-1); text-transform: uppercase; letter-spacing: 0.1em; color: var(--meia-tinta); font-weight: 600; }
+  td code { font-family: var(--mono); font-size: var(--passo-1); }
+
+  footer { color: var(--meia-tinta); font-size: var(--passo-2); border-top: 1px solid var(--fio); padding-top: 1.5rem; }
+</style>
+</head>
+<body>
+
+<div class="folha">
+
+  <header class="capa">
+    <div class="marca">
+      <svg viewBox="0 0 512 512" role="img" aria-label="Ícone do Conta em Dia">
+      <rect width="512" height="512" fill="#F7F9F9"/>
+      <path d="M 308.60 422.41 A 174.52 174.52 0 1 1 308.60 89.59 L 280.60 164.48 A 94.76 94.76 0 1 0 280.60 347.52 Z" fill="#0F766E" stroke="#0F766E" stroke-width="18.01" stroke-linejoin="round"/>
+      <path d="M 337.82 129.67 A 150.51 150.51 0 0 1 405.07 235.24 L 349.34 239.62 A 94.76 94.76 0 0 0 310.29 178.33 Z" fill="#8C661C" stroke="#8C661C" stroke-width="18.01" stroke-linejoin="round"/>
+      <path d="M 405.07 276.76 A 150.51 150.51 0 0 1 337.82 382.33 L 310.29 333.67 A 94.76 94.76 0 0 0 349.34 272.38 Z" fill="#497949" stroke="#497949" stroke-width="18.01" stroke-linejoin="round"/>
+      </svg>
+      <h1 class="nome">Conta em Dia<span>Bills on Track</span></h1>
+    </div>
+    <p class="lede">Checklist mensal de contas e painel 50-30-20. A identidade nasce de uma restrição: toda cor precisa passar no contraste antes de ser bonita.</p>
+  </header>
+
+  <section>
+    <p class="rotulo">Cor</p>
+    <h2>Três grupos, uma semente</h2>
+    <p>O verde-petróleo é a semente do <code>ColorScheme</code> e também a cor de Necessidade — o grupo que domina o mês de quase todo mundo. Desejo e Investimento foram escurecidos até passarem no contraste; os tons originais reprovavam em 2,13:1 e 2,65:1.</p>
+    <div class="grade-cor">
+      <article class="cor">
+        <div class="amostra" style="background:#0F766E"><b>#0F766E</b></div>
+        <dl>
+          <div class="papel-nome">Necessidade · semente</div>
+          <dt>Contraste</dt><dd><span class="razao"><span class="barra"><i style="width:100%"></i></span>5,18:1</span></dd>
+          <dt>Papel</dt><dd>Primário, check do ícone</dd>
+        </dl>
+      </article>
+      <article class="cor">
+        <div class="amostra" style="background:#8C661C"><b>#8C661C</b></div>
+        <dl>
+          <div class="papel-nome">Desejo</div>
+          <dt>Contraste</dt><dd><span class="razao"><span class="barra"><i style="width:95%"></i></span>4,93:1</span></dd>
+          <dt>Antes</dt><dd>#D9A441 · 2,13:1</dd>
+        </dl>
+      </article>
+      <article class="cor">
+        <div class="amostra" style="background:#497949"><b>#497949</b></div>
+        <dl>
+          <div class="papel-nome">Investimento</div>
+          <dt>Contraste</dt><dd><span class="razao"><span class="barra"><i style="width:93%"></i></span>4,83:1</span></dd>
+          <dt>Antes</dt><dd>#6FA86F · 2,65:1</dd>
+        </dl>
+      </article>
+      <article class="cor">
+        <div class="amostra" style="background:#787D7D"><b>#787D7D</b></div>
+        <dl>
+          <div class="papel-nome">Livre</div>
+          <dt>Contraste</dt><dd><span class="razao"><span class="barra"><i style="width:76%"></i></span>3,95:1</span></dd>
+          <dt>Papel</dt><dd>Fatia não comprometida</dd>
+        </dl>
+      </article>
+    </div>
+    <p class="nota">Razões medidas por luminância relativa (WCAG 2.1) contra o fundo <code>#F7F9F9</code>. Texto exige 4,5:1; elemento gráfico, 3:1. “Livre” fica de propósito mais claro que os três grupos — é fundo, não protagonista.</p>
+
+    <div class="aviso">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+      <span><b>As cores de grupo são de elemento gráfico, nunca de texto.</b>
+      <code>GrupoVisual.cor</code> devolve a mesma cor nos dois temas, então sobre a
+      superfície escura (<code>#0E1514</code>) os grupos caem para 3,38 / 3,55 / 3,62:1 —
+      acima do piso de 3:1 de elemento gráfico, abaixo dos 4,5:1 de texto.
+      Ícone, fatia da rosca, ponto e barra de progresso continuam válidos; texto
+      usa <code>onSurface</code>. O único uso de texto que existia — o percentual do
+      grupo no onboarding — foi removido, já que o avatar e o rótulo na mesma linha
+      já atribuem o grupo. As variantes claras da última coluna passariam também como
+      texto, mas ramificar a cor por <code>Brightness</code> só se justifica se algum
+      dia o texto colorido for necessário.</span>
+    </div>
+    <div class="rolagem">
+      <table>
+        <thead><tr><th>Grupo</th><th>Tema claro</th><th>Tema escuro (hoje)</th><th>Variante clara proposta</th></tr></thead>
+        <tbody>
+          <tr><td>Necessidade</td><td><code>#0F766E</code> · 5,18:1</td><td><code>#0F766E</code> · 3,38:1</td><td><code>#2FAA9E</code> · 6,48:1</td></tr>
+          <tr><td>Desejo</td><td><code>#8C661C</code> · 4,93:1</td><td><code>#8C661C</code> · 3,55:1</td><td><code>#C99A3F</code> · 7,20:1</td></tr>
+          <tr><td>Investimento</td><td><code>#497949</code> · 4,83:1</td><td><code>#497949</code> · 3,62:1</td><td><code>#7DB57D</code> · 7,73:1</td></tr>
+          <tr><td>Livre</td><td><code>#787D7D</code> · 3,95:1</td><td><code>#787D7D</code> · 4,43:1</td><td><code>#A4ACAB</code> · 7,98:1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="rotulo">Tipografia</p>
+    <h2>Roboto, com pesos que dizem alguma coisa</h2>
+    <div class="escala">
+      <div class="linha-tipo"><code>headlineSmall · 700</code><div class="espec" style="font-size:var(--passo-5);font-weight:700;line-height:1.15">R$ 5.000,00</div></div>
+      <div class="linha-tipo"><code>titleLarge · 700</code><div class="espec" style="font-size:var(--passo-4);font-weight:700">Meu mês</div></div>
+      <div class="linha-tipo"><code>titleMedium · 600</code><div class="espec" style="font-weight:600">Aluguel</div></div>
+      <div class="linha-tipo"><code>bodyMedium · 1.35</code><div class="espec">A referência 50-30-20 é um diagnóstico, não um limite.</div></div>
+      <div class="linha-tipo"><code>labelMedium · 0.6</code><div class="espec" style="font-size:var(--passo-1);letter-spacing:0.6px;text-transform:uppercase;color:var(--meia-tinta)">Pago este mês</div></div>
+    </div>
+    <p class="nota">O rótulo em versalete espaçado marca seção na interface — e é o mesmo recurso que separa as seções desta página.</p>
+  </section>
+
+  <section>
+    <p class="rotulo">Ritmo</p>
+    <h2>Escala de 4</h2>
+    <div class="ritmo">
+      <div class="tijolo"><i style="width:4px"></i><code>Xs 4</code></div>
+      <div class="tijolo"><i style="width:8px"></i><code>Sm 8</code></div>
+      <div class="tijolo"><i style="width:12px"></i><code>Md 12</code></div>
+      <div class="tijolo"><i style="width:16px"></i><code>Lg 16</code></div>
+      <div class="tijolo"><i style="width:24px"></i><code>Xl 24</code></div>
+      <div class="tijolo"><i style="width:32px"></i><code>Xxl 32</code></div>
+    </div>
+    <div class="rolagem">
+      <table>
+        <thead><tr><th>Token</th><th>Valor</th><th>Onde</th></tr></thead>
+        <tbody>
+          <tr><td><code>raio</code></td><td>16</td><td>Cards e campos</td></tr>
+          <tr><td><code>raioGrande</code></td><td>24</td><td>Folhas e diálogos</td></tr>
+          <tr><td><code>maxLargura</code></td><td>480</td><td>Conteúdo, para a leitura não esticar</td></tr>
+          <tr><td><code>alvoToqueMinimo</code></td><td>44</td><td>Todo elemento tocável (RNF-05)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="rotulo">Peças</p>
+    <h2>O que se repete na tela</h2>
+    <div class="pecas">
+      <div class="peca">
+        <span class="rot">Linha da checklist</span>
+        <div class="item">
+          <span class="avatar" style="background:color-mix(in srgb, var(--necessidade) 16%, transparent)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--necessidade)" stroke-width="2"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+          </span>
+          <span class="txt"><b>Aluguel</b><small>Vence dia 5</small></span>
+          <span class="val">1.800,00</span>
+        </div>
+        <div class="item">
+          <span class="avatar" style="background:color-mix(in srgb, var(--desejo) 16%, transparent)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--desejo)" stroke-width="2"><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7M2 7h20v5H2zM12 7v13M12 7S9 3 7 4s0 3 5 3zM12 7s3-4 5-3-0 3-5 3z"/></svg>
+          </span>
+          <span class="txt"><b>Academia</b><small>Vence dia 10</small></span>
+          <span class="val">120,00</span>
+        </div>
+      </div>
+
+      <div class="peca">
+        <span class="rot">Card de destaque</span>
+        <div class="destaque">
+          <div class="cabeca"><span>Pago este mês</span><b>62%</b></div>
+          <div class="trilha"><i style="width:62%"></i></div>
+          <small style="color:var(--meia-tinta)">R$ 3.100,00 de R$ 5.000,00</small>
+        </div>
+      </div>
+
+      <div class="peca">
+        <span class="rot">Aviso de mês fechado</span>
+        <div class="aviso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0"/></svg>
+          <span>Mês fechado — somente leitura. Este é o registro do que foi pago naquele mês.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="rotulo">Tom</p>
+    <h2>Educativo, nunca punitivo</h2>
+    <p>Ultrapassar um grupo não é erro. Quando o mês estoura, o painel troca “Renda do mês” por “Comprometido — 108% da renda”: informa o fato, sem vermelho de alerta, sem ícone de exclamação, sem linguagem de culpa.</p>
+    <p class="nota">É o princípio 1.5.1 do documento de requisitos, e a razão de a paleta não ter uma cor de erro fora dos estados de falha real. Um mês em que as necessidades consomem 90% da renda é exatamente a informação que o app existe para revelar.</p>
+  </section>
+
+  <footer>Cores, tokens e razões de contraste extraídos de <code>core/theme/app_theme.dart</code> e <code>core/theme/grupo_visual.dart</code>.</footer>
+
+</div>
+
+</body>
+</html>

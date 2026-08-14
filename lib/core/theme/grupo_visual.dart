@@ -14,6 +14,13 @@ import '../../l10n/app_localizations.dart';
 /// (dourado/verde) foi preservado; só a luminosidade mudou. Razões de
 /// contraste calculadas via luminância relativa (fórmula WCAG 2.1), sobre
 /// 0xFFF7F9F9. "necessidade" já passava (~5,18:1) e não foi alterada.
+///
+/// **Estas cores são só para ELEMENTO GRÁFICO — não use como cor de texto.**
+/// Elas não variam por `Brightness`, e sobre a superfície escura do tema
+/// (0xFF0E1514) caem para 3,38 / 3,55 / 3,62:1: acima do piso de 3:1 de
+/// elemento gráfico, abaixo do piso de 4,5:1 de texto (RNF-05). Ícone, fatia
+/// da rosca, ponto e barra de progresso estão certos; rótulo, valor e
+/// percentual devem usar `onSurface`.
 extension GrupoVisual on Grupo {
   Color get cor => switch (this) {
         Grupo.necessidade => const Color(0xFF0F766E), // ~5,18:1

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Ícone do Conta em Dia">
+<rect width="512" height="512" fill="#F7F9F9"/>
+<path d="M 308.60 422.41 A 174.52 174.52 0 1 1 308.60 89.59 L 280.60 164.48 A 94.76 94.76 0 1 0 280.60 347.52 Z" fill="#0F766E" stroke="#0F766E" stroke-width="18.01" stroke-linejoin="round"/>
+<path d="M 337.82 129.67 A 150.51 150.51 0 0 1 405.07 235.24 L 349.34 239.62 A 94.76 94.76 0 0 0 310.29 178.33 Z" fill="#8C661C" stroke="#8C661C" stroke-width="18.01" stroke-linejoin="round"/>
+<path d="M 405.07 276.76 A 150.51 150.51 0 0 1 337.82 382.33 L 310.29 333.67 A 94.76 94.76 0 0 0 349.34 272.38 Z" fill="#497949" stroke="#497949" stroke-width="18.01" stroke-linejoin="round"/>
+</svg>

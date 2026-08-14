@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fundo escuro do app. O ícone adaptativo NÃO muda por tema (o Android
+         não troca ícone de launcher); só o splash tem variante. -->
+    <color name="splash_background">#0E1514</color>
+</resources>
