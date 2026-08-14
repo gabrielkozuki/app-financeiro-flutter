@@ -11,13 +11,27 @@ ocorrências mensais, entradas, cartões com fatura e rateio, virada de mês com
 percentuais configuráveis, exportação CSV/JSON e exclusão total. `flutter analyze` sem
 issues; 43 testes de regra de negócio passando.
 
-**M8 pendente**, dividido em duas partes:
-- **Auth + backup na nuvem** — bloqueado pela configuração do projeto Firebase, que depende da
-  conta do usuário. As dependências já estão no `pubspec.yaml`, mas **nada de Firebase é
-  importado em `lib/`** ainda. Guia em `docs/configurar-firebase.md`.
-- **Qualidade + distribuição** — a parte de acessibilidade do M8 foi antecipada (contraste
-  ≥4,5:1 nas cores de grupo e ≥3:1 nos elementos gráficos, alvos ≥44dp, rótulos semânticos);
-  falta o build de release assinado e o GitHub Release público (CE-03).
+**Marcos restantes** (renumerados em 04/08/2026 — o M8 original agrupava auth,
+qualidade e distribuição; virou três marcos com um propósito cada):
+
+- **M8 — Tradução (pt-BR + en-US).** `flutter_localizations` + ARB, as ~133 strings de UI
+  saem dos widgets, e o nome exibido passa a ser localizado: "Conta em Dia" / "Bills on
+  Track". Vem ANTES do auth de propósito: as telas de login, backup e exclusão de conta são
+  as mais textuais do app e nasceriam em português para serem traduzidas depois.
+  *Código, comentários e documentação seguem em pt-BR* — só o texto visível ao usuário é
+  localizado.
+- **M9 — Auth Firebase + backup na nuvem (CE-05/CE-06).** Bloqueado pela configuração do
+  projeto Firebase, que depende da conta do usuário — guia em `docs/configurar-firebase.md`
+  (as dependências foram REMOVIDAS do `pubspec.yaml` até aqui; ver passo 4 do guia).
+  Inclui a exclusão de conta que a diretriz 5.1.1(v) da App Store exige: apagar o
+  `backups/{uid}` e a conta em si, não só o dado local.
+- **M10 — Publicação (CE-03/CE-04).** Keystore de release e assinatura própria, ícone e
+  splash reais, política de privacidade, `flutter build apk --release` e GitHub Release.
+  A parte de acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos ≥44dp,
+  rótulos semânticos).
+
+Identidade definida: **`br.com.gabrielkozuki.contaemdia`** (permanente — é a chave de
+atualização do Android), nome exibido "Conta em Dia".
 
 ### Onde a implementação divergiu do plano
 

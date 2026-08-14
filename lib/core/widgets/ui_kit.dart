@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 /// Pequenos blocos de UI reaproveitados entre as telas para manter a
@@ -47,7 +48,7 @@ class SheetHeader extends StatelessWidget {
             IconButton(
               onPressed: onExcluir,
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Excluir',
+              tooltip: AppLocalizations.of(context).acaoExcluir,
               color: context.colors.error,
             ),
         ],
@@ -146,6 +147,7 @@ class ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.colors;
     return Center(
       child: Padding(
@@ -163,13 +165,12 @@ class ErrorState extends StatelessWidget {
               child: Icon(Icons.cloud_off_rounded, size: 40, color: scheme.error),
             ),
             const SizedBox(height: AppTheme.spaceLg),
-            Text(titulo ?? 'Não conseguimos carregar seus dados',
+            Text(titulo ?? l10n.erroTituloPadrao,
                 style: context.texts.titleMedium,
                 textAlign: TextAlign.center),
             const SizedBox(height: AppTheme.spaceSm),
             Text(
-              'Algo deu errado ao ler os dados deste aparelho. Nada foi '
-              'perdido — tente de novo.',
+              l10n.erroDescricaoPadrao,
               style: context.texts.bodyMedium
                   ?.copyWith(color: scheme.onSurfaceVariant),
               textAlign: TextAlign.center,
@@ -178,7 +179,7 @@ class ErrorState extends StatelessWidget {
             FilledButton.tonalIcon(
               onPressed: onTentarNovamente,
               icon: const Icon(Icons.refresh),
-              label: const Text('Tentar novamente'),
+              label: Text(l10n.acaoTentarNovamente),
             ),
           ],
         ),

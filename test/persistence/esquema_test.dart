@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_financeiro/data/db/app_database.dart';
-import 'package:app_financeiro/data/export_service.dart';
+import 'package:app_financeiro/data/backup_service.dart';
 import 'package:app_financeiro/data/repositories/drift_cartoes_repository.dart';
 import 'package:app_financeiro/data/repositories/drift_contas_repository.dart';
 import 'package:app_financeiro/domain/entities/cartao.dart';
@@ -92,7 +92,7 @@ void main() {
     test('o backup JSON carrega o índice, não o nome do valor', () async {
       await contas.criar(contaFixa('Streaming'));
 
-      final backup = jsonDecode(await ExportService(db).exportarJson())
+      final backup = jsonDecode(await BackupService(db).exportarJson())
           as Map<String, dynamic>;
       final conta = (backup['contas'] as List).single as Map<String, dynamic>;
       expect(conta['grupo'], 1);

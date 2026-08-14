@@ -1,0 +1,578 @@
+{
+  "@@locale": "pt",
+  "appTitulo": "Conta em Dia",
+  "@appTitulo": {
+    "description": "Nome do app. NÃO é tradução literal entre idiomas: cada locale escolhe um nome que a busca do launcher encontre (pt: 'conta'/'contas'; en: 'bill'/'bills')."
+  },
+  "abaContas": "Contas",
+  "abaGrafico": "Gráfico",
+  "abaConfiguracoes": "Configurações",
+  "tituloMeuMes": "Meu mês",
+  "tituloDirecionamento": "Direcionamento",
+  "acaoCancelar": "Cancelar",
+  "acaoSalvar": "Salvar",
+  "acaoExcluir": "Excluir",
+  "acaoAdicionar": "Adicionar",
+  "acaoTentarNovamente": "Tentar novamente",
+  "erroTituloPadrao": "Não conseguimos carregar seus dados",
+  "erroDescricaoPadrao": "Algo deu errado ao ler os dados deste aparelho. Nada foi perdido — tente de novo.",
+  "acaoContinuar": "Continuar",
+  "acaoRemover": "Remover",
+  "acaoVoltar": "Voltar",
+  "acaoSair": "Sair",
+  "acaoRestaurar": "Restaurar",
+  "acaoConcluir": "Concluir",
+  "acaoComecar": "Começar",
+  "acaoSalvarAlteracoes": "Salvar alterações",
+  "campoNome": "Nome",
+  "campoValor": "Valor",
+  "campoValorLiquido": "Valor líquido",
+  "campoGrupo": "Grupo",
+  "campoVenceDia": "Vence dia",
+  "validacaoInformeNome": "Informe um nome",
+  "validacaoDia": "Informe um dia entre 1 e 31",
+  "validacaoValorInvalido": "Valor inválido",
+  "venceDia": "Vence dia {dia}",
+  "@venceDia": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "grupoNecessidade": "Necessidade",
+  "grupoDesejo": "Desejo",
+  "grupoInvestimento": "Investimento",
+  "erroCarregarMes": "Não conseguimos carregar este mês",
+  "erroCarregarRendas": "Não conseguimos carregar suas rendas",
+  "erroCarregarCartoes": "Não conseguimos carregar seus cartões",
+  "erroCarregarPercentuais": "Não conseguimos carregar seus percentuais",
+  "erroAbrirDados": "Não conseguimos abrir seus dados",
+  "mesAnterior": "Mês anterior",
+  "mesProximo": "Próximo mês",
+  "mesEscolher": "Escolher mês",
+  "mesAnoAnterior": "Ano anterior",
+  "mesAnoProximo": "Próximo ano",
+  "mesSemanticaSeletor": "Mês selecionado: {mes}. Toque para escolher outro.",
+  "@mesSemanticaSeletor": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "mesSemanticaAtual": "{mes}, mês atual",
+  "@mesSemanticaAtual": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "mesErroReabrir": "Não foi possível reabrir o mês.",
+  "mesErroConcluirEdicao": "Não foi possível concluir a edição do mês.",
+  "contasNovaConta": "Nova conta",
+  "contasSecaoMensais": "Contas mensais",
+  "contasVazioTitulo": "Nenhuma conta neste mês",
+  "contasVazioDescricao": "Toque em \"Nova conta\" para começar a organizar seu mês.",
+  "contasVazioFechadoTitulo": "Nenhuma conta neste mês fechado",
+  "contasVazioFechadoDescricao": "Este mês faz parte do histórico e não teve contas registradas.",
+  "contasMesFechadoAviso": "Mês fechado — somente leitura. Este é o registro do que foi pago naquele mês.",
+  "contasReabrirMes": "Reabrir mês",
+  "contasReabrirTitulo": "Reabrir este mês?",
+  "contasReabrirTexto": "O mês volta a ser editável para você corrigir contas e faturas deste mês. Nada nos outros meses é afetado. Ao concluir, um novo registro do mês é gravado.",
+  "contasReabrirAcao": "Reabrir",
+  "contasEditandoFechadoAviso": "Editando um mês fechado. As alterações valem só para este mês.",
+  "contasConcluirEdicao": "Concluir edição",
+  "contasPagoEsteMes": "PAGO ESTE MÊS",
+  "contasPagoSemantica": "Pago este mês: {pago} de {total}, {percentual} por cento",
+  "@contasPagoSemantica": {
+    "placeholders": {
+      "pago": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      },
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "contasPagoDeTotal": "de {total} · {percentual}%",
+  "@contasPagoDeTotal": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "estadoPaga": "paga",
+  "estadoPendente": "pendente",
+  "contaSemantica": "{nome}, {grupo}, {valor}, {estado}",
+  "@contaSemantica": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      },
+      "grupo": {
+        "type": "String"
+      },
+      "valor": {
+        "type": "String"
+      },
+      "estado": {
+        "type": "String"
+      }
+    }
+  },
+  "contaMarcarPaga": "Marcar {nome} como paga",
+  "@contaMarcarPaga": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "contaSubtitulo": "{grupo} · vencimento dia {dia}",
+  "@contaSubtitulo": {
+    "placeholders": {
+      "grupo": {
+        "type": "String"
+      },
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "contaSubtituloParcela": "{grupo} · vencimento dia {dia} · {parcela}/{total}",
+  "@contaSubtituloParcela": {
+    "placeholders": {
+      "grupo": {
+        "type": "String"
+      },
+      "dia": {
+        "type": "int"
+      },
+      "parcela": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "contaErroMarcar": "Não foi possível marcar \"{nome}\".",
+  "@contaErroMarcar": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaTitulo": "Fatura {cartao}",
+  "@faturaTitulo": {
+    "placeholders": {
+      "cartao": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaMarcarPaga": "Marcar a fatura {cartao} como paga",
+  "@faturaMarcarPaga": {
+    "placeholders": {
+      "cartao": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaInformar": "Informar",
+  "faturaSubtitulo": "vence dia {dia}",
+  "@faturaSubtitulo": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "faturaSubtituloRatear": "vence dia {dia} · toque para ratear",
+  "@faturaSubtituloRatear": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "faturaErroMarcar": "Não foi possível marcar a fatura {cartao}.",
+  "@faturaErroMarcar": {
+    "placeholders": {
+      "cartao": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaValorTotal": "Valor total da fatura",
+  "faturaComoDividir": "Como dividir entre os grupos",
+  "faturaComoDividirTexto": "Divida de cabeça, sem itemizar. É o que mantém o painel fiel quando quase tudo é pago no cartão.",
+  "faturaSalvar": "Salvar fatura",
+  "faturaNaoUsei": "Não usei este cartão neste mês",
+  "faturaInformeTotal": "Informe o valor total da fatura.",
+  "faturaTudoAlocado": "Tudo alocado!",
+  "faturaFaltaAlocar": "Falta alocar {valor}",
+  "@faturaFaltaAlocar": {
+    "placeholders": {
+      "valor": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaAlocouAMais": "Você alocou {valor} a mais que o total",
+  "@faturaAlocouAMais": {
+    "placeholders": {
+      "valor": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaErroSalvar": "Não foi possível salvar esta fatura.",
+  "contaFormTituloNova": "Nova conta",
+  "contaFormTituloEditar": "Editar conta",
+  "contaFormTituloParcela": "Editar parcela",
+  "contaFormTituloAjustar": "Ajustar neste mês",
+  "contaFormSubtituloParcela": "Parcela {atual}/{total}",
+  "@contaFormSubtituloParcela": {
+    "placeholders": {
+      "atual": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "contaFormNomeHint": "Ex.: Aluguel",
+  "contaFormNomeBloqueado": "Nome não editável ao ajustar um mês fechado",
+  "contaFormValorDoMes": "Valor deste mês",
+  "contaFormValorParcela": "Valor da parcela",
+  "contaFormDiaBloqueado": "Não editável neste ajuste",
+  "contaFormValorPago": "Valor pago (se diferente do planejado)",
+  "contaFormAplicarProximos": "Aplicar valor aos próximos meses",
+  "contaFormAplicarProximosDescricao": "Desligado, o valor muda só neste mês",
+  "contaFormRecorrenciaFixa": "Fixa",
+  "contaFormRecorrenciaPontual": "Só este mês",
+  "contaFormRecorrenciaParcelada": "Parcelada",
+  "contaFormNumeroParcelas": "Nº de parcelas",
+  "contaFormValidacaoParcelas": "Entre 1 e 120",
+  "contaFormExplicacaoFixa": "Repete todo mês a partir de {mes}.",
+  "@contaFormExplicacaoFixa": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormExplicacaoPontual": "Aparece apenas em {mes}.",
+  "@contaFormExplicacaoPontual": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormExplicacaoParcelada": "Gera uma parcela por mês a partir de {mes}.",
+  "@contaFormExplicacaoParcelada": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormRemoverTitulo": "Remover deste mês?",
+  "contaFormRemoverTexto": "\"{nome}\" sai apenas deste mês. Nenhum outro mês é afetado.",
+  "@contaFormRemoverTexto": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormExcluirTitulo": "Excluir conta",
+  "contaFormExcluirTexto": "O que você quer excluir? Meses anteriores nunca são afetados.",
+  "contaFormExcluirSoEsteMes": "Só deste mês",
+  "contaFormExcluirDaquiEmDiante": "Deste mês em diante",
+  "contaFormErroSalvar": "Não foi possível salvar esta conta.",
+  "contaFormErroExcluir": "Não foi possível excluir esta conta.",
+  "graficoSemRegistrosTitulo": "Sem registros neste mês",
+  "graficoSemRegistrosDescricao": "Este mês faz parte do histórico e não teve contas nem rendas registradas para calcular o direcionamento.",
+  "graficoSemRendaTitulo": "Sem renda cadastrada neste mês",
+  "graficoSemRendaDescricao": "Cadastre sua renda em Configurações → Rendas para ver o direcionamento do seu dinheiro.",
+  "graficoComoEstaDividido": "Como está dividido",
+  "graficoComprometido": "Comprometido",
+  "graficoRendaDoMes": "Renda do mês",
+  "graficoLivre": "Livre",
+  "graficoPercentualDaRenda": "{percentual}% da renda",
+  "@graficoPercentualDaRenda": {
+    "placeholders": {
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoSemanticaRosca": "Renda do mês: {renda}, dividida entre {grupos} e Livre",
+  "@graficoSemanticaRosca": {
+    "placeholders": {
+      "renda": {
+        "type": "String"
+      },
+      "grupos": {
+        "type": "String"
+      }
+    }
+  },
+  "graficoSemanticaRoscaComprometido": "Comprometido {percentual}% da renda do mês, {comprometido} de {renda}",
+  "@graficoSemanticaRoscaComprometido": {
+    "placeholders": {
+      "percentual": {
+        "type": "int"
+      },
+      "comprometido": {
+        "type": "String"
+      },
+      "renda": {
+        "type": "String"
+      }
+    }
+  },
+  "graficoMetaAcima": "meta {meta}% · acima da meta",
+  "@graficoMetaAcima": {
+    "placeholders": {
+      "meta": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoMetaAbaixo": "meta {meta}% · abaixo da meta",
+  "@graficoMetaAbaixo": {
+    "placeholders": {
+      "meta": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoMetaDentro": "meta {meta}% · na meta",
+  "@graficoMetaDentro": {
+    "placeholders": {
+      "meta": {
+        "type": "int"
+      }
+    }
+  },
+  "rendasTitulo": "Rendas",
+  "rendaNova": "Nova entrada",
+  "rendaEditar": "Editar entrada",
+  "rendasVazioTitulo": "Nenhuma renda neste mês",
+  "rendasVazioDescricao": "Toque em \"Nova entrada\" para cadastrar seu salário ou outra entrada.",
+  "rendasRecorrentes": "Recorrentes (todo mês)",
+  "rendasPontuaisDoMes": "Pontuais de {mes}",
+  "@rendasPontuaisDoMes": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "rendaRecebeDia": "Recebe dia {dia}",
+  "@rendaRecebeDia": {
+    "placeholders": {
+      "dia": {
+        "type": "String"
+      }
+    }
+  },
+  "rendaSoEm": "Só em {mes}",
+  "@rendaSoEm": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "rendasTotalDoMes": "TOTAL DO MÊS",
+  "rendaNomeHint": "Ex.: Salário",
+  "rendaTipoRecorrente": "Recorrente",
+  "rendaTipoPontual": "Só este mês",
+  "rendaDiaRecebimento": "Dia do recebimento",
+  "rendaEntraApenasEm": "Entra apenas em {mes}.",
+  "@rendaEntraApenasEm": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "rendaErroSalvar": "Não foi possível salvar esta entrada.",
+  "rendaErroExcluir": "Não foi possível excluir esta entrada.",
+  "cartoesTitulo": "Cartões",
+  "cartaoNovo": "Novo cartão",
+  "cartaoEditar": "Editar cartão",
+  "cartoesVazioTitulo": "Nenhum cartão cadastrado",
+  "cartoesVazioDescricao": "Toque em \"Novo cartão\" para acompanhar as faturas na sua checklist mensal.",
+  "cartaoFaturaVenceDia": "Fatura vence dia {dia}",
+  "@cartaoFaturaVenceDia": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "cartaoNomeHint": "Ex.: Nubank",
+  "cartaoDiaVencimento": "Dia de vencimento",
+  "cartaoDiaInvalido": "Dia inválido",
+  "cartaoExcluirTitulo": "Excluir cartão?",
+  "cartaoExcluirTexto": "O cartão \"{nome}\" sai da lista e para de gerar faturas. As faturas dos meses já fechados continuam no histórico.",
+  "@cartaoExcluirTexto": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "cartaoErroSalvar": "Não foi possível salvar este cartão.",
+  "cartaoErroExcluir": "Não foi possível excluir este cartão.",
+  "configRendasSubtitulo": "Entradas recorrentes e pontuais",
+  "configCartoesSubtitulo": "Cartões de crédito e faturas",
+  "configMetodologia": "Metodologia (percentuais)",
+  "configMetodologiaSubtitulo": "Ajuste a referência 50-30-20",
+  "configSecaoDados": "Dados",
+  "configExportar": "Exportar dados",
+  "configExportarSubtitulo": "Planilha (CSV) ou backup completo (JSON)",
+  "configContaBackup": "Conta e backup",
+  "configContaBackupSubtitulo": "Entrar, restaurar backup",
+  "configSecaoRisco": "Zona de risco",
+  "configApagarTudo": "Apagar todos os dados",
+  "configExportarCsv": "Planilha do mês (CSV)",
+  "configExportarJson": "Backup completo (JSON)",
+  "configCompartilharCsv": "Planilha de {mes}",
+  "@configCompartilharCsv": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "configCompartilharJson": "Backup completo do app",
+  "configErroExportarCsv": "Não foi possível exportar a planilha deste mês.",
+  "configErroExportarJson": "Não foi possível gerar o backup.",
+  "configApagarConfirmarTitulo": "Apagar todos os dados?",
+  "configApagarConfirmarTexto": "Isso remove rendas, contas, cartões e histórico deste dispositivo.",
+  "configApagarTemCerteza": "Tem certeza?",
+  "configApagarPalavra": "excluir",
+  "@configApagarPalavra": {
+    "description": "Palavra que o usuário digita para confirmar a exclusão total. É comparada com o texto digitado — mude junto com configApagarInstrucao."
+  },
+  "configApagarInstrucao": "Esta ação não pode ser desfeita. Para confirmar, digite \"{palavra}\" abaixo.",
+  "@configApagarInstrucao": {
+    "placeholders": {
+      "palavra": {
+        "type": "String"
+      }
+    }
+  },
+  "configApagarAcao": "Apagar tudo",
+  "configErroApagar": "Não foi possível apagar os dados.",
+  "percentuaisTitulo": "Metodologia",
+  "percentuaisIntro": "A referência 50-30-20 é um diagnóstico, não um limite. Ajuste os percentuais como preferir — a soma deve dar 100%.",
+  "percentuaisSomaOk": "Soma: {soma}% — tudo certo",
+  "@percentuaisSomaOk": {
+    "placeholders": {
+      "soma": {
+        "type": "int"
+      }
+    }
+  },
+  "percentuaisSomaInvalida": "Soma: {soma}% — precisa fechar em 100%",
+  "@percentuaisSomaInvalida": {
+    "placeholders": {
+      "soma": {
+        "type": "int"
+      }
+    }
+  },
+  "percentuaisSalvar": "Salvar percentuais",
+  "percentuaisAtualizados": "Percentuais atualizados.",
+  "percentuaisErroSalvar": "Não foi possível salvar os percentuais.",
+  "backupSecaoEntrar": "Entrar",
+  "backupEntrarTexto": "Entrar guarda um backup dos seus dados na sua conta. O app continua funcionando normalmente sem entrar.",
+  "backupEntrarApple": "Entrar com a Apple",
+  "backupEntrarGoogle": "Entrar com o Google",
+  "backupEmBreve": "Em breve",
+  "backupSecao": "Backup",
+  "backupNuvem": "Backup na nuvem",
+  "backupNuvemSubtitulo": "Disponível depois de entrar na conta",
+  "backupRestaurarArquivo": "Restaurar de um arquivo",
+  "backupRestaurarArquivoSubtitulo": "Escolha um backup JSON exportado pelo app",
+  "backupEscolherArquivo": "Escolha o backup (.json)",
+  "backupErroLerArquivo": "Não foi possível ler o arquivo.",
+  "backupRestaurarTitulo": "Restaurar backup?",
+  "backupRestaurarTituloComData": "Restaurar backup de {data}?",
+  "@backupRestaurarTituloComData": {
+    "placeholders": {
+      "data": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestaurarTexto": "Os dados atuais deste aparelho serão substituídos pelos do backup. Os meses entre a data do backup e hoje ficarão em branco.",
+  "backupErroRestaurar": "Não foi possível restaurar este backup.",
+  "backupRestaurado": "Backup restaurado.",
+  "onboardingPasso": "Passo {atual} de {total}",
+  "@onboardingPasso": {
+    "placeholders": {
+      "atual": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingBoasVindasTexto": "Um aplicativo para organizar sua vida financeira, com o objetivo de te dar mais discernimento e autonomia.",
+  "onboardingBulletChecklistTitulo": "Marque o que já pagou",
+  "onboardingBulletChecklistDescricao": "Veja num relance o que falta pagar no mês.",
+  "onboardingBulletDirecionamentoTitulo": "Direcionamento",
+  "onboardingBulletDirecionamentoDescricao": "Separação de renda proporcional como referência, não como limitação.",
+  "onboardingBulletPrivacidadeTitulo": "Seus dados são seus",
+  "onboardingBulletPrivacidadeDescricao": "Funciona offline; nada sai do aparelho sem você mandar.",
+  "onboardingJaUso": "Já uso o app",
+  "onboardingRendaTitulo": "Quais são suas rendas?",
+  "onboardingRendaTexto": "Adicione suas entradas mensais em valores líquidos — salário, vale, bolsa. Pode adicionar mais de uma.",
+  "onboardingRendaNomeLabel": "Nome (ex.: Salário)",
+  "onboardingAdicionarRenda": "Adicionar renda",
+  "onboardingRendaVazia": "Nenhuma renda adicionada ainda.",
+  "onboardingRendaPadrao": "Renda {numero}",
+  "@onboardingRendaPadrao": {
+    "placeholders": {
+      "numero": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingTotalMensal": "Total mensal",
+  "onboardingMetodologiaTitulo": "Como dividir seu dinheiro",
+  "onboardingMetodologiaTexto": "Usamos a referência 50-30-20 como diagnóstico — nunca como limite ou cobrança. Dá para ajustar os percentuais depois.",
+  "onboardingContasTitulo": "Suas contas principais",
+  "onboardingContasTexto": "Adicione de 3 a 5 contas para começar. Toque numa sugestão:",
+  "onboardingContasVazio": "Nenhuma conta adicionada ainda.",
+  "onboardingSugestaoAluguel": "Aluguel",
+  "onboardingSugestaoInternet": "Internet",
+  "onboardingSugestaoEnergia": "Energia",
+  "onboardingSugestaoMercado": "Mercado",
+  "onboardingSugestaoAcademia": "Academia",
+  "onboardingSugestaoReserva": "Reserva de emergência",
+  "onboardingSairTitulo": "Sair e perder o que você já digitou?",
+  "onboardingSairTexto": "Suas rendas e contas ainda não foram salvas. Você pode continuar de onde parou.",
+  "onboardingErroConcluir": "Não foi possível concluir seu cadastro."
+}

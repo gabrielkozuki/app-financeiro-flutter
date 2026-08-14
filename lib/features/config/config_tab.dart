@@ -9,9 +9,11 @@ import '../../core/feedback.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_kit.dart';
+import '../../l10n/app_localizations.dart';
 import '../cartao/cartoes_page.dart';
 import '../entradas/entradas_page.dart';
 import '../mes/mes_panorama.dart';
+import 'conta_backup_page.dart';
 import 'percentuais_page.dart';
 
 /// Aba "Configurações": rendas, cartões, percentuais da metodologia, exportação
@@ -21,9 +23,10 @@ class ConfigTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.colors;
     return Scaffold(
-      appBar: AppBar(title: const Text('Configurações')),
+      appBar: AppBar(title: Text(l10n.abaConfiguracoes)),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -31,47 +34,45 @@ class ConfigTab extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceSm),
               children: [
-                const SectionLabel('Direcionamento'),
+                SectionLabel(l10n.tituloDirecionamento),
                 _Grupo(children: [
                   _item(context,
                       icone: Icons.attach_money,
-                      titulo: 'Rendas',
-                      subtitulo: 'Entradas recorrentes e pontuais',
+                      titulo: l10n.rendasTitulo,
+                      subtitulo: l10n.configRendasSubtitulo,
                       destino: const EntradasPage()),
                   _item(context,
                       icone: Icons.credit_card,
-                      titulo: 'Cartões',
-                      subtitulo: 'Cartões de crédito e faturas',
+                      titulo: l10n.cartoesTitulo,
+                      subtitulo: l10n.configCartoesSubtitulo,
                       destino: const CartoesPage()),
                   _item(context,
                       icone: Icons.percent,
-                      titulo: 'Metodologia (percentuais)',
-                      subtitulo: 'Ajuste a referência 50-30-20',
+                      titulo: l10n.configMetodologia,
+                      subtitulo: l10n.configMetodologiaSubtitulo,
                       destino: const PercentuaisPage()),
                 ]),
-                const SectionLabel('Dados'),
+                SectionLabel(l10n.configSecaoDados),
                 _Grupo(children: [
                   ListTile(
                     leading: const Icon(Icons.download_outlined),
-                    title: const Text('Exportar dados'),
-                    subtitle:
-                        const Text('Planilha (CSV) ou backup completo (JSON)'),
+                    title: Text(l10n.configExportar),
+                    subtitle: Text(l10n.configExportarSubtitulo),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _abrirExportar(context, ref),
                   ),
-                  const ListTile(
-                    leading: Icon(Icons.cloud_upload_outlined),
-                    title: Text('Backup na nuvem'),
-                    subtitle: Text('Em breve (M8, com login)'),
-                    enabled: false,
-                  ),
+                  _item(context,
+                      icone: Icons.account_circle_outlined,
+                      titulo: l10n.configContaBackup,
+                      subtitulo: l10n.configContaBackupSubtitulo,
+                      destino: const ContaBackupPage()),
                 ]),
-                const SectionLabel('Zona de risco'),
+                SectionLabel(l10n.configSecaoRisco),
                 _Grupo(children: [
                   ListTile(
                     leading: Icon(Icons.delete_forever_outlined,
                         color: scheme.error),
-                    title: Text('Apagar todos os dados',
+                    title: Text(l10n.configApagarTudo,
                         style: TextStyle(color: scheme.error)),
                     onTap: () => _apagarTudo(context, ref),
                   ),
@@ -101,6 +102,7 @@ class ConfigTab extends ConsumerWidget {
   }
 
   Future<void> _abrirExportar(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -110,7 +112,7 @@ class ConfigTab extends ConsumerWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.table_chart_outlined),
-              title: const Text('Planilha do mês (CSV)'),
+              title: Text(l10n.configExportarCsv),
               onTap: () async {
                 Navigator.pop(ctx);
                 await _exportarCsv(context, ref);
@@ -118,7 +120,7 @@ class ConfigTab extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.data_object),
-              title: const Text('Backup completo (JSON)'),
+              title: Text(l10n.configExportarJson),
               onTap: () async {
                 Navigator.pop(ctx);
                 await _exportarJson(context, ref);
@@ -131,6 +133,7 @@ class ConfigTab extends ConsumerWidget {
   }
 
   Future<void> _exportarCsv(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final mes = ref.read(mesReferenciaProvider);
     await executarComFeedback(
       context,
@@ -138,21 +141,22 @@ class ConfigTab extends ConsumerWidget {
         final conteudo =
             await ref.read(exportServiceProvider).exportarCsvMes(mes);
         await _compartilhar(
-            'financas_$mes.csv', conteudo, 'Planilha de $mes');
+            'financas_$mes.csv', conteudo, l10n.configCompartilharCsv(mes));
       },
-      mensagemErro: 'Não foi possível exportar a planilha deste mês.',
+      mensagemErro: l10n.configErroExportarCsv,
     );
   }
 
   Future<void> _exportarJson(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     await executarComFeedback(
       context,
       () async {
-        final conteudo = await ref.read(exportServiceProvider).exportarJson();
-        await _compartilhar(
-            'financas_backup.json', conteudo, 'Backup completo do app');
+        final conteudo = await ref.read(backupServiceProvider).exportarJson();
+        await _compartilhar('financas_backup.json', conteudo,
+            l10n.configCompartilharJson);
       },
-      mensagemErro: 'Não foi possível gerar o backup.',
+      mensagemErro: l10n.configErroExportarJson,
     );
   }
 
@@ -165,19 +169,19 @@ class ConfigTab extends ConsumerWidget {
   }
 
   Future<void> _apagarTudo(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final passo1 = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Apagar todos os dados?'),
-        content: const Text(
-            'Isso remove rendas, contas, cartões e histórico deste dispositivo.'),
+        title: Text(l10n.configApagarConfirmarTitulo),
+        content: Text(l10n.configApagarConfirmarTexto),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar')),
+              child: Text(l10n.acaoCancelar)),
           FilledButton.tonal(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Continuar')),
+              child: Text(l10n.acaoContinuar)),
         ],
       ),
     );
@@ -191,13 +195,11 @@ class ConfigTab extends ConsumerWidget {
 
     final ok = await executarComFeedback(
       context,
-      () => ref.read(exportServiceProvider).apagarTudo(),
-      mensagemErro: 'Não foi possível apagar os dados.',
+      () => ref.read(backupServiceProvider).apagarTudo(),
+      mensagemErro: l10n.configErroApagar,
     );
     if (!ok || !context.mounted) return;
-    invalidarLeituras(ref);
-    // Meses reabertos são de dados que não existem mais.
-    ref.read(mesesReabertosProvider.notifier).limpar();
+    aposMudancaAmpla(ref);
   }
 }
 
@@ -226,25 +228,25 @@ class _ConfirmarExclusaoDialogState extends State<_ConfirmarExclusaoDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final confirmado = _controller.text.trim().toLowerCase() == 'excluir';
+    final l10n = AppLocalizations.of(context);
+    final palavra = l10n.configApagarPalavra;
+    final confirmado = _controller.text.trim().toLowerCase() == palavra;
     return AlertDialog(
-      title: const Text('Tem certeza?'),
+      title: Text(l10n.configApagarTemCerteza),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-              'Esta ação não pode ser desfeita. Para confirmar, digite '
-              '"excluir" abaixo.'),
+          Text(l10n.configApagarInstrucao(palavra)),
           const SizedBox(height: 12),
           TextField(
             controller: _controller,
             autofocus: true,
             autocorrect: false,
             onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              hintText: 'excluir',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: palavra,
+              border: const OutlineInputBorder(),
             ),
           ),
         ],
@@ -252,12 +254,12 @@ class _ConfirmarExclusaoDialogState extends State<_ConfirmarExclusaoDialog> {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar')),
+            child: Text(l10n.acaoCancelar)),
         FilledButton(
           style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error),
           onPressed: confirmado ? () => Navigator.pop(context, true) : null,
-          child: const Text('Apagar tudo'),
+          child: Text(l10n.configApagarAcao),
         ),
       ],
     );

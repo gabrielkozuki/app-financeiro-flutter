@@ -12,6 +12,7 @@ import '../../domain/repositories/repositories.dart';
 import '../../domain/usecases/calcular_metodologia.dart';
 import '../../domain/usecases/gerar_mes.dart';
 import '../../domain/usecases/ratear_fatura.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Uma linha da checklist: a ocorrência do mês + a conta de origem.
 class ItemChecklist {
@@ -80,6 +81,7 @@ final panoramaMesProvider =
   final entradasRepo = ref.watch(entradasRepoProvider);
   final configRepo = ref.watch(configRepoProvider);
   final fechRepo = ref.watch(fechamentoRepoProvider);
+  final emTransacao = ref.watch(emTransacaoProvider);
   final reaberto = ref.watch(mesesReabertosProvider);
   final ehPassado = ehMesPassado(mes);
 
@@ -105,7 +107,10 @@ final panoramaMesProvider =
   // serve para corrigir o que já existe naquele mês, não para injetar nele as
   // contas de hoje.
   if (!ehPassado) {
-    await _gerarMes(mes, contasRepo: contasRepo, cartoesRepo: cartoesRepo);
+    await _gerarMes(mes,
+        contasRepo: contasRepo,
+        cartoesRepo: cartoesRepo,
+        emTransacao: emTransacao);
   }
 
   final linhas = await _linhasDoMes(mes,
@@ -208,6 +213,7 @@ Future<void> _gerarMes(
   String mes, {
   required ContasRepository contasRepo,
   required CartoesRepository cartoesRepo,
+  required Future<void> Function(Future<void> Function()) emTransacao,
 }) async {
   final gerado = const GerarMes()(
     mesReferencia: mes,
@@ -216,17 +222,24 @@ Future<void> _gerarMes(
     cartoesAtivos: await cartoesRepo.listarAtivos(),
     cartaoIdsComFaturaNoMes: await cartoesRepo.cartaoIdsComFaturaNoMes(mes),
   );
+  if (gerado.ocorrencias.isEmpty && gerado.faturas.isEmpty) return;
 
-  for (final o in gerado.ocorrencias) {
-    await contasRepo.inserirOcorrencia(
-      contaId: o.contaId,
-      mesReferencia: o.mesReferencia,
-      valorPlanejado: o.valorPlanejado,
-    );
-  }
-  for (final f in gerado.faturas) {
-    await cartoesRepo.criarFatura(cartaoId: f.cartaoId, mesReferencia: f.mesReferencia);
-  }
+  // Um commit só para a virada inteira: são ~20-25 linhas no primeiro acesso
+  // de cada mês, e sem isto cada INSERT vira uma ida ao isolate do banco —
+  // desperdício justamente no momento em que o usuário está abrindo o app.
+  await emTransacao(() async {
+    for (final o in gerado.ocorrencias) {
+      await contasRepo.inserirOcorrencia(
+        contaId: o.contaId,
+        mesReferencia: o.mesReferencia,
+        valorPlanejado: o.valorPlanejado,
+      );
+    }
+    for (final f in gerado.faturas) {
+      await cartoesRepo.criarFatura(
+          cartaoId: f.cartaoId, mesReferencia: f.mesReferencia);
+    }
+  });
 }
 
 /// Fecha os meses passados que têm dados e ainda não têm retrato — exceto os
@@ -240,10 +253,15 @@ Future<void> _garantirFechamentos({
   required ConfigRepository configRepo,
   required FechamentoRepository fechRepo,
 }) async {
+  // Duas consultas fixas (meses com dados + meses já fechados) e a diferença
+  // entre os conjuntos. Antes era um `doMes` POR MÊS: com 10 anos de uso, 120
+  // consultas a cada invalidação do panorama só para concluir que não há nada
+  // a fechar — que é o caso comum.
+  final jaFechados = await fechRepo.mesesFechados();
   for (final m in await fechRepo.mesesComDados()) {
     if (m.compareTo(mesAtual) < 0 &&
         !reaberto.contains(m) &&
-        await fechRepo.doMes(m) == null) {
+        !jaFechados.contains(m)) {
       await fecharMes(
         mes: m,
         contasRepo: contasRepo,
@@ -295,6 +313,19 @@ void invalidarLeituras(WidgetRef ref) {
   ref.invalidate(precisaOnboardingProvider);
 }
 
+/// Ritual obrigatório depois de TROCAR o banco inteiro: apagar tudo (RF-20),
+/// restaurar um backup ou concluir o onboarding.
+///
+/// São duas coisas que precisam andar juntas — descartar o cache de leitura e
+/// esquecer os meses reabertos, que são de dados que podem não existir mais.
+/// Existe como função única porque o M8 acrescenta dois chamadores (restaurar
+/// da nuvem e de arquivo), e um ritual de duas linhas copiado em quatro lugares
+/// é a receita conhecida de "restaurei e a tela continuou mostrando o antigo".
+void aposMudancaAmpla(WidgetRef ref) {
+  invalidarLeituras(ref);
+  ref.read(mesesReabertosProvider.notifier).limpar();
+}
+
 /// Reabre o mês selecionado para edição: descarta o retrato e marca o mês como
 /// reaberto nesta sessão (fica editável, restrito às ocorrências daquele mês).
 Future<void> reabrirMesSelecionado(BuildContext context, WidgetRef ref) async {
@@ -303,7 +334,7 @@ Future<void> reabrirMesSelecionado(BuildContext context, WidgetRef ref) async {
   final ok = await executarComFeedback(
     context,
     () => fechRepo.excluir(mes),
-    mensagemErro: 'Não foi possível reabrir o mês.',
+    mensagemErro: AppLocalizations.of(context).mesErroReabrir,
   );
   if (!ok || !context.mounted) return;
   ref.read(mesesReabertosProvider.notifier).reabrir(mes);
@@ -330,7 +361,7 @@ Future<void> concluirEdicaoMesSelecionado(
       configRepo: configRepo,
       fechRepo: fechRepo,
     ),
-    mensagemErro: 'Não foi possível concluir a edição do mês.',
+    mensagemErro: AppLocalizations.of(context).mesErroConcluirEdicao,
   );
   if (!ok || !context.mounted) return;
   ref.read(mesesReabertosProvider.notifier).refechar(mes);

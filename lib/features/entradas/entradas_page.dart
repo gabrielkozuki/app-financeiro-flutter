@@ -10,6 +10,7 @@ import '../../core/widgets/campo_moeda.dart';
 import '../../core/widgets/ui_kit.dart';
 import '../../domain/entities/entrada.dart';
 import '../../domain/entities/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../mes/mes_panorama.dart';
 import '../mes/seletor_mes.dart';
 
@@ -22,18 +23,19 @@ class EntradasPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(entradasDoMesProvider);
     final mes = ref.watch(mesSelecionadoProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rendas'),
+        title: Text(l10n.rendasTitulo),
         bottom: seletorMesBar(context),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _abrirForm(context),
         icon: const Icon(Icons.add),
-        label: const Text('Nova entrada'),
+        label: Text(l10n.rendaNova),
       ),
       body: SafeArea(
         child: async.when(
@@ -42,7 +44,7 @@ class EntradasPage extends ConsumerWidget {
             e,
             s,
             contexto: 'EntradasPage',
-            titulo: 'Não conseguimos carregar suas rendas',
+            titulo: l10n.erroCarregarRendas,
             onTentarNovamente: () => ref.invalidate(entradasDoMesProvider),
           ),
           data: (entradas) {
@@ -54,11 +56,10 @@ class EntradasPage extends ConsumerWidget {
             final total = entradas.fold<double>(0, (s, e) => s + e.valorLiquido);
 
             if (entradas.isEmpty) {
-              return const EmptyState(
+              return EmptyState(
                 icone: Icons.attach_money,
-                titulo: 'Nenhuma renda neste mês',
-                descricao: 'Toque em "Nova entrada" para cadastrar seu '
-                    'salário ou outra entrada.',
+                titulo: l10n.rendasVazioTitulo,
+                descricao: l10n.rendasVazioDescricao,
               );
             }
 
@@ -67,11 +68,12 @@ class EntradasPage extends ConsumerWidget {
               children: [
                 _CardTotal(total: total),
                 if (recorrentes.isNotEmpty) ...[
-                  const SectionLabel('Recorrentes (todo mês)'),
+                  SectionLabel(l10n.rendasRecorrentes),
                   for (final e in recorrentes) _tile(context, e),
                 ],
                 if (pontuais.isNotEmpty) ...[
-                  SectionLabel('Pontuais de ${mesAno(mes)}'),
+                  SectionLabel(
+                      l10n.rendasPontuaisDoMes(mesAno(mes, l10n.localeName))),
                   for (final e in pontuais) _tile(context, e),
                 ],
               ],
@@ -83,6 +85,7 @@ class EntradasPage extends ConsumerWidget {
   }
 
   Widget _tile(BuildContext context, Entrada e) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
           horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceXs),
@@ -96,8 +99,8 @@ class EntradasPage extends ConsumerWidget {
           ),
           title: Text(e.nome),
           subtitle: Text(e.tipo == TipoEntrada.recorrente
-              ? 'Recebe dia ${e.diaRecebimento ?? '-'}'
-              : 'Só em ${e.mesReferencia ?? '-'}'),
+              ? l10n.rendaRecebeDia('${e.diaRecebimento ?? '-'}')
+              : l10n.rendaSoEm(e.mesReferencia ?? '-')),
           trailing: Text(brl(e.valorLiquido),
               style: const TextStyle(fontWeight: FontWeight.w600)),
           onTap: () => _abrirForm(context, entrada: e),
@@ -135,7 +138,7 @@ class _CardTotal extends StatelessWidget {
           children: [
             Icon(Icons.payments_outlined, size: 20, color: scheme.primary),
             const SizedBox(width: AppTheme.spaceSm),
-            Text('TOTAL DO MÊS',
+            Text(AppLocalizations.of(context).rendasTotalDoMes,
                 style: context.texts.labelMedium
                     ?.copyWith(color: scheme.onSurfaceVariant)),
             const Spacer(),
@@ -209,7 +212,7 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
     final ok = await executarComFeedback(
       context,
       () => _edicao ? repo.atualizar(entrada) : repo.criar(entrada),
-      mensagemErro: 'Não foi possível salvar esta entrada.',
+      mensagemErro: AppLocalizations.of(context).rendaErroSalvar,
     );
     _concluir(ok);
   }
@@ -219,7 +222,7 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
     final ok = await executarComFeedback(
       context,
       () => ref.read(entradasRepoProvider).excluir(widget.entrada!.id),
-      mensagemErro: 'Não foi possível excluir esta entrada.',
+      mensagemErro: AppLocalizations.of(context).rendaErroExcluir,
     );
     _concluir(ok);
   }
@@ -238,7 +241,8 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
 
   @override
   Widget build(BuildContext context) {
-    final insets = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context);
+    final insets = MediaQuery.viewInsetsOf(context).bottom;
     final mes = ref.watch(mesSelecionadoProvider);
 
     return Padding(
@@ -250,31 +254,34 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SheetHeader(
-              titulo: _edicao ? 'Editar entrada' : 'Nova entrada',
+              titulo: _edicao ? l10n.rendaEditar : l10n.rendaNova,
               onExcluir: _edicao ? (_salvando ? null : _excluir) : null,
             ),
             const SizedBox(height: AppTheme.spaceXs),
             TextFormField(
               controller: _nome,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                  labelText: 'Nome', hintText: 'Ex.: Salário'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Informe um nome' : null,
+              decoration: InputDecoration(
+                  labelText: l10n.campoNome, hintText: l10n.rendaNomeHint),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l10n.validacaoInformeNome
+                  : null,
             ),
             const SizedBox(height: 12),
             CampoMoeda(
               controller: _valor,
-              labelText: 'Valor líquido',
+              labelText: l10n.campoValorLiquido,
               obrigatorioPositivo: true,
             ),
             const SizedBox(height: 16),
             SegmentedButton<TipoEntrada>(
-              segments: const [
+              segments: [
                 ButtonSegment(
-                    value: TipoEntrada.recorrente, label: Text('Recorrente')),
+                    value: TipoEntrada.recorrente,
+                    label: Text(l10n.rendaTipoRecorrente)),
                 ButtonSegment(
-                    value: TipoEntrada.pontual, label: Text('Só este mês')),
+                    value: TipoEntrada.pontual,
+                    label: Text(l10n.rendaTipoPontual)),
               ],
               selected: {_tipo},
               onSelectionChanged: (s) => setState(() => _tipo = s.first),
@@ -284,23 +291,23 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
               TextFormField(
                 controller: _dia,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    labelText: 'Dia do recebimento', errorMaxLines: 2),
+                decoration: InputDecoration(
+                    labelText: l10n.rendaDiaRecebimento, errorMaxLines: 2),
                 validator: (v) {
                   final d = int.tryParse(v ?? '');
                   return (d == null || d < 1 || d > 31)
-                      ? 'Informe um dia entre 1 e 31'
+                      ? l10n.validacaoDia
                       : null;
                 },
               )
             else
-              Text('Entra apenas em ${mesAno(mes)}.',
+              Text(l10n.rendaEntraApenasEm(mesAno(mes, l10n.localeName)),
                   style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 20),
             BotaoSalvar(
               salvando: _salvando,
               onPressed: _salvar,
-              rotulo: _edicao ? 'Salvar' : 'Adicionar',
+              rotulo: _edicao ? l10n.acaoSalvar : l10n.acaoAdicionar,
             ),
           ],
         ),

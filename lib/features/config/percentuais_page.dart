@@ -10,6 +10,7 @@ import '../../core/widgets/ui_kit.dart';
 import '../../domain/entities/configuracao.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/usecases/percentuais.dart';
+import '../../l10n/app_localizations.dart';
 import '../mes/mes_panorama.dart';
 
 /// Tela (sobreposta) de ajuste dos percentuais da metodologia (RF-15). A soma
@@ -59,10 +60,11 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
     if (!const ValidarPercentuais()(config)) return;
 
     setState(() => _salvando = true);
+    final l10n = AppLocalizations.of(context);
     final ok = await executarComFeedback(
       context,
       () => ref.read(configRepoProvider).salvar(config),
-      mensagemErro: 'Não foi possível salvar os percentuais.',
+      mensagemErro: l10n.percentuaisErroSalvar,
     );
     if (!mounted) return;
     setState(() => _salvando = false);
@@ -71,17 +73,18 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
     // Sem isto, reabrir a tela mostraria o percentual antigo em cache.
     ref.invalidate(_configVigenteProvider);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Percentuais atualizados.')),
+      SnackBar(content: Text(l10n.percentuaisAtualizados)),
     );
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final configAsync = ref.watch(_configVigenteProvider(_mesVigencia));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Metodologia')),
+      appBar: AppBar(title: Text(l10n.percentuaisTitulo)),
       body: SafeArea(
         child: configAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -89,7 +92,7 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
             e,
             s,
             contexto: 'PercentuaisPage',
-            titulo: 'Não conseguimos carregar seus percentuais',
+            titulo: l10n.erroCarregarPercentuais,
             onTentarNovamente: () => ref.invalidate(_configVigenteProvider),
           ),
           data: (config) {
@@ -107,8 +110,7 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
               padding: const EdgeInsets.all(AppTheme.spaceXl),
               children: [
                 Text(
-                  'A referência 50-30-20 é um diagnóstico, não um limite. '
-                  'Ajuste os percentuais como preferir — a soma deve dar 100%.',
+                  l10n.percentuaisIntro,
                   style: textTheme.bodyMedium
                       ?.copyWith(color: scheme.onSurfaceVariant),
                 ),
@@ -125,7 +127,7 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
                                   t.replaceAll(',', '.')) ??
                               0),
                       decoration: InputDecoration(
-                        labelText: g.rotulo,
+                        labelText: g.rotulo(context),
                         prefixIcon: Icon(g.icone, color: g.cor),
                         suffixText: '%',
                       ),
@@ -159,8 +161,9 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
                       const SizedBox(width: AppTheme.spaceSm),
                       Text(
                         somaOk
-                            ? 'Soma: ${digitada.soma.round()}% — tudo certo'
-                            : 'Soma: ${digitada.soma.round()}% — precisa fechar em 100%',
+                            ? l10n.percentuaisSomaOk(digitada.soma.round())
+                            : l10n.percentuaisSomaInvalida(
+                                digitada.soma.round()),
                         style: textTheme.bodyMedium?.copyWith(
                           color: somaOk ? scheme.primary : scheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
@@ -173,7 +176,7 @@ class _PercentuaisPageState extends ConsumerState<PercentuaisPage> {
                 BotaoSalvar(
                   salvando: _salvando,
                   onPressed: somaOk ? _salvar : null,
-                  rotulo: 'Salvar percentuais',
+                  rotulo: l10n.percentuaisSalvar,
                 ),
               ],
             );

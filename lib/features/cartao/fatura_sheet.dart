@@ -12,6 +12,7 @@ import '../../core/widgets/ui_kit.dart';
 import '../../domain/entities/cartao.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/usecases/ratear_fatura.dart';
+import '../../l10n/app_localizations.dart';
 import '../mes/mes_panorama.dart';
 
 /// Abre o detalhe da fatura: informar o valor total e subdividi-lo entre os
@@ -103,7 +104,7 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
       } else {
         await repo.desmarcarFatura(_fatura.id);
       }
-    }, mensagemErro: 'Não foi possível salvar esta fatura.');
+    }, mensagemErro: AppLocalizations.of(context).faturaErroSalvar);
     _concluir(ok);
   }
 
@@ -116,7 +117,7 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
       await repo.definirValorFatura(_fatura.id, 0);
       await repo.salvarRateio(_fatura.id, const {});
       await repo.marcarFaturaPaga(_fatura.id, valorPago: 0);
-    }, mensagemErro: 'Não foi possível salvar esta fatura.');
+    }, mensagemErro: AppLocalizations.of(context).faturaErroSalvar);
     _concluir(ok);
   }
 
@@ -132,7 +133,8 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final insets = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context);
+    final insets = MediaQuery.viewInsetsOf(context).bottom;
     final textTheme = Theme.of(context).textTheme;
     final mes = ref.watch(mesSelecionadoProvider);
     final validacao = _validacao;
@@ -145,21 +147,20 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SheetHeader(
-              titulo: 'Fatura ${widget.item.cartao.nome}',
-              subtitulo: mesAno(mes),
+              titulo: l10n.faturaTitulo(widget.item.cartao.nome),
+              subtitulo: mesAno(mes, l10n.localeName),
             ),
             const SizedBox(height: AppTheme.spaceSm),
             CampoMoeda(
               controller: _total,
-              labelText: 'Valor total da fatura',
+              labelText: l10n.faturaValorTotal,
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: AppTheme.spaceXl),
-            Text('Como dividir entre os grupos', style: textTheme.titleMedium),
+            Text(l10n.faturaComoDividir, style: textTheme.titleMedium),
             const SizedBox(height: AppTheme.spaceXs),
             Text(
-              'Divida de cabeça, sem itemizar. É o que mantém o painel fiel '
-              'quando quase tudo é pago no cartão.',
+              l10n.faturaComoDividirTexto,
               style: textTheme.bodySmall
                   ?.copyWith(color: context.colors.onSurfaceVariant),
             ),
@@ -169,7 +170,7 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
                 padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXs),
                 child: CampoMoeda(
                   controller: _grupos[g]!,
-                  labelText: g.rotulo,
+                  labelText: g.rotulo(context),
                   prefixIcon: Icon(g.icone, color: g.cor),
                   onChanged: (_) => setState(() {}),
                 ),
@@ -180,13 +181,13 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
             BotaoSalvar(
               salvando: _salvando,
               onPressed: _valido ? _salvar : null,
-              rotulo: 'Salvar fatura',
+              rotulo: l10n.faturaSalvar,
             ),
             const SizedBox(height: 4),
             TextButton.icon(
               onPressed: _salvando ? null : _naoUsei,
               icon: const Icon(Icons.block_flipped, size: 18),
-              label: const Text('Não usei este cartão neste mês'),
+              label: Text(l10n.faturaNaoUsei),
             ),
           ],
         ),
@@ -195,10 +196,11 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
   }
 
   Widget _feedback(ValidacaoRateio validacao, TextTheme textTheme) {
+    final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final falta = validacao.faltaAlocar;
     if (_totalValor <= 0) {
-      return Text('Informe o valor total da fatura.',
+      return Text(l10n.faturaInformeTotal,
           style: textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant));
     }
     if (validacao.valido) {
@@ -206,15 +208,15 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
         children: [
           Icon(Icons.check_circle_outline, color: scheme.primary),
           const SizedBox(width: AppTheme.spaceSm),
-          Text('Tudo alocado!', style: textTheme.bodyMedium),
+          Text(l10n.faturaTudoAlocado, style: textTheme.bodyMedium),
         ],
       );
     }
     // Feedback neutro (não é um erro nem um julgamento sobre o gasto): apenas
     // indica que a divisão ainda não fecha com o valor total.
     final texto = falta > 0
-        ? 'Falta alocar ${brl(falta)}'
-        : 'Você alocou ${brl(-falta)} a mais que o total';
+        ? l10n.faturaFaltaAlocar(brl(falta))
+        : l10n.faturaAlocouAMais(brl(-falta));
     return Row(
       children: [
         Icon(Icons.info_outline, size: 18, color: scheme.onSurfaceVariant),

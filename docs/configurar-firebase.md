@@ -35,7 +35,19 @@ eu ligo o código de **login (Google + Apple)** e o **backup na nuvem** no app.
    }
    ```
 
-## 4. Conectar o app Flutter (no seu Mac ou máquina com Flutter)
+## 4. Readicionar as dependências
+
+Elas foram **removidas do `pubspec.yaml`** enquanto o M8 não começa: mesmo sem
+serem importadas em `lib/`, injetavam `ACCESS_NETWORK_STATE`, `USE_BIOMETRIC`,
+`USE_FINGERPRINT` e `READ_GSERVICES` no manifesto do APK e um
+`FirebaseInitProvider` no start do app — permissões e custo sem função.
+
+```bash
+flutter pub add firebase_core firebase_auth firebase_database google_sign_in
+# sign_in_with_apple só quando houver conta paga no Apple Developer Program
+```
+
+## 5. Conectar o app Flutter (no seu Mac ou máquina com Flutter)
 
 ```bash
 dart pub global activate flutterfire_cli

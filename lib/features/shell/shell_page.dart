@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 import '../config/config_tab.dart';
 import '../contas/contas_tab.dart';
 import '../grafico/grafico_tab.dart';
@@ -21,26 +23,27 @@ class _ShellPageState extends State<ShellPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: IndexedStack(index: _indice, children: _abas),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _indice,
         onDestinationSelected: (i) => setState(() => _indice = i),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.checklist_outlined),
-            selectedIcon: Icon(Icons.checklist),
-            label: 'Contas',
+            icon: const Icon(Icons.checklist_outlined),
+            selectedIcon: const Icon(Icons.checklist),
+            label: l10n.abaContas,
           ),
           NavigationDestination(
-            icon: Icon(Icons.donut_small_outlined),
-            selectedIcon: Icon(Icons.donut_small),
-            label: 'Gráfico',
+            icon: const Icon(Icons.donut_small_outlined),
+            selectedIcon: const Icon(Icons.donut_small),
+            label: l10n.abaGrafico,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Configurações',
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
+            label: l10n.abaConfiguracoes,
           ),
         ],
       ),

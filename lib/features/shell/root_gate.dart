@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers.dart';
 import '../../core/widgets/ui_kit.dart';
+import '../../l10n/app_localizations.dart';
 import '../onboarding/onboarding_page.dart';
 import 'shell_page.dart';
 
@@ -24,7 +25,7 @@ class RootGate extends ConsumerWidget {
           e,
           s,
           contexto: 'RootGate',
-          titulo: 'Não conseguimos abrir seus dados',
+          titulo: AppLocalizations.of(context).erroAbrirDados,
           onTentarNovamente: () => ref.invalidate(precisaOnboardingProvider),
         ),
       ),

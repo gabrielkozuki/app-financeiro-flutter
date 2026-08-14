@@ -7,6 +7,7 @@ import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/grupo_visual.dart';
 import '../../core/widgets/ui_kit.dart';
+import '../../l10n/app_localizations.dart';
 import '../cartao/fatura_sheet.dart';
 import '../mes/mes_panorama.dart';
 import '../mes/seletor_mes.dart';
@@ -19,6 +20,7 @@ class ContasTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final mes = ref.watch(mesReferenciaProvider);
     final async = ref.watch(panoramaMesProvider(mes));
     final somenteLeitura = ref.watch(mesSomenteLeituraProvider);
@@ -28,7 +30,7 @@ class ContasTab extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meu mês'),
+        title: Text(l10n.tituloMeuMes),
         bottom: seletorMesBar(context),
       ),
       floatingActionButton: (somenteLeitura || editandoFechado)
@@ -36,7 +38,7 @@ class ContasTab extends ConsumerWidget {
           : FloatingActionButton.extended(
               onPressed: () => abrirNovaConta(context),
               icon: const Icon(Icons.add),
-              label: const Text('Nova conta'),
+              label: Text(l10n.contasNovaConta),
             ),
       body: SafeArea(
         child: Center(
@@ -52,7 +54,7 @@ class ContasTab extends ConsumerWidget {
                 e,
                 s,
                 contexto: 'ContasTab',
-                titulo: 'Não conseguimos carregar este mês',
+                titulo: l10n.erroCarregarMes,
                 onTentarNovamente: () => ref.invalidate(panoramaMesProvider),
               ),
               data: (panorama) => _Conteudo(panorama: panorama),
@@ -94,6 +96,7 @@ class _Conteudo extends ConsumerWidget {
   }
 
   Widget _cabecalho(BuildContext context, int pagas, int total) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final scheme = context.colors;
     return Padding(
@@ -101,7 +104,7 @@ class _Conteudo extends ConsumerWidget {
           AppTheme.spaceXl, AppTheme.spaceSm, AppTheme.spaceXl, AppTheme.spaceXs),
       child: Row(
         children: [
-          Text('Contas mensais', style: textTheme.titleMedium),
+          Text(l10n.contasSecaoMensais, style: textTheme.titleMedium),
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(
@@ -126,15 +129,16 @@ class _Vazio extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final somenteLeitura = ref.watch(mesSomenteLeituraProvider);
     return EmptyState(
       icone: somenteLeitura ? Icons.history : Icons.checklist_rounded,
       titulo: somenteLeitura
-          ? 'Nenhuma conta neste mês fechado'
-          : 'Nenhuma conta neste mês',
+          ? l10n.contasVazioFechadoTitulo
+          : l10n.contasVazioTitulo,
       descricao: somenteLeitura
-          ? 'Este mês faz parte do histórico e não teve contas registradas.'
-          : 'Toque em "Nova conta" para começar a organizar seu mês.',
+          ? l10n.contasVazioFechadoDescricao
+          : l10n.contasVazioDescricao,
     );
   }
 }
@@ -144,6 +148,7 @@ class _BannerMesFechado extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -166,8 +171,7 @@ class _BannerMesFechado extends ConsumerWidget {
                 const SizedBox(width: AppTheme.spaceSm),
                 Expanded(
                   child: Text(
-                    'Mês fechado — somente leitura. Este é o registro do que '
-                    'foi pago naquele mês.',
+                    l10n.contasMesFechadoAviso,
                     style: context.texts.bodySmall
                         ?.copyWith(color: scheme.onSurfaceVariant),
                   ),
@@ -179,7 +183,7 @@ class _BannerMesFechado extends ConsumerWidget {
               child: TextButton.icon(
                 onPressed: () => _confirmarReabrir(context, ref),
                 icon: const Icon(Icons.lock_open_outlined, size: 18),
-                label: const Text('Reabrir mês'),
+                label: Text(l10n.contasReabrirMes),
               ),
             ),
           ],
@@ -189,21 +193,19 @@ class _BannerMesFechado extends ConsumerWidget {
   }
 
   Future<void> _confirmarReabrir(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reabrir este mês?'),
-        content: const Text(
-            'O mês volta a ser editável para você corrigir contas e faturas '
-            'deste mês. Nada nos outros meses é afetado. Ao concluir, um novo '
-            'registro do mês é gravado.'),
+        title: Text(l10n.contasReabrirTitulo),
+        content: Text(l10n.contasReabrirTexto),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar')),
+              child: Text(l10n.acaoCancelar)),
           FilledButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Reabrir')),
+              child: Text(l10n.contasReabrirAcao)),
         ],
       ),
     );
@@ -218,6 +220,7 @@ class _BannerEditandoFechado extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -240,8 +243,7 @@ class _BannerEditandoFechado extends ConsumerWidget {
                 const SizedBox(width: AppTheme.spaceSm),
                 Expanded(
                   child: Text(
-                    'Editando um mês fechado. As alterações valem só para este '
-                    'mês.',
+                    l10n.contasEditandoFechadoAviso,
                     style: context.texts.bodySmall
                         ?.copyWith(color: scheme.onTertiaryContainer),
                   ),
@@ -253,7 +255,7 @@ class _BannerEditandoFechado extends ConsumerWidget {
               child: TextButton.icon(
                 onPressed: () => concluirEdicaoMesSelecionado(context, ref),
                 icon: const Icon(Icons.check, size: 18),
-                label: const Text('Concluir edição'),
+                label: Text(l10n.contasConcluirEdicao),
               ),
             ),
           ],
@@ -271,6 +273,7 @@ class _CardPago extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final scheme = context.colors;
     final fracao = total == 0 ? 0.0 : (pago / total).clamp(0.0, 1.0);
@@ -283,7 +286,7 @@ class _CardPago extends StatelessWidget {
     // `scheme.primary`, com texto de apoio em `onSurfaceVariant` para manter
     // contraste garantido pelo Material 3 em qualquer tema.
     return Semantics(
-      label: 'Pago este mês: ${brl(pago)} de ${brl(total)}, $percentual por cento',
+      label: l10n.contasPagoSemantica(brl(pago), brl(total), percentual),
       // Sem isso, o leitor de tela lê o rótulo-resumo e, em seguida, os
       // textos internos (valor, "de X · Y%") de novo — mesma duplicidade
       // corrigida na rosca de Direcionamento.
@@ -307,7 +310,7 @@ class _CardPago extends StatelessWidget {
                         size: 16, color: scheme.primary),
                   ),
                   const SizedBox(width: AppTheme.spaceSm),
-                  Text('PAGO ESTE MÊS',
+                  Text(l10n.contasPagoEsteMes,
                       style: textTheme.labelMedium
                           ?.copyWith(color: scheme.onSurfaceVariant)),
                 ],
@@ -328,7 +331,7 @@ class _CardPago extends StatelessWidget {
                         )),
                   ),
                   const SizedBox(width: AppTheme.spaceSm),
-                  Text('de ${brl(total)} · $percentual%',
+                  Text(l10n.contasPagoDeTotal(brl(total), percentual),
                       style: textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       )),
@@ -391,6 +394,7 @@ class _ContaTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final onSurfaceVariant = context.colors.onSurfaceVariant;
     final conta = item.conta;
@@ -409,7 +413,7 @@ class _ContaTile extends ConsumerWidget {
         () => (v ?? false)
             ? repo.marcarPaga(ocorrencia.id)
             : repo.desmarcar(ocorrencia.id),
-        mensagemErro: 'Não foi possível marcar "${conta.nome}".',
+        mensagemErro: l10n.contaErroMarcar(conta.nome),
       );
       // `ref` só é utilizável enquanto o tile estiver montado.
       if (ok && context.mounted) ref.invalidate(panoramaMesProvider);
@@ -419,8 +423,11 @@ class _ContaTile extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: AppTheme.spaceLg, vertical: 5),
       child: Semantics(
-        label: '${conta.nome}, ${conta.grupo.rotulo}, ${brl(ocorrencia.valorEfetivo)}'
-            ', ${paga ? 'paga' : 'pendente'}',
+        label: l10n.contaSemantica(
+            conta.nome,
+            conta.grupo.rotulo(context),
+            brl(ocorrencia.valorEfetivo),
+            paga ? l10n.estadoPaga : l10n.estadoPendente),
         child: _ChecklistCard(
           cor: conta.grupo.cor,
           child: ListTile(
@@ -438,7 +445,7 @@ class _ContaTile extends ConsumerWidget {
             leading: Checkbox(
                 value: paga,
                 onChanged: somenteLeitura ? null : alternar,
-                semanticLabel: 'Marcar ${conta.nome} como paga'),
+                semanticLabel: l10n.contaMarcarPaga(conta.nome)),
             title: Row(
               children: [
                 Expanded(
@@ -471,8 +478,14 @@ class _ContaTile extends ConsumerWidget {
                   const SizedBox(width: AppTheme.spaceXs + 2),
                   Expanded(
                     child: Text(
-                      '${conta.grupo.rotulo} · vencimento dia ${conta.diaVencimento}'
-                      '${ocorrencia.parcelaAtual != null ? ' · ${ocorrencia.parcelaAtual}/${conta.totalParcelas}' : ''}',
+                      ocorrencia.parcelaAtual != null
+                          ? l10n.contaSubtituloParcela(
+                              conta.grupo.rotulo(context),
+                              conta.diaVencimento,
+                              ocorrencia.parcelaAtual!,
+                              conta.totalParcelas ?? 0)
+                          : l10n.contaSubtitulo(
+                              conta.grupo.rotulo(context), conta.diaVencimento),
                       style:
                           textTheme.bodyMedium?.copyWith(color: onSurfaceVariant),
                       overflow: TextOverflow.ellipsis,
@@ -495,6 +508,7 @@ class _FaturaTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final scheme = context.colors;
     final onSurfaceVariant = scheme.onSurfaceVariant;
@@ -515,8 +529,7 @@ class _FaturaTile extends ConsumerWidget {
         () => (v ?? false)
             ? repo.marcarFaturaPaga(fatura.id)
             : repo.desmarcarFatura(fatura.id),
-        mensagemErro:
-            'Não foi possível marcar a fatura ${item.cartao.nome}.',
+        mensagemErro: l10n.faturaErroMarcar(item.cartao.nome),
       );
       // `ref` só é utilizável enquanto o tile estiver montado.
       if (ok && context.mounted) ref.invalidate(panoramaMesProvider);
@@ -538,12 +551,12 @@ class _FaturaTile extends ConsumerWidget {
           leading: Checkbox(
               value: paga,
               onChanged: somenteLeitura ? null : alternar,
-              semanticLabel: 'Marcar a fatura ${item.cartao.nome} como paga'),
+              semanticLabel: l10n.faturaMarcarPaga(item.cartao.nome)),
           title: Row(
             children: [
               Expanded(
                 child: Text(
-                  'Fatura ${item.cartao.nome}',
+                  l10n.faturaTitulo(item.cartao.nome),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -553,7 +566,7 @@ class _FaturaTile extends ConsumerWidget {
                 ),
               ),
               Text(
-                temValor ? brl(item.valorEfetivo) : 'Informar',
+                temValor ? brl(item.valorEfetivo) : l10n.faturaInformar,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: temValor ? null : scheme.primary,
@@ -569,8 +582,9 @@ class _FaturaTile extends ConsumerWidget {
                 const SizedBox(width: AppTheme.spaceXs + 2),
                 Expanded(
                   child: Text(
-                    'vence dia ${item.cartao.diaVencimento}'
-                    '${item.rateios.isEmpty && temValor ? ' · toque para ratear' : ''}',
+                    item.rateios.isEmpty && temValor
+                        ? l10n.faturaSubtituloRatear(item.cartao.diaVencimento)
+                        : l10n.faturaSubtitulo(item.cartao.diaVencimento),
                     style:
                         textTheme.bodyMedium?.copyWith(color: onSurfaceVariant),
                     overflow: TextOverflow.ellipsis,

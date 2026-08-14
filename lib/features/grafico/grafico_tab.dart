@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/theme/grupo_visual.dart';
 import '../../core/widgets/ui_kit.dart';
 import '../../domain/usecases/calcular_metodologia.dart';
+import '../../l10n/app_localizations.dart';
 import '../mes/mes_panorama.dart';
 import '../mes/seletor_mes.dart';
 
@@ -19,12 +20,13 @@ class GraficoTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final mes = ref.watch(mesReferenciaProvider);
     final async = ref.watch(panoramaMesProvider(mes));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Direcionamento'),
+        title: Text(l10n.tituloDirecionamento),
         bottom: seletorMesBar(context),
       ),
       body: SafeArea(
@@ -39,7 +41,7 @@ class GraficoTab extends ConsumerWidget {
                 e,
                 s,
                 contexto: 'GraficoTab',
-                titulo: 'Não conseguimos carregar este mês',
+                titulo: l10n.erroCarregarMes,
                 onTentarNovamente: () => ref.invalidate(panoramaMesProvider),
               ),
               data: (panorama) {
@@ -49,12 +51,10 @@ class GraficoTab extends ConsumerWidget {
               final semRegistros =
                   panorama.itens.isEmpty && panorama.faturas.isEmpty;
               if (somenteLeitura && semRegistros) {
-                return const EmptyState(
+                return EmptyState(
                   icone: Icons.history,
-                  titulo: 'Sem registros neste mês',
-                  descricao: 'Este mês faz parte do histórico e não teve '
-                      'contas nem rendas registradas para calcular o '
-                      'direcionamento.',
+                  titulo: l10n.graficoSemRegistrosTitulo,
+                  descricao: l10n.graficoSemRegistrosDescricao,
                 );
               }
               return _Conteudo(metodologia: panorama.metodologia);
@@ -74,12 +74,12 @@ class _Conteudo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (metodologia.renda <= 0) {
-      return const EmptyState(
+      return EmptyState(
         icone: Icons.donut_large_outlined,
-        titulo: 'Sem renda cadastrada neste mês',
-        descricao: 'Cadastre sua renda em Configurações → Rendas para ver o '
-            'direcionamento do seu dinheiro.',
+        titulo: l10n.graficoSemRendaTitulo,
+        descricao: l10n.graficoSemRendaDescricao,
       );
     }
     return ListView(
@@ -88,7 +88,7 @@ class _Conteudo extends StatelessWidget {
         const SizedBox(height: AppTheme.spaceSm),
         _Rosca(metodologia: metodologia),
         const SizedBox(height: AppTheme.spaceXl),
-        const SectionLabel('Como está dividido'),
+        SectionLabel(l10n.graficoComoEstaDividido),
         const SizedBox(height: AppTheme.spaceSm),
         for (final item in metodologia.itens) _LinhaGrupo(item: item),
         _LinhaLivre(metodologia: metodologia),
@@ -105,6 +105,7 @@ class _Rosca extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.colors;
     final secoes = <PieChartSectionData>[
       for (final item in metodologia.itens)
@@ -135,11 +136,14 @@ class _Rosca extends StatelessWidget {
 
     return Semantics(
       label: estourou
-          ? 'Comprometido ${percentualComprometido.round()}% da renda do mês, '
-              '${brl(metodologia.totalComprometido)} de ${brl(metodologia.renda)}'
-          : 'Renda do mês: ${brl(metodologia.renda)}, dividida entre '
-              '${[for (final i in metodologia.itens) i.grupo.rotulo].join(", ")} '
-              'e Livre',
+          ? l10n.graficoSemanticaRoscaComprometido(
+              percentualComprometido.round(),
+              brl(metodologia.totalComprometido),
+              brl(metodologia.renda))
+          : l10n.graficoSemanticaRosca(
+              brl(metodologia.renda),
+              [for (final i in metodologia.itens) i.grupo.rotulo(context)]
+                  .join(", ")),
       // Sem isso, o leitor de tela lê o rótulo-resumo e depois os dois Text
       // internos ("Renda do mês" / valor) de novo, em sequência.
       excludeSemantics: true,
@@ -166,13 +170,14 @@ class _Rosca extends StatelessWidget {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(estourou ? 'Comprometido' : 'Renda do mês',
+                Text(estourou ? l10n.graficoComprometido : l10n.graficoRendaDoMes,
                     style: context.texts.labelMedium
                         ?.copyWith(color: scheme.onSurfaceVariant)),
                 const SizedBox(height: 2),
                 Text(
                   estourou
-                      ? '${percentualComprometido.round()}% da renda'
+                      ? l10n.graficoPercentualDaRenda(
+                          percentualComprometido.round())
                       : brl(metodologia.renda),
                   style: context.texts.headlineSmall,
                 ),
@@ -192,12 +197,14 @@ class _LinhaGrupo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final scheme = context.colors;
+    final meta = item.metaPercentual.round();
     final situacaoTexto = switch (item.situacao) {
-      Situacao.acima => 'acima da meta',
-      Situacao.abaixo => 'abaixo da meta',
-      Situacao.dentro => 'na meta',
+      Situacao.acima => l10n.graficoMetaAcima(meta),
+      Situacao.abaixo => l10n.graficoMetaAbaixo(meta),
+      Situacao.dentro => l10n.graficoMetaDentro(meta),
     };
     final situacaoIcone = switch (item.situacao) {
       Situacao.acima => Icons.arrow_upward_rounded,
@@ -228,7 +235,8 @@ class _LinhaGrupo extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.grupo.rotulo, style: textTheme.titleMedium),
+                    Text(item.grupo.rotulo(context),
+                        style: textTheme.titleMedium),
                     Text(brl(item.comprometido),
                         style: textTheme.bodySmall
                             ?.copyWith(color: scheme.onSurfaceVariant)),
@@ -247,7 +255,7 @@ class _LinhaGrupo extends StatelessWidget {
                       Icon(situacaoIcone,
                           size: 13, color: scheme.onSurfaceVariant),
                       const SizedBox(width: 2),
-                      Text('meta ${item.metaPercentual.round()}% · $situacaoTexto',
+                      Text(situacaoTexto,
                           style: textTheme.bodySmall
                               ?.copyWith(color: scheme.onSurfaceVariant)),
                     ],
@@ -279,6 +287,7 @@ class _LinhaLivre extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final scheme = context.colors;
     return Container(
@@ -298,7 +307,7 @@ class _LinhaLivre extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Livre', style: textTheme.titleMedium),
+                Text(l10n.graficoLivre, style: textTheme.titleMedium),
                 Text(brl(metodologia.livreParaGastar),
                     style: textTheme.bodySmall
                         ?.copyWith(color: scheme.onSurfaceVariant)),

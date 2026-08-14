@@ -12,6 +12,7 @@ import '../../core/widgets/ui_kit.dart';
 import '../../domain/entities/conta.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/usecases/gerar_parcelas.dart';
+import '../../l10n/app_localizations.dart';
 import '../mes/mes_panorama.dart';
 
 /// Abre o formulário de nova conta como folha inferior (tela sobreposta, sem
@@ -113,6 +114,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _salvando = true);
 
+    final l10n = AppLocalizations.of(context);
     final repo = ref.read(contasRepoProvider);
     final emTransacao = ref.read(emTransacaoProvider);
     final mesData = ref.read(mesSelecionadoProvider);
@@ -197,7 +199,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
         await repo.inserirOcorrencia(
             contaId: id, mesReferencia: mes, valorPlanejado: valor);
       }
-    }, mensagemErro: 'Não foi possível salvar esta conta.');
+    }, mensagemErro: l10n.contaFormErroSalvar);
 
     if (!mounted) return;
     setState(() => _salvando = false);
@@ -207,6 +209,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
   }
 
   Future<void> _excluir() async {
+    final l10n = AppLocalizations.of(context);
     final conta = widget.conta!;
     final repo = ref.read(contasRepoProvider);
 
@@ -216,7 +219,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
       if (!mounted) return;
       setState(() => _salvando = true);
       final ok = await executarComFeedback(context, acao,
-          mensagemErro: 'Não foi possível excluir esta conta.');
+          mensagemErro: l10n.contaFormErroExcluir);
       if (!mounted) return;
       setState(() => _salvando = false);
       if (!ok) return;
@@ -232,16 +235,15 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
       final ok = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Remover deste mês?'),
-          content: Text(
-              '"${conta.nome}" sai apenas deste mês. Nenhum outro mês é afetado.'),
+          title: Text(l10n.contaFormRemoverTitulo),
+          content: Text(l10n.contaFormRemoverTexto(conta.nome)),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancelar')),
+                child: Text(l10n.acaoCancelar)),
             FilledButton.tonal(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Remover')),
+                child: Text(l10n.acaoRemover)),
           ],
         ),
       );
@@ -256,19 +258,18 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
     final acao = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir conta'),
-        content: const Text(
-            'O que você quer excluir? Meses anteriores nunca são afetados.'),
+        title: Text(l10n.contaFormExcluirTitulo),
+        content: Text(l10n.contaFormExcluirTexto),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar')),
+              child: Text(l10n.acaoCancelar)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, 'mes'),
-              child: const Text('Só deste mês')),
+              child: Text(l10n.contaFormExcluirSoEsteMes)),
           FilledButton.tonal(
               onPressed: () => Navigator.pop(ctx, 'futuras'),
-              child: const Text('Deste mês em diante')),
+              child: Text(l10n.contaFormExcluirDaquiEmDiante)),
         ],
       ),
     );
@@ -290,11 +291,13 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final mes = ref.watch(mesSelecionadoProvider);
-    final insets = MediaQuery.of(context).viewInsets.bottom;
+    final insets = MediaQuery.viewInsetsOf(context).bottom;
     final ocorrencia = widget.ocorrencia;
     final mostrarValorPago = _edicao && (ocorrencia?.paga ?? false);
     final ehParcelaEdicao = _edicao && _parcelada;
+    final rotuloMes = mesAno(mes, l10n.localeName);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 4, 20, AppTheme.spaceXl + insets),
@@ -307,12 +310,15 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
             children: [
               SheetHeader(
                 titulo: widget.apenasOcorrencia
-                    ? 'Ajustar neste mês'
+                    ? l10n.contaFormTituloAjustar
                     : _edicao
-                        ? (ehParcelaEdicao ? 'Editar parcela' : 'Editar conta')
-                        : 'Nova conta',
+                        ? (ehParcelaEdicao
+                            ? l10n.contaFormTituloParcela
+                            : l10n.contaFormTituloEditar)
+                        : l10n.contaFormTituloNova,
                 subtitulo: ehParcelaEdicao && ocorrencia?.parcelaAtual != null
-                    ? 'Parcela ${ocorrencia!.parcelaAtual}/${widget.conta!.totalParcelas}'
+                    ? l10n.contaFormSubtituloParcela(ocorrencia!.parcelaAtual!,
+                        widget.conta!.totalParcelas ?? 0)
                     : null,
                 onExcluir: _edicao ? (_salvando ? null : _excluir) : null,
               ),
@@ -322,14 +328,14 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                 readOnly: widget.apenasOcorrencia,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  labelText: 'Nome',
-                  hintText: 'Ex.: Aluguel',
+                  labelText: l10n.campoNome,
+                  hintText: l10n.contaFormNomeHint,
                   helperText: widget.apenasOcorrencia
-                      ? 'Nome não editável ao ajustar um mês fechado'
+                      ? l10n.contaFormNomeBloqueado
                       : null,
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Informe um nome'
+                    ? l10n.validacaoInformeNome
                     : null,
               ),
               const SizedBox(height: 12),
@@ -339,10 +345,10 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                     child: CampoMoeda(
                       controller: _valor,
                       labelText: widget.apenasOcorrencia
-                          ? 'Valor deste mês'
+                          ? l10n.contaFormValorDoMes
                           : _parcelada
-                              ? 'Valor da parcela'
-                              : 'Valor',
+                              ? l10n.contaFormValorParcela
+                              : l10n.campoValor,
                       obrigatorioPositivo: true,
                     ),
                   ),
@@ -357,9 +363,9 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                       readOnly: widget.apenasOcorrencia,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Vence dia',
+                        labelText: l10n.campoVenceDia,
                         helperText: widget.apenasOcorrencia
-                            ? 'Não editável neste ajuste'
+                            ? l10n.contaFormDiaBloqueado
                             : null,
                         helperMaxLines: 2,
                         errorMaxLines: 2,
@@ -367,7 +373,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                       validator: (v) {
                         final d = int.tryParse(v ?? '');
                         return (d == null || d < 1 || d > 31)
-                            ? 'Informe um dia entre 1 e 31'
+                            ? l10n.validacaoDia
                             : null;
                       },
                     ),
@@ -378,7 +384,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                 const SizedBox(height: 12),
                 CampoMoeda(
                   controller: _valorPago,
-                  labelText: 'Valor pago (se diferente do planejado)',
+                  labelText: l10n.contaFormValorPago,
                 ),
               ],
               if (_edicao &&
@@ -388,13 +394,12 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                   contentPadding: EdgeInsets.zero,
                   value: _aplicarProximos,
                   onChanged: (v) => setState(() => _aplicarProximos = v),
-                  title: const Text('Aplicar valor aos próximos meses'),
-                  subtitle: const Text(
-                      'Desligado, o valor muda só neste mês'),
+                  title: Text(l10n.contaFormAplicarProximos),
+                  subtitle: Text(l10n.contaFormAplicarProximosDescricao),
                 ),
               if (!widget.apenasOcorrencia) ...[
                 const SizedBox(height: AppTheme.spaceLg),
-                Text('Grupo', style: context.texts.labelLarge),
+                Text(l10n.campoGrupo, style: context.texts.labelLarge),
                 const SizedBox(height: AppTheme.spaceSm),
                 Wrap(
                   spacing: AppTheme.spaceSm,
@@ -402,7 +407,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                   children: [
                     for (final g in Grupo.values)
                       ChoiceChip(
-                        label: Text(g.rotulo),
+                        label: Text(g.rotulo(context)),
                         avatar: Icon(g.icone, size: 18, color: g.cor),
                         // O ícone do grupo já indica a cor/identidade; sem o
                         // checkmark padrão, ele não fica sobreposto pelo "✓".
@@ -417,13 +422,16 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
               if (!_edicao) ...[
                 const SizedBox(height: AppTheme.spaceLg),
                 SegmentedButton<Recorrencia>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(
-                        value: Recorrencia.fixa, label: Text('Fixa')),
+                        value: Recorrencia.fixa,
+                        label: Text(l10n.contaFormRecorrenciaFixa)),
                     ButtonSegment(
-                        value: Recorrencia.pontual, label: Text('Só este mês')),
+                        value: Recorrencia.pontual,
+                        label: Text(l10n.contaFormRecorrenciaPontual)),
                     ButtonSegment(
-                        value: Recorrencia.parcelada, label: Text('Parcelada')),
+                        value: Recorrencia.parcelada,
+                        label: Text(l10n.contaFormRecorrenciaParcelada)),
                   ],
                   selected: {_recorrencia},
                   onSelectionChanged: (s) =>
@@ -434,12 +442,12 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                   TextFormField(
                     controller: _parcelas,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                        labelText: 'Nº de parcelas'),
+                    decoration: InputDecoration(
+                        labelText: l10n.contaFormNumeroParcelas),
                     validator: (v) {
                       final n = int.tryParse(v ?? '');
                       return (n == null || n < 1 || n > 120)
-                          ? 'Entre 1 e 120'
+                          ? l10n.contaFormValidacaoParcelas
                           : null;
                     },
                   ),
@@ -448,10 +456,11 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
                 Text(
                   switch (_recorrencia) {
                     Recorrencia.fixa =>
-                      'Repete todo mês a partir de ${mesAno(mes)}.',
-                    Recorrencia.pontual => 'Aparece apenas em ${mesAno(mes)}.',
+                      l10n.contaFormExplicacaoFixa(rotuloMes),
+                    Recorrencia.pontual =>
+                      l10n.contaFormExplicacaoPontual(rotuloMes),
                     Recorrencia.parcelada =>
-                      'Gera uma parcela por mês a partir de ${mesAno(mes)}.',
+                      l10n.contaFormExplicacaoParcelada(rotuloMes),
                   },
                   style: context.texts.bodySmall,
                 ),
@@ -460,7 +469,7 @@ class _ContaFormState extends ConsumerState<_ContaForm> {
               BotaoSalvar(
                 salvando: _salvando,
                 onPressed: _salvar,
-                rotulo: _edicao ? 'Salvar alterações' : 'Salvar',
+                rotulo: _edicao ? l10n.acaoSalvarAlteracoes : l10n.acaoSalvar,
               ),
             ],
           ),

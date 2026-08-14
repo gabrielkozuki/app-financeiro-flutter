@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/db/app_database.dart';
+import '../data/backup_service.dart';
 import '../data/export_service.dart';
 import '../data/repositories/drift_cartoes_repository.dart';
 import '../data/repositories/drift_config_repository.dart';
@@ -44,8 +45,15 @@ final configRepoProvider = Provider<ConfigRepository>(
 final cartoesRepoProvider = Provider<CartoesRepository>(
     (ref) => DriftCartoesRepository(ref.watch(dbProvider)));
 
+/// Planilha CSV do mês (RF-19).
 final exportServiceProvider =
     Provider<ExportService>((ref) => ExportService(ref.watch(dbProvider)));
+
+/// Backup completo do banco: gerar, restaurar e apagar. Recebe a `AppDatabase`
+/// direto, e não os repositórios: é operação sobre o banco INTEIRO, que não
+/// cabe nos contratos por agregado.
+final backupServiceProvider =
+    Provider<BackupService>((ref) => BackupService(ref.watch(dbProvider)));
 
 final fechamentoRepoProvider = Provider<FechamentoRepository>(
     (ref) => DriftFechamentoRepository(ref.watch(dbProvider)));

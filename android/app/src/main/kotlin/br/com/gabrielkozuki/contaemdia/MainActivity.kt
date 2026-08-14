@@ -1,4 +1,4 @@
-package com.example.app_financeiro
+package br.com.gabrielkozuki.contaemdia
 
 import io.flutter.embedding.android.FlutterActivity
 

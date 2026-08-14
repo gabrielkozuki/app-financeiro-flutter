@@ -1,4 +1,4 @@
-# Minhas Finanças
+# Conta em Dia
 
 App mobile de finanças pessoais que funciona como uma **checklist mensal de contas** combinada
 com um **painel de direcionamento 50-30-20**. Responde, em uma tela, a duas perguntas: *"já

@@ -13,6 +13,8 @@ import '../../domain/entities/conta.dart';
 import '../../domain/entities/configuracao.dart';
 import '../../domain/entities/entrada.dart';
 import '../../domain/entities/enums.dart';
+import '../../l10n/app_localizations.dart';
+import '../config/conta_backup_page.dart';
 import '../mes/mes_panorama.dart';
 
 const _totalPaginasOnboarding = 4;
@@ -39,15 +41,16 @@ class _RendaRascunho {
 }
 
 /// Sugestões prontas para reduzir o atrito do cadastro inicial (risco #4 da
-/// seção 12): o usuário toca e ajusta o valor.
-const _sugestoes = <(String, Grupo, int)>[
-  ('Aluguel', Grupo.necessidade, 5),
-  ('Internet', Grupo.necessidade, 10),
-  ('Energia', Grupo.necessidade, 15),
-  ('Mercado', Grupo.necessidade, 20),
-  ('Academia', Grupo.desejo, 10),
-  ('Reserva de emergência', Grupo.investimento, 5),
-];
+/// seção 12): o usuário toca e ajusta o valor. O nome traduzido é o que vai
+/// para o banco — a conta nasce com o rótulo que o usuário tocou.
+List<(String, Grupo, int)> _sugestoes(AppLocalizations l10n) => [
+      (l10n.onboardingSugestaoAluguel, Grupo.necessidade, 5),
+      (l10n.onboardingSugestaoInternet, Grupo.necessidade, 10),
+      (l10n.onboardingSugestaoEnergia, Grupo.necessidade, 15),
+      (l10n.onboardingSugestaoMercado, Grupo.necessidade, 20),
+      (l10n.onboardingSugestaoAcademia, Grupo.desejo, 10),
+      (l10n.onboardingSugestaoReserva, Grupo.investimento, 5),
+    ];
 
 /// Onboarding de primeira execução (seção 9): renda → metodologia (padrão
 /// 50-30-20) → 3 a 5 contas principais → app funcional.
@@ -79,7 +82,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     final valor = parseMoeda(_rendaValorCtrl.text);
     if (valor <= 0) return;
     final nome = _rendaNome.text.trim().isEmpty
-        ? 'Renda ${_rendas.length + 1}'
+        ? AppLocalizations.of(context).onboardingRendaPadrao(_rendas.length + 1)
         : _rendaNome.text.trim();
     setState(() {
       _rendas.add(_RendaRascunho(nome, valor));
@@ -111,24 +114,25 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   /// para descartar cedo demais — é o que causava o "TextEditingController was
   /// used after being disposed" na animação de fechamento (ver `config_tab`).
   Future<double?> _perguntarValor(String nome) {
+    final l10n = AppLocalizations.of(context);
     var valor = 0.0;
     return showDialog<double>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(nome),
         content: CampoMoeda(
-          labelText: 'Valor',
+          labelText: l10n.campoValor,
           autofocus: true,
           onChanged: (texto) => valor = parseMoeda(texto),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(l10n.acaoCancelar),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, valor > 0 ? valor : null),
-            child: const Text('Adicionar'),
+            child: Text(l10n.acaoAdicionar),
           ),
         ],
       ),
@@ -137,6 +141,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   Future<void> _concluir() async {
     setState(() => _salvando = true);
+    final l10n = AppLocalizations.of(context);
     final mes = ref.read(mesReferenciaProvider);
     final entradasRepo = ref.read(entradasRepoProvider);
     final contasRepo = ref.read(contasRepoProvider);
@@ -173,7 +178,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         await contasRepo.inserirOcorrencia(
             contaId: id, mesReferencia: mes, valorPlanejado: c.valor);
       }
-    }), mensagemErro: 'Não foi possível concluir seu cadastro.');
+    }), mensagemErro: l10n.onboardingErroConcluir);
 
     if (!mounted) return;
     setState(() => _salvando = false);
@@ -185,20 +190,19 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   /// [_concluir], então o back do sistema levaria embora tudo o que foi
   /// digitado sem aviso.
   Future<void> _confirmarSaida() async {
+    final l10n = AppLocalizations.of(context);
     final sair = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sair e perder o que você já digitou?'),
-        content: const Text(
-            'Suas rendas e contas ainda não foram salvas. Você pode continuar '
-            'de onde parou.'),
+        title: Text(l10n.onboardingSairTitulo),
+        content: Text(l10n.onboardingSairTexto),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Continuar')),
+              child: Text(l10n.acaoContinuar)),
           FilledButton.tonal(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Sair')),
+              child: Text(l10n.acaoSair)),
         ],
       ),
     );
@@ -249,7 +253,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _indicadorProgresso() => Semantics(
-        label: 'Passo ${_pagina + 1} de $_totalPaginasOnboarding',
+        label: AppLocalizations.of(context)
+            .onboardingPasso(_pagina + 1, _totalPaginasOnboarding),
         excludeSemantics: true,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(4),
@@ -261,6 +266,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       );
 
   Widget _paginaBoasVindas() {
+    final l10n = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -274,23 +280,44 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             tamanho: 72,
           ),
           const SizedBox(height: 20),
-          Text('Minhas Finanças', style: textTheme.headlineMedium),
+          Text(l10n.appTitulo,
+              style: textTheme.headlineMedium),
           const SizedBox(height: 24),
           Text(
-            'Um aplicativo para organizar sua vida financeira, '
-            'com o objetivo de te dar mais discernimento e autonomia.',
+            l10n.onboardingBoasVindasTexto,
             style: textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
-          _bulletBoasVindas(Icons.checklist, 'Marque o que já pagou',
-              'Veja num relance o que falta pagar no mês.'),
+          _bulletBoasVindas(
+              Icons.checklist,
+              l10n.onboardingBulletChecklistTitulo,
+              l10n.onboardingBulletChecklistDescricao),
           const SizedBox(height: 16),
-          _bulletBoasVindas(Icons.donut_small, 'Direcionamento',
-              'Separação de renda proporcional como referência, '
-                  'não como limitação.'),
+          _bulletBoasVindas(
+              Icons.donut_small,
+              l10n.onboardingBulletDirecionamentoTitulo,
+              l10n.onboardingBulletDirecionamentoDescricao),
           const SizedBox(height: 16),
-          _bulletBoasVindas(Icons.lock_outline, 'Seus dados são seus',
-              'Funciona offline; nada sai do aparelho sem você mandar.'),
+          _bulletBoasVindas(
+              Icons.lock_outline,
+              l10n.onboardingBulletPrivacidadeTitulo,
+              l10n.onboardingBulletPrivacidadeDescricao),
+          const SizedBox(height: 24),
+          // Porta de saída do onboarding para quem NÃO é usuário novo.
+          //
+          // Sem ela, um aparelho recém-instalado é um beco sem saída: o
+          // `precisaOnboardingProvider` só libera o app quando existe alguma
+          // conta ou renda, e a restauração vive em Configurações — dentro do
+          // app. Quem trocou de celular teria de cadastrar dados só para
+          // alcançar a tela que os apagaria em seguida.
+          Center(
+            child: TextButton.icon(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const ContaBackupPage())),
+              icon: const Icon(Icons.restore, size: 18),
+              label: Text(l10n.onboardingJaUso),
+            ),
+          ),
         ],
       ),
     );
@@ -321,6 +348,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _paginaRenda() {
+    final l10n = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
     final total = _rendas.fold<double>(0, (s, r) => s + r.valor);
     final podeAdicionar = parseMoeda(_rendaValorCtrl.text) > 0;
@@ -333,19 +361,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           const SizedBox(height: 8),
           Icon(Icons.savings_outlined, size: 48, color: context.colors.primary),
           const SizedBox(height: 16),
-          Text('Quais são suas rendas?', style: textTheme.headlineSmall),
+          Text(l10n.onboardingRendaTitulo, style: textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
-            'Adicione suas entradas mensais em valores líquidos — salário, '
-            'vale, bolsa. Pode adicionar mais de uma.',
+            l10n.onboardingRendaTexto,
             style: textTheme.bodyMedium,
           ),
           const SizedBox(height: 20),
           TextField(
             controller: _rendaNome,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Nome (ex.: Salário)',
+            decoration: InputDecoration(
+              labelText: l10n.onboardingRendaNomeLabel,
             ),
           ),
           const SizedBox(height: 12),
@@ -355,7 +382,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               Expanded(
                 child: CampoMoeda(
                   controller: _rendaValorCtrl,
-                  labelText: 'Valor líquido',
+                  labelText: l10n.campoValorLiquido,
                   onChanged: (_) => setState(() {}),
                   onSubmitted: (_) => _adicionarRenda(),
                 ),
@@ -364,13 +391,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               IconButton.filledTonal(
                 onPressed: podeAdicionar ? _adicionarRenda : null,
                 icon: const Icon(Icons.add),
-                tooltip: 'Adicionar renda',
+                tooltip: l10n.onboardingAdicionarRenda,
               ),
             ],
           ),
           const SizedBox(height: 16),
           if (_rendas.isEmpty)
-            Text('Nenhuma renda adicionada ainda.', style: textTheme.bodySmall)
+            Text(l10n.onboardingRendaVazia, style: textTheme.bodySmall)
           else ...[
             for (var i = 0; i < _rendas.length; i++)
               ListTile(
@@ -392,7 +419,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Total mensal', style: textTheme.titleMedium),
+                Text(l10n.onboardingTotalMensal, style: textTheme.titleMedium),
                 Text(brl(total),
                     style: textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold)),
@@ -405,6 +432,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _paginaMetodologia() {
+    final l10n = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -415,11 +443,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           Icon(Icons.donut_small_outlined,
               size: 48, color: context.colors.primary),
           const SizedBox(height: 16),
-          Text('Como dividir seu dinheiro', style: textTheme.headlineSmall),
+          Text(l10n.onboardingMetodologiaTitulo,
+              style: textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
-            'Usamos a referência 50-30-20 como diagnóstico — nunca como '
-            'limite ou cobrança. Dá para ajustar os percentuais depois.',
+            l10n.onboardingMetodologiaTexto,
             style: textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),
@@ -437,7 +465,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           GroupAvatar(icone: grupo.icone, cor: grupo.cor, tamanho: 36),
           const SizedBox(width: 12),
-          Text(grupo.rotulo, style: Theme.of(context).textTheme.titleMedium),
+          Text(grupo.rotulo(context),
+              style: Theme.of(context).textTheme.titleMedium),
           const Spacer(),
           Text('$pct%',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -448,6 +477,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _paginaContas() {
+    final l10n = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -455,16 +485,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          Text('Suas contas principais', style: textTheme.headlineSmall),
+          Text(l10n.onboardingContasTitulo, style: textTheme.headlineSmall),
           const SizedBox(height: 8),
-          Text('Adicione de 3 a 5 contas para começar. Toque numa sugestão:',
-              style: textTheme.bodyMedium),
+          Text(l10n.onboardingContasTexto, style: textTheme.bodyMedium),
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
             runSpacing: 4,
             children: [
-              for (final (nome, grupo, dia) in _sugestoes)
+              for (final (nome, grupo, dia) in _sugestoes(l10n))
                 ActionChip(
                   avatar: Icon(grupo.icone, size: 18, color: grupo.cor),
                   label: Text(nome),
@@ -514,6 +543,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _rodape() {
+    final l10n = AppLocalizations.of(context);
     // 0 = boas-vindas, 1 = renda, 2 = metodologia, 3 = contas. Só a última
     // página conclui; as demais apenas avançam, e a de renda exige ao menos
     // uma entrada cadastrada.
@@ -545,9 +575,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(switch (_pagina) {
-                    0 => 'Começar',
-                    3 => 'Concluir',
-                    _ => 'Continuar',
+                    0 => l10n.acaoComecar,
+                    3 => l10n.acaoConcluir,
+                    _ => l10n.acaoContinuar,
                   }),
           ),
         ],

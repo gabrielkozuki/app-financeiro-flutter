@@ -137,4 +137,9 @@ abstract interface class FechamentoRepository {
   /// Meses (`YYYY-MM`) que têm alguma ocorrência ou fatura registrada — a base
   /// para decidir quais meses passados precisam ser fechados.
   Future<List<String>> mesesComDados();
+
+  /// Meses que JÁ têm retrato. Existe para a varredura de fechamento decidir
+  /// o que falta com uma consulta só, em vez de um `doMes` por mês — que
+  /// crescia com os anos de uso e rodava a cada invalidação do panorama.
+  Future<Set<String>> mesesFechados();
 }

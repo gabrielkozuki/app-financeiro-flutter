@@ -46,6 +46,16 @@ class DriftFechamentoRepository implements FechamentoRepository {
   }
 
   @override
+  Future<Set<String>> mesesFechados() async {
+    final rows = await (_db.selectOnly(_db.fechamentosMensais)
+          ..addColumns([_db.fechamentosMensais.mesReferencia]))
+        .get();
+    return rows
+        .map((r) => r.read(_db.fechamentosMensais.mesReferencia)!)
+        .toSet();
+  }
+
+  @override
   Future<List<String>> mesesComDados() async {
     final ocorr = await (_db.selectOnly(_db.ocorrenciasConta, distinct: true)
           ..addColumns([_db.ocorrenciasConta.mesReferencia]))

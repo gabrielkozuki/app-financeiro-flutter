@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/format/dates.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Seletor de mês (‹ Mês Ano ›) usado nas abas Contas e Gráfico. As setas mudam
 /// um mês por vez; tocar no rótulo abre um seletor de mês/ano. Navegar para
@@ -13,9 +14,11 @@ class SeletorMes extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final mes = ref.watch(mesSelecionadoProvider);
     final textTheme = Theme.of(context).textTheme;
     final notifier = ref.read(mesSelecionadoProvider.notifier);
+    final rotuloMes = mesAno(mes, l10n.localeName);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -23,7 +26,7 @@ class SeletorMes extends ConsumerWidget {
         IconButton(
           onPressed: () => notifier.mover(-1),
           icon: const Icon(Icons.chevron_left),
-          tooltip: 'Mês anterior',
+          tooltip: l10n.mesAnterior,
         ),
         // Espaço extra entre a seta e o rótulo — evita toques acidentais na
         // seta ao mirar no rótulo (e vice-versa).
@@ -31,7 +34,7 @@ class SeletorMes extends ConsumerWidget {
         // Toque no rótulo abre o seletor de mês/ano.
         Semantics(
           button: true,
-          label: 'Mês selecionado: ${mesAno(mes)}. Toque para escolher outro.',
+          label: l10n.mesSemanticaSeletor(rotuloMes),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.raio),
             onTap: () async {
@@ -52,7 +55,7 @@ class SeletorMes extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        mesAno(mes),
+                        rotuloMes,
                         style: textTheme.titleLarge,
                       ),
                       const SizedBox(width: 2),
@@ -68,7 +71,7 @@ class SeletorMes extends ConsumerWidget {
         IconButton(
           onPressed: () => notifier.mover(1),
           icon: const Icon(Icons.chevron_right),
-          tooltip: 'Próximo mês',
+          tooltip: l10n.mesProximo,
         ),
       ],
     );
@@ -108,11 +111,12 @@ class _SeletorMesDialogState extends State<_SeletorMesDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = context.colors;
     final agora = DateTime.now();
 
     return AlertDialog(
-      title: const Text('Escolher mês'),
+      title: Text(l10n.mesEscolher),
       contentPadding: const EdgeInsets.fromLTRB(
           AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceSm),
       content: SizedBox(
@@ -127,13 +131,13 @@ class _SeletorMesDialogState extends State<_SeletorMesDialog> {
                 IconButton(
                   onPressed: () => setState(() => _ano--),
                   icon: const Icon(Icons.chevron_left),
-                  tooltip: 'Ano anterior',
+                  tooltip: l10n.mesAnoAnterior,
                 ),
                 Text('$_ano', style: context.texts.titleLarge),
                 IconButton(
                   onPressed: () => setState(() => _ano++),
                   icon: const Icon(Icons.chevron_right),
-                  tooltip: 'Próximo ano',
+                  tooltip: l10n.mesAnoProximo,
                 ),
               ],
             ),
@@ -149,7 +153,7 @@ class _SeletorMesDialogState extends State<_SeletorMesDialog> {
               children: [
                 for (var m = 1; m <= 12; m++)
                   _BotaoMes(
-                    rotulo: nomeMes(m).substring(0, 3),
+                    rotulo: nomeMesAbreviado(m, l10n.localeName),
                     selecionado:
                         _ano == widget.inicial.year && m == widget.inicial.month,
                     ehHoje: _ano == agora.year && m == agora.month,
@@ -164,7 +168,7 @@ class _SeletorMesDialogState extends State<_SeletorMesDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: Text(l10n.acaoCancelar),
         ),
       ],
     );
@@ -222,7 +226,7 @@ class _BotaoMes extends StatelessWidget {
     return Semantics(
       button: true,
       excludeSemantics: true,
-      label: '$rotulo, mês atual',
+      label: AppLocalizations.of(context).mesSemanticaAtual(rotulo),
       onTap: onTap,
       child: conteudo,
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../format/money.dart';
 
 /// Campo monetário único do app: um [TextFormField] já pré-configurado com o
@@ -40,6 +41,7 @@ class CampoMoeda extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TextFormField(
       controller: controller,
       autofocus: autofocus,
@@ -53,7 +55,8 @@ class CampoMoeda extends StatelessWidget {
         prefixText: r'R$ ',
       ),
       validator: obrigatorioPositivo
-          ? (texto) => parseMoeda(texto ?? '') <= 0 ? 'Valor inválido' : null
+          ? (texto) =>
+              parseMoeda(texto ?? '') <= 0 ? l10n.validacaoValorInvalido : null
           : null,
     );
   }

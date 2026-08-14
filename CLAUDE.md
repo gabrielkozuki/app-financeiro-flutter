@@ -86,6 +86,28 @@ passados. É um desenho deliberado, aprovado, não um descuido. Consequências a
 - **Tom neutro** ao ultrapassar um grupo (RF-13): sem vermelho de erro, sem ícone de alerta, sem
   linguagem de culpa. É princípio de produto, não estética.
 
+## M9 (auth + backup) — decisões já tomadas
+
+- **Login NÃO é porta de entrada.** O app abre e funciona inteiro sem conta
+  (RNF-01/RNF-04). Entrar mora em `features/config/conta_backup_page.dart`,
+  alcançável de Configurações **e** do botão "Já uso o app" na primeira tela do
+  onboarding — sem essa porta, um aparelho recém-instalado não chega à
+  restauração. O `RootGate` continua binário.
+- **"Entrar com a Apple" vem ACIMA de "Entrar com o Google".** Não é preferência
+  visual: a diretriz 4.8 da App Store exige alternativa equivalente e com
+  privacidade quando há login de terceiros, e as HIG pedem destaque. Reordenar
+  arrisca rejeição na publicação.
+- **Excluir conta** (diretriz 5.1.1(v) da App Store) é diferente de "apagar dados locais":
+  precisa remover o `backups/{uid}` e a conta no Firebase, não só o banco.
+- **Backup:** blob JSON por UID no Realtime Database, *last-wins*. Perguntar no
+  logout antes de enviar; ao logar com UID diferente do último visto, perguntar
+  "usar os dados deste aparelho" vs "restaurar os da conta" com a data do backup.
+- `data/backup_service.dart` é a base e **não sabe nada de rede** — o serviço de
+  nuvem só move a String de `exportarJson()`/`importarJson()`.
+- Depois de trocar o banco inteiro, chame `aposMudancaAmpla(ref)` — invalidar as
+  leituras sem esquecer os meses reabertos deixa a tela mostrando dado que não
+  existe mais.
+
 ## Decisões fechadas — não reabrir sem perguntar
 
 Riverpod; drift/SQLite; **exatamente 3 menus fixos** (Contas · Gráfico · Configurações) com
@@ -105,5 +127,5 @@ precisa justificar o ganho.
 
 - `.claude/requisitos-app-financas.md` — requisitos (RF/RN/RNF) e os critérios de entrega
   CE-01..CE-06. É a fonte da verdade; amarre mudanças a ele.
-- `.claude/plano-mvp.md` — plano dos marcos M0–M8, status atual e onde a execução divergiu.
-- `docs/configurar-firebase.md` — o que falta para o M8 (auth + backup).
+- `.claude/plano-mvp.md` — plano dos marcos M0–M10, status atual e onde a execução divergiu.
+- `docs/configurar-firebase.md` — o que falta para o M9 (auth + backup).

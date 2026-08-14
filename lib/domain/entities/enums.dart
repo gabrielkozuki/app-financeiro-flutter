@@ -3,17 +3,10 @@
 ///
 /// Observação: "Livre" (o quanto da renda ainda não foi comprometido) NÃO é um
 /// grupo de classificação — é uma fatia calculada, exibida apenas na rosca.
-enum Grupo {
-  necessidade,
-  desejo,
-  investimento;
-
-  String get rotulo => switch (this) {
-        Grupo.necessidade => 'Necessidade',
-        Grupo.desejo => 'Desejo',
-        Grupo.investimento => 'Investimento',
-      };
-}
+///
+/// O rótulo exibido é traduzido e vive em `core/theme/grupo_visual.dart`
+/// (`Grupo.rotulo(context)`) — o domínio não conhece idioma.
+enum Grupo { necessidade, desejo, investimento }
 
 /// Recorrência de uma conta (RF-04/RF-06).
 enum Recorrencia { fixa, pontual, parcelada }

@@ -1,23 +1,23 @@
-const List<String> _meses = [
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro',
-];
+import 'package:intl/intl.dart';
 
-/// Nome do mês em português a partir do número (1 = Janeiro … 12 = Dezembro).
-String nomeMes(int mes) => _meses[mes - 1];
+/// Nome abreviado do mês (ex.: `Jan.`) a partir do número, no idioma do
+/// [locale] — usado na grade do seletor de mês.
+String nomeMesAbreviado(int mes, String locale) =>
+    _capitalizar(DateFormat.MMM(locale).format(DateTime(2000, mes)));
 
-/// Rótulo "Mês Ano" (ex.: `Julho 2026`) usado no seletor de mês.
-String mesAno(DateTime data) => '${nomeMes(data.month)} ${data.year}';
+/// Rótulo "Mês Ano" (ex.: `Julho de 2026`) usado no seletor de mês.
+String mesAno(DateTime data, String locale) =>
+    _capitalizar(DateFormat.yMMMM(locale).format(data));
+
+/// Data curta na convenção do [locale] (`31/12/2026`, `12/31/2026`) — usada
+/// para dizer de quando é um backup.
+String dataCurta(DateTime data, String locale) =>
+    DateFormat.yMd(locale).format(data);
+
+/// O `intl` devolve o mês em minúscula em pt ("julho de 2026"); as telas o
+/// exibem como título.
+String _capitalizar(String texto) =>
+    texto.isEmpty ? texto : texto[0].toUpperCase() + texto.substring(1);
 
 /// Chave de mês de referência no formato `YYYY-MM`, usada como identificador
 /// dos recortes mensais no banco (ver seção 8 do documento de requisitos).

@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -39,15 +41,21 @@ dependencies:
   drift_flutter: ^0.3.1
   sqlite3_flutter_libs: ^0.6.0+eol
   path_provider: ^2.1.6
-  firebase_core: ^4.12.1
-  firebase_auth: ^6.5.6
-  firebase_database: ^12.4.6
-  google_sign_in: ^7.2.0
-  sign_in_with_apple: ^8.1.0
-  intl: ^0.20.3
+  # As dependências do Firebase (firebase_core/auth/database, google_sign_in,
+  # sign_in_with_apple) saem daqui até o M8 começar: mesmo sem serem importadas
+  # em lib/, elas injetavam ACCESS_NETWORK_STATE, USE_BIOMETRIC, USE_FINGERPRINT
+  # e READ_GSERVICES no manifesto do APK, além de um FirebaseInitProvider no
+  # start. Ver docs/configurar-firebase.md para readicioná-las.
+  # Alinhado ao que o flutter_localizations fixa — não subir sem checar.
+  intl: ^0.20.2
   fl_chart: ^1.2.0
   csv: ^8.0.0
-  share_plus: ^13.2.1
+  # share_plus preso na 12.x e file_picker na 11.x porque as duas divergem em
+  # `win32` (13.x pede ^6, o picker pede ^5.9). O app só tem Android e iOS, onde
+  # win32 nunca é compilado — a API usada (`SharePlus.instance.share`) é a mesma
+  # nas duas. Se algum dia houver target Windows, isto precisa ser revisto.
+  share_plus: ^12.0.2
+  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +70,8 @@ dev_dependencies:
   drift_dev: ^2.34.0
   build_runner: ^2.15.1
 flutter:
+  # Gera AppLocalizations a partir dos ARB em lib/l10n (ver l10n.yaml).
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

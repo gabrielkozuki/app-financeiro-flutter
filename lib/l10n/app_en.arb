@@ -1,0 +1,572 @@
+{
+  "@@locale": "en",
+  "appTitulo": "Bills on Track",
+  "abaContas": "Bills",
+  "abaGrafico": "Chart",
+  "abaConfiguracoes": "Settings",
+  "tituloMeuMes": "My month",
+  "tituloDirecionamento": "Breakdown",
+  "acaoCancelar": "Cancel",
+  "acaoSalvar": "Save",
+  "acaoExcluir": "Delete",
+  "acaoAdicionar": "Add",
+  "acaoTentarNovamente": "Try again",
+  "erroTituloPadrao": "We couldn't load your data",
+  "erroDescricaoPadrao": "Something went wrong reading data on this device. Nothing was lost — please try again.",
+  "acaoContinuar": "Continue",
+  "acaoRemover": "Remove",
+  "acaoVoltar": "Back",
+  "acaoSair": "Leave",
+  "acaoRestaurar": "Restore",
+  "acaoConcluir": "Finish",
+  "acaoComecar": "Get started",
+  "acaoSalvarAlteracoes": "Save changes",
+  "campoNome": "Name",
+  "campoValor": "Amount",
+  "campoValorLiquido": "Net amount",
+  "campoGrupo": "Group",
+  "campoVenceDia": "Due day",
+  "validacaoInformeNome": "Enter a name",
+  "validacaoDia": "Enter a day between 1 and 31",
+  "validacaoValorInvalido": "Invalid amount",
+  "venceDia": "Due on day {dia}",
+  "@venceDia": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "grupoNecessidade": "Needs",
+  "grupoDesejo": "Wants",
+  "grupoInvestimento": "Savings",
+  "erroCarregarMes": "We couldn't load this month",
+  "erroCarregarRendas": "We couldn't load your income",
+  "erroCarregarCartoes": "We couldn't load your cards",
+  "erroCarregarPercentuais": "We couldn't load your percentages",
+  "erroAbrirDados": "We couldn't open your data",
+  "mesAnterior": "Previous month",
+  "mesProximo": "Next month",
+  "mesEscolher": "Choose a month",
+  "mesAnoAnterior": "Previous year",
+  "mesAnoProximo": "Next year",
+  "mesSemanticaSeletor": "Selected month: {mes}. Tap to choose another one.",
+  "@mesSemanticaSeletor": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "mesSemanticaAtual": "{mes}, current month",
+  "@mesSemanticaAtual": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "mesErroReabrir": "We couldn't reopen this month.",
+  "mesErroConcluirEdicao": "We couldn't finish editing this month.",
+  "contasNovaConta": "New bill",
+  "contasSecaoMensais": "Monthly bills",
+  "contasVazioTitulo": "No bills this month",
+  "contasVazioDescricao": "Tap \"New bill\" to start organizing your month.",
+  "contasVazioFechadoTitulo": "No bills in this closed month",
+  "contasVazioFechadoDescricao": "This month is part of your history and had no bills recorded.",
+  "contasMesFechadoAviso": "Closed month — read only. This is the record of what was paid back then.",
+  "contasReabrirMes": "Reopen month",
+  "contasReabrirTitulo": "Reopen this month?",
+  "contasReabrirTexto": "The month becomes editable again so you can correct its bills and statements. No other month is affected. When you're done, a new record of the month is saved.",
+  "contasReabrirAcao": "Reopen",
+  "contasEditandoFechadoAviso": "You're editing a closed month. Changes apply to this month only.",
+  "contasConcluirEdicao": "Finish editing",
+  "contasPagoEsteMes": "PAID THIS MONTH",
+  "contasPagoSemantica": "Paid this month: {pago} of {total}, {percentual} percent",
+  "@contasPagoSemantica": {
+    "placeholders": {
+      "pago": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      },
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "contasPagoDeTotal": "of {total} · {percentual}%",
+  "@contasPagoDeTotal": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "estadoPaga": "paid",
+  "estadoPendente": "pending",
+  "contaSemantica": "{nome}, {grupo}, {valor}, {estado}",
+  "@contaSemantica": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      },
+      "grupo": {
+        "type": "String"
+      },
+      "valor": {
+        "type": "String"
+      },
+      "estado": {
+        "type": "String"
+      }
+    }
+  },
+  "contaMarcarPaga": "Mark {nome} as paid",
+  "@contaMarcarPaga": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "contaSubtitulo": "{grupo} · due on day {dia}",
+  "@contaSubtitulo": {
+    "placeholders": {
+      "grupo": {
+        "type": "String"
+      },
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "contaSubtituloParcela": "{grupo} · due on day {dia} · {parcela}/{total}",
+  "@contaSubtituloParcela": {
+    "placeholders": {
+      "grupo": {
+        "type": "String"
+      },
+      "dia": {
+        "type": "int"
+      },
+      "parcela": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "contaErroMarcar": "We couldn't update \"{nome}\".",
+  "@contaErroMarcar": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaTitulo": "{cartao} statement",
+  "@faturaTitulo": {
+    "placeholders": {
+      "cartao": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaMarcarPaga": "Mark the {cartao} statement as paid",
+  "@faturaMarcarPaga": {
+    "placeholders": {
+      "cartao": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaInformar": "Add amount",
+  "faturaSubtitulo": "due on day {dia}",
+  "@faturaSubtitulo": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "faturaSubtituloRatear": "due on day {dia} · tap to split",
+  "@faturaSubtituloRatear": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "faturaErroMarcar": "We couldn't update the {cartao} statement.",
+  "@faturaErroMarcar": {
+    "placeholders": {
+      "cartao": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaValorTotal": "Statement total",
+  "faturaComoDividir": "How to split it between groups",
+  "faturaComoDividirTexto": "Split it off the top of your head — no need to go item by item. That's what keeps the breakdown honest when almost everything goes on the card.",
+  "faturaSalvar": "Save statement",
+  "faturaNaoUsei": "I didn't use this card this month",
+  "faturaInformeTotal": "Enter the statement total.",
+  "faturaTudoAlocado": "Everything's split!",
+  "faturaFaltaAlocar": "{valor} still to split",
+  "@faturaFaltaAlocar": {
+    "placeholders": {
+      "valor": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaAlocouAMais": "You've split {valor} more than the total",
+  "@faturaAlocouAMais": {
+    "placeholders": {
+      "valor": {
+        "type": "String"
+      }
+    }
+  },
+  "faturaErroSalvar": "We couldn't save this statement.",
+  "contaFormTituloNova": "New bill",
+  "contaFormTituloEditar": "Edit bill",
+  "contaFormTituloParcela": "Edit installment",
+  "contaFormTituloAjustar": "Adjust for this month",
+  "contaFormSubtituloParcela": "Installment {atual}/{total}",
+  "@contaFormSubtituloParcela": {
+    "placeholders": {
+      "atual": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "contaFormNomeHint": "e.g. Rent",
+  "contaFormNomeBloqueado": "The name can't be changed while adjusting a closed month",
+  "contaFormValorDoMes": "Amount for this month",
+  "contaFormValorParcela": "Installment amount",
+  "contaFormDiaBloqueado": "Can't be changed in this adjustment",
+  "contaFormValorPago": "Amount paid (if different from planned)",
+  "contaFormAplicarProximos": "Apply this amount to the coming months",
+  "contaFormAplicarProximosDescricao": "When off, the amount changes for this month only",
+  "contaFormRecorrenciaFixa": "Recurring",
+  "contaFormRecorrenciaPontual": "This month only",
+  "contaFormRecorrenciaParcelada": "Installments",
+  "contaFormNumeroParcelas": "Number of installments",
+  "contaFormValidacaoParcelas": "Between 1 and 120",
+  "contaFormExplicacaoFixa": "Repeats every month starting in {mes}.",
+  "@contaFormExplicacaoFixa": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormExplicacaoPontual": "Shows up in {mes} only.",
+  "@contaFormExplicacaoPontual": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormExplicacaoParcelada": "Creates one installment a month starting in {mes}.",
+  "@contaFormExplicacaoParcelada": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormRemoverTitulo": "Remove from this month?",
+  "contaFormRemoverTexto": "\"{nome}\" leaves this month only. No other month is affected.",
+  "@contaFormRemoverTexto": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "contaFormExcluirTitulo": "Delete bill",
+  "contaFormExcluirTexto": "What would you like to delete? Earlier months are never affected.",
+  "contaFormExcluirSoEsteMes": "This month only",
+  "contaFormExcluirDaquiEmDiante": "This month onwards",
+  "contaFormErroSalvar": "We couldn't save this bill.",
+  "contaFormErroExcluir": "We couldn't delete this bill.",
+  "graficoSemRegistrosTitulo": "Nothing recorded this month",
+  "graficoSemRegistrosDescricao": "This month is part of your history and has no bills or income recorded to break down.",
+  "graficoSemRendaTitulo": "No income for this month",
+  "graficoSemRendaDescricao": "Add your income in Settings → Income to see where your money goes.",
+  "graficoComoEstaDividido": "How it's divided",
+  "graficoComprometido": "Committed",
+  "graficoRendaDoMes": "Monthly income",
+  "graficoLivre": "Left to spend",
+  "graficoPercentualDaRenda": "{percentual}% of your income",
+  "@graficoPercentualDaRenda": {
+    "placeholders": {
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoSemanticaRosca": "Monthly income: {renda}, divided between {grupos} and Left to spend",
+  "@graficoSemanticaRosca": {
+    "placeholders": {
+      "renda": {
+        "type": "String"
+      },
+      "grupos": {
+        "type": "String"
+      }
+    }
+  },
+  "graficoSemanticaRoscaComprometido": "{percentual}% of this month's income is committed, {comprometido} of {renda}",
+  "@graficoSemanticaRoscaComprometido": {
+    "placeholders": {
+      "percentual": {
+        "type": "int"
+      },
+      "comprometido": {
+        "type": "String"
+      },
+      "renda": {
+        "type": "String"
+      }
+    }
+  },
+  "graficoMetaAcima": "{meta}% target · above",
+  "@graficoMetaAcima": {
+    "placeholders": {
+      "meta": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoMetaAbaixo": "{meta}% target · below",
+  "@graficoMetaAbaixo": {
+    "placeholders": {
+      "meta": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoMetaDentro": "{meta}% target · on target",
+  "@graficoMetaDentro": {
+    "placeholders": {
+      "meta": {
+        "type": "int"
+      }
+    }
+  },
+  "rendasTitulo": "Income",
+  "rendaNova": "New income",
+  "rendaEditar": "Edit income",
+  "rendasVazioTitulo": "No income this month",
+  "rendasVazioDescricao": "Tap \"New income\" to add your salary or another source.",
+  "rendasRecorrentes": "Recurring (every month)",
+  "rendasPontuaisDoMes": "One-time in {mes}",
+  "@rendasPontuaisDoMes": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "rendaRecebeDia": "Paid on day {dia}",
+  "@rendaRecebeDia": {
+    "placeholders": {
+      "dia": {
+        "type": "String"
+      }
+    }
+  },
+  "rendaSoEm": "Only in {mes}",
+  "@rendaSoEm": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "rendasTotalDoMes": "MONTHLY TOTAL",
+  "rendaNomeHint": "e.g. Salary",
+  "rendaTipoRecorrente": "Recurring",
+  "rendaTipoPontual": "This month only",
+  "rendaDiaRecebimento": "Day you get paid",
+  "rendaEntraApenasEm": "Counts in {mes} only.",
+  "@rendaEntraApenasEm": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "rendaErroSalvar": "We couldn't save this income.",
+  "rendaErroExcluir": "We couldn't delete this income.",
+  "cartoesTitulo": "Cards",
+  "cartaoNovo": "New card",
+  "cartaoEditar": "Edit card",
+  "cartoesVazioTitulo": "No cards yet",
+  "cartoesVazioDescricao": "Tap \"New card\" to follow your statements in the monthly checklist.",
+  "cartaoFaturaVenceDia": "Statement due on day {dia}",
+  "@cartaoFaturaVenceDia": {
+    "placeholders": {
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "cartaoNomeHint": "e.g. Visa",
+  "cartaoDiaVencimento": "Due day",
+  "cartaoDiaInvalido": "Invalid day",
+  "cartaoExcluirTitulo": "Delete card?",
+  "cartaoExcluirTexto": "The \"{nome}\" card leaves the list and stops generating statements. Statements in months already closed stay in your history.",
+  "@cartaoExcluirTexto": {
+    "placeholders": {
+      "nome": {
+        "type": "String"
+      }
+    }
+  },
+  "cartaoErroSalvar": "We couldn't save this card.",
+  "cartaoErroExcluir": "We couldn't delete this card.",
+  "configRendasSubtitulo": "Recurring and one-time income",
+  "configCartoesSubtitulo": "Credit cards and statements",
+  "configMetodologia": "Method (percentages)",
+  "configMetodologiaSubtitulo": "Adjust the 50-30-20 reference",
+  "configSecaoDados": "Data",
+  "configExportar": "Export data",
+  "configExportarSubtitulo": "Spreadsheet (CSV) or full backup (JSON)",
+  "configContaBackup": "Account and backup",
+  "configContaBackupSubtitulo": "Sign in, restore a backup",
+  "configSecaoRisco": "Danger zone",
+  "configApagarTudo": "Delete all data",
+  "configExportarCsv": "This month's spreadsheet (CSV)",
+  "configExportarJson": "Full backup (JSON)",
+  "configCompartilharCsv": "Spreadsheet for {mes}",
+  "@configCompartilharCsv": {
+    "placeholders": {
+      "mes": {
+        "type": "String"
+      }
+    }
+  },
+  "configCompartilharJson": "Full app backup",
+  "configErroExportarCsv": "We couldn't export this month's spreadsheet.",
+  "configErroExportarJson": "We couldn't create the backup.",
+  "configApagarConfirmarTitulo": "Delete all data?",
+  "configApagarConfirmarTexto": "This removes income, bills, cards and history from this device.",
+  "configApagarTemCerteza": "Are you sure?",
+  "configApagarPalavra": "delete",
+  "configApagarInstrucao": "This can't be undone. To confirm, type \"{palavra}\" below.",
+  "@configApagarInstrucao": {
+    "placeholders": {
+      "palavra": {
+        "type": "String"
+      }
+    }
+  },
+  "configApagarAcao": "Delete everything",
+  "configErroApagar": "We couldn't delete your data.",
+  "percentuaisTitulo": "Method",
+  "percentuaisIntro": "The 50-30-20 reference is a diagnosis, not a limit. Set the percentages however you like — they just need to add up to 100%.",
+  "percentuaisSomaOk": "Total: {soma}% — all set",
+  "@percentuaisSomaOk": {
+    "placeholders": {
+      "soma": {
+        "type": "int"
+      }
+    }
+  },
+  "percentuaisSomaInvalida": "Total: {soma}% — needs to add up to 100%",
+  "@percentuaisSomaInvalida": {
+    "placeholders": {
+      "soma": {
+        "type": "int"
+      }
+    }
+  },
+  "percentuaisSalvar": "Save percentages",
+  "percentuaisAtualizados": "Percentages updated.",
+  "percentuaisErroSalvar": "We couldn't save your percentages.",
+  "backupSecaoEntrar": "Sign in",
+  "backupEntrarTexto": "Signing in keeps a backup of your data in your account. The app works just the same without it.",
+  "backupEntrarApple": "Sign in with Apple",
+  "backupEntrarGoogle": "Sign in with Google",
+  "backupEmBreve": "Coming soon",
+  "backupSecao": "Backup",
+  "backupNuvem": "Cloud backup",
+  "backupNuvemSubtitulo": "Available once you sign in",
+  "backupRestaurarArquivo": "Restore from a file",
+  "backupRestaurarArquivoSubtitulo": "Pick a JSON backup exported by the app",
+  "backupEscolherArquivo": "Choose the backup (.json)",
+  "backupErroLerArquivo": "We couldn't read that file.",
+  "backupRestaurarTitulo": "Restore backup?",
+  "backupRestaurarTituloComData": "Restore the backup from {data}?",
+  "@backupRestaurarTituloComData": {
+    "placeholders": {
+      "data": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestaurarTexto": "The data on this device will be replaced by the one in the backup. The months between the backup date and today will come up empty.",
+  "backupErroRestaurar": "We couldn't restore this backup.",
+  "backupRestaurado": "Backup restored.",
+  "onboardingPasso": "Step {atual} of {total}",
+  "@onboardingPasso": {
+    "placeholders": {
+      "atual": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingBoasVindasTexto": "An app to organize your financial life, made to give you more clarity and more say over your money.",
+  "onboardingBulletChecklistTitulo": "Check off what you've paid",
+  "onboardingBulletChecklistDescricao": "See at a glance what's still left to pay this month.",
+  "onboardingBulletDirecionamentoTitulo": "Breakdown",
+  "onboardingBulletDirecionamentoDescricao": "A proportional split of your income as a reference, never as a limit.",
+  "onboardingBulletPrivacidadeTitulo": "Your data is yours",
+  "onboardingBulletPrivacidadeDescricao": "Works offline; nothing leaves the device unless you say so.",
+  "onboardingJaUso": "I already use the app",
+  "onboardingRendaTitulo": "What's your income?",
+  "onboardingRendaTexto": "Add what you take home each month — salary, benefits, stipend. You can add more than one.",
+  "onboardingRendaNomeLabel": "Name (e.g. Salary)",
+  "onboardingAdicionarRenda": "Add income",
+  "onboardingRendaVazia": "No income added yet.",
+  "onboardingRendaPadrao": "Income {numero}",
+  "@onboardingRendaPadrao": {
+    "placeholders": {
+      "numero": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingTotalMensal": "Monthly total",
+  "onboardingMetodologiaTitulo": "How to divide your money",
+  "onboardingMetodologiaTexto": "We use the 50-30-20 reference as a diagnosis — never as a limit or a demand. You can fine-tune the percentages later.",
+  "onboardingContasTitulo": "Your main bills",
+  "onboardingContasTexto": "Add 3 to 5 bills to get started. Tap a suggestion:",
+  "onboardingContasVazio": "No bills added yet.",
+  "onboardingSugestaoAluguel": "Rent",
+  "onboardingSugestaoInternet": "Internet",
+  "onboardingSugestaoEnergia": "Electricity",
+  "onboardingSugestaoMercado": "Groceries",
+  "onboardingSugestaoAcademia": "Gym",
+  "onboardingSugestaoReserva": "Emergency fund",
+  "onboardingSairTitulo": "Leave and lose what you've entered?",
+  "onboardingSairTexto": "Your income and bills haven't been saved yet. You can pick up right where you left off.",
+  "onboardingErroConcluir": "We couldn't finish your setup."
+}

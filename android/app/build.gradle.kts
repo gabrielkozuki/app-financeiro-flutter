@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.app_financeiro"
+    namespace = "br.com.gabrielkozuki.contaemdia"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,8 +15,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.app_financeiro"
+        // Permanente: é a chave que o Android usa para saber se um APK é
+        // atualização ou app novo. Trocar depois de publicar obriga o usuário a
+        // desinstalar (perdendo o banco local) para instalar a versão nova.
+        applicationId = "br.com.gabrielkozuki.contaemdia"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

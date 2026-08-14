@@ -1,5 +1,5 @@
 import 'package:app_financeiro/data/db/app_database.dart';
-import 'package:app_financeiro/data/export_service.dart';
+import 'package:app_financeiro/data/backup_service.dart';
 import 'package:app_financeiro/data/repositories/drift_cartoes_repository.dart';
 import 'package:app_financeiro/data/repositories/drift_config_repository.dart';
 import 'package:app_financeiro/data/repositories/drift_contas_repository.dart';
@@ -294,7 +294,7 @@ void main() {
   group('Exportação e limpeza', () {
     test('backup JSON faz round-trip e apagarTudo limpa (RF-19/RF-20)',
         () async {
-      final service = ExportService(db);
+      final service = BackupService(db);
       await entradas.criar(const Entrada(
           id: 0,
           nome: 'Salário',

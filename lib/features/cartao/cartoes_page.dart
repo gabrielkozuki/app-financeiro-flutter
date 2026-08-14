@@ -7,6 +7,7 @@ import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_kit.dart';
 import '../../domain/entities/cartao.dart';
+import '../../l10n/app_localizations.dart';
 import '../mes/mes_panorama.dart';
 
 /// Tela (sobreposta) de gestão de cartões de crédito (RF-21). Acessada pela aba
@@ -16,14 +17,15 @@ class CartoesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(cartoesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Cartões')),
+      appBar: AppBar(title: Text(l10n.cartoesTitulo)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _abrirForm(context),
         icon: const Icon(Icons.add),
-        label: const Text('Novo cartão'),
+        label: Text(l10n.cartaoNovo),
       ),
       body: SafeArea(
         child: async.when(
@@ -32,16 +34,15 @@ class CartoesPage extends ConsumerWidget {
             e,
             s,
             contexto: 'CartoesPage',
-            titulo: 'Não conseguimos carregar seus cartões',
+            titulo: l10n.erroCarregarCartoes,
             onTentarNovamente: () => ref.invalidate(cartoesProvider),
           ),
           data: (cartoes) {
             if (cartoes.isEmpty) {
-              return const EmptyState(
+              return EmptyState(
                 icone: Icons.credit_card_outlined,
-                titulo: 'Nenhum cartão cadastrado',
-                descricao: 'Toque em "Novo cartão" para acompanhar as '
-                    'faturas na sua checklist mensal.',
+                titulo: l10n.cartoesVazioTitulo,
+                descricao: l10n.cartoesVazioDescricao,
               );
             }
             return ListView(
@@ -60,7 +61,8 @@ class CartoesPage extends ConsumerWidget {
                           tamanho: 36,
                         ),
                         title: Text(c.nome),
-                        subtitle: Text('Fatura vence dia ${c.diaVencimento}'),
+                        subtitle:
+                            Text(l10n.cartaoFaturaVenceDia(c.diaVencimento)),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => _abrirForm(context, cartao: c),
                       ),
@@ -143,25 +145,24 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
           await repo.criarFatura(cartaoId: id, mesReferencia: mes);
         }
       }
-    }, mensagemErro: 'Não foi possível salvar este cartão.');
+    }, mensagemErro: AppLocalizations.of(context).cartaoErroSalvar);
     _concluir(ok);
   }
 
   Future<void> _excluir() async {
+    final l10n = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir cartão?'),
-        content: Text(
-            'O cartão "${widget.cartao!.nome}" sai da lista e para de gerar '
-            'faturas. As faturas dos meses já fechados continuam no histórico.'),
+        title: Text(l10n.cartaoExcluirTitulo),
+        content: Text(l10n.cartaoExcluirTexto(widget.cartao!.nome)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar')),
+              child: Text(l10n.acaoCancelar)),
           FilledButton.tonal(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Excluir')),
+              child: Text(l10n.acaoExcluir)),
         ],
       ),
     );
@@ -178,7 +179,7 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
         await repo.excluirFaturasAPartirDe(widget.cartao!.id, mesCorrente());
         await repo.definirAtivo(widget.cartao!.id, false);
       }),
-      mensagemErro: 'Não foi possível excluir este cartão.',
+      mensagemErro: l10n.cartaoErroExcluir,
     );
     _concluir(excluiu);
   }
@@ -196,7 +197,8 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
 
   @override
   Widget build(BuildContext context) {
-    final insets = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context);
+    final insets = MediaQuery.viewInsetsOf(context).bottom;
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 4, 20, 20 + insets),
       child: Form(
@@ -206,7 +208,7 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SheetHeader(
-              titulo: _edicao ? 'Editar cartão' : 'Novo cartão',
+              titulo: _edicao ? l10n.cartaoEditar : l10n.cartaoNovo,
               onExcluir: _edicao ? (_salvando ? null : _excluir) : null,
             ),
             const SizedBox(height: AppTheme.spaceXs),
@@ -217,27 +219,30 @@ class _CartaoFormState extends ConsumerState<_CartaoForm> {
               // títulos de conta/fatura agora truncam com "…", mas evitar um
               // nome absurdamente longo já na origem é mais amigável.
               maxLength: 40,
-              decoration: const InputDecoration(
-                  labelText: 'Nome', hintText: 'Ex.: Nubank'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Informe um nome' : null,
+              decoration: InputDecoration(
+                  labelText: l10n.campoNome, hintText: l10n.cartaoNomeHint),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l10n.validacaoInformeNome
+                  : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _dia,
               keyboardType: TextInputType.number,
               decoration:
-                  const InputDecoration(labelText: 'Dia de vencimento'),
+                  InputDecoration(labelText: l10n.cartaoDiaVencimento),
               validator: (v) {
                 final d = int.tryParse(v ?? '');
-                return (d == null || d < 1 || d > 31) ? 'Dia inválido' : null;
+                return (d == null || d < 1 || d > 31)
+                    ? l10n.cartaoDiaInvalido
+                    : null;
               },
             ),
             const SizedBox(height: 20),
             BotaoSalvar(
               salvando: _salvando,
               onPressed: _salvar,
-              rotulo: _edicao ? 'Salvar' : 'Adicionar',
+              rotulo: _edicao ? l10n.acaoSalvar : l10n.acaoAdicionar,
             ),
           ],
         ),
