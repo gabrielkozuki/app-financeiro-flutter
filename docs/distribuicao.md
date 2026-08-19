@@ -1,105 +1,137 @@
-# Distribuição — App Store
+# Distribuição — Google Play Store
 
-**Destino único, decidido em 14/08/2026.** Sem Play Store e sem APK por GitHub Releases: o app
-é um produto só, e dois canais para o mesmo binário multiplicam manutenção sem multiplicar
-alcance.
+**Destino principal, decidido em 19/08/2026, por custo.** O motivo é direto:
 
-O projeto **continua compilando e sendo testado no Android** — `integration_test/` roda em
-emulador Android e é assim que os fluxos ponta a ponta são verificados. O que mudou é o
-destino, não o alvo de build. Se um dia a decisão voltar atrás, o caminho Android está
-preservado em [`assinar-release.md`](assinar-release.md).
+| | Google Play | App Store |
+|---|---|---|
+| Conta de desenvolvedor | **US$ 25, taxa única** | US$ 99 por **ano**, recorrente |
+| Hardware | Qualquer um | Mac com Xcode |
+| Revisão | Automatizada + humana | Humana |
 
-**É o último passo do projeto**, por decisão: só depois do M9. Publicar antes significa subir
-um app com "Entrar" desabilitado, o que reprova na diretriz 2.1 (*App Completeness*) e deixa o
-CE-06 em aberto.
+**A App Store fica para depois**, se e quando a anuidade se justificar. Nada do trabalho de
+iOS foi perdido: `Info.plist`, `AppIcon.appiconset`, `LaunchImage` e o storyboard já estão
+prontos, e o projeto segue compilando para iOS. Retomar é ter o Mac, não refazer trabalho.
 
-## O que só existe no Mac
+**APK avulso por GitHub Releases segue descartado.** Uma loja já cumpre CE-03; um segundo
+canal para o mesmo binário multiplica manutenção sem multiplicar alcance.
 
-Nada disto tem substituto no Windows, nem em VM (a licença do macOS não permite):
+## Comece pelo prazo, não pelo build
 
-- `flutter build ipa` e `pod install`
-- Rodar em simulador ou aparelho
-- Assinar com certificado Apple
-- Enviar ao App Store Connect (via Xcode ou Transporter)
+Uma conta pessoal nova no Play precisa passar por um **teste fechado antes de liberar a
+produção** — na política vigente na data desta decisão: **12 testadores por 14 dias
+corridos**, ininterruptos. Isso não é trabalho, é **espera de calendário**, e é a única coisa
+do projeto que não acelera com esforço.
 
-O que **não** precisa de Mac já foi feito — ver "Estado de iOS" abaixo.
+Consequência prática: **crie a conta e abra o teste fechado assim que houver um build
+assinado**, mesmo com o M9 incompleto. Os 14 dias correm em paralelo ao desenvolvimento. Se
+você deixar para o fim, adiciona duas semanas mortas depois de tudo pronto.
+
+> Confirme a exigência vigente no Play Console — essa política mudou algumas vezes desde 2023
+> e pode ter mudado de novo.
+
+Precisa também de 12 pessoas reais com conta Google dispostas a instalar. Vale começar a
+juntar a lista agora.
 
 ## Pré-requisitos
 
 | Item | Situação |
 |---|---|
-| Mac com Xcode | — |
-| Apple Developer Program | US$ 99/**ano**, recorrente. Sem isso não há envio |
+| Conta Google Play Developer | US$ 25, uma vez. Verificação de identidade leva alguns dias |
+| Keystore de upload | Ver [`assinar-release.md`](assinar-release.md) — **está no caminho crítico** |
 | M9 completo | Login, backup e exclusão de conta. Ver [`m9-auth-backup.md`](m9-auth-backup.md) |
-| Login com Apple | Diretriz 4.8, obrigatório porque há login Google. Faz parte do M9 |
-| Excluir conta dentro do app | Diretriz 5.1.1(v). Faz parte do M9 |
 | Política de privacidade | URL pública. Ver [`politica-privacidade.md`](politica-privacidade.md) |
-| Nutrition labels | Formulário no App Store Connect, separado da política e precisa bater com ela |
-| Nada em estado "em breve" | Diretriz 2.1. Hoje `conta_backup_page.dart` tem dois itens `enabled: false` |
-| Capturas de tela | Por tamanho de tela exigido pelo App Store Connect |
+| URL de exclusão de conta | Exigência específica do Play, **fora do app**. Ver abaixo |
+| Formulário de segurança de dados | No console, precisa bater com a política |
+| Classificação indicativa | Questionário no console |
+| Ficha da loja | Descrição, ícone 512×512, gráfico de destaque 1024×500, capturas |
+| Teste fechado | 12 testadores / 14 dias — **comece cedo** |
 
-## Diretrizes que este app toca de perto
+## O que o Play exige e a Apple não
 
-- **2.1 — App Completeness.** Funcionalidade visível que não funciona é rejeição. Os dois
-  `ListTile` de login desabilitados são exatamente o caso, e é por isso que a publicação vem
-  depois do M9.
-- **4.8 — Login Services.** Havendo login de terceiros (Google), é obrigatório oferecer
-  alternativa equivalente e com privacidade. O "Entrar com a Apple" já está posicionado acima
-  do Google no layout por causa disso — **não reordene**.
-- **5.1.1(v) — Account Deletion.** Precisa ser possível excluir a conta **dentro do app**, não
-  por e-mail de suporte. Remove `backups/{uid}` e a conta no Auth.
-- **5.1.1 — Data Collection.** As nutrition labels precisam bater com a política. O app não
-  coleta analytics de valores; o que sai do aparelho é o backup, por ação explícita.
+Duas coisas que não estavam no roteiro anterior:
 
-## Estado de iOS
+- **URL pública de exclusão de conta.** A Apple exige que dê para excluir a conta *dentro do
+  app* (diretriz 5.1.1(v)); o Play exige isso **e** um endereço na web onde alguém que já
+  desinstalou possa pedir a exclusão. Pode ser uma seção da mesma página da política, desde
+  que explique o que é apagado e como pedir.
+- **Formulário de segurança de dados.** Equivalente às *nutrition labels*, mas com perguntas
+  próprias, incluindo se o dado é criptografado em trânsito e se o usuário pode pedir
+  exclusão. Divergir da política é motivo de suspensão.
 
-A preparação que não depende de Xcode está **feita** — plist, catálogo de assets e storyboard
-são texto e PNG, editáveis em qualquer sistema:
+Em compensação, **"Entrar com a Apple" deixa de ser obrigatório** — a diretriz 4.8 é da Apple.
+Mesmo assim ele **continua no layout, acima do Google**: o custo de manter é zero, e reordenar
+depois, quando a App Store voltar ao mapa, seria retrabalho e risco de rejeição.
+
+## O build
+
+```bash
+flutter build appbundle --release
+```
+
+**AAB, não APK.** O Play exige App Bundle para apps novos, e é ele que monta o pacote por
+aparelho — por isso não existe `--split-per-abi` aqui.
+
+**O arquivo enviado tem ~57 MB e isso é normal**: o AAB carrega as três ABIs mais os recursos
+de todas as densidades e idiomas, para o Play escolher. O que o usuário baixa é a fatia do
+aparelho dele, ~20 MB. Não tente reduzir o AAB — o número que importa é o "tamanho do
+download" que o console mostra depois do envio.
+
+O `targetSdk 36` já atende a exigência atual do Play (≥35) e o `minSdk 24` cobre praticamente
+todo aparelho em uso.
+
+## Play App Signing
+
+**Ative.** É o padrão para apps novos e muda a natureza do risco do keystore:
+
+- Você assina o AAB com a **chave de upload** e envia.
+- O Google re-assina com a **chave de assinatura do app**, que fica com ele.
+- Perder a chave de upload é **recuperável** — dá para pedir a substituição pelo console.
+
+Isso inverte o alerta que valia para distribuição fora de loja, onde perder o keystore
+significava nunca mais atualizar o app. Guardar bem continua valendo; deixar de ser
+catastrófico, não.
+
+**A pegadinha que quebra o login em produção:** com Play App Signing existem **dois** SHA-1.
+O do seu keystore de upload e o da chave que o Google gerou. O Google Sign-In em produção usa
+o **da chave de assinatura do app**, que só aparece em **Play Console → Configurar →
+Integridade do app**. Registrar só o de upload faz o login funcionar em desenvolvimento e
+falhar em silêncio para quem baixar da loja. Ver o passo 1.6 de
+[`m9-auth-backup.md`](m9-auth-backup.md).
+
+## Estado de iOS (congelado, não perdido)
+
+Preparado até onde o Windows alcança, e assim permanece até haver Mac:
 
 | Item | Hoje |
 |---|---|
-| `CFBundleDisplayName` | "Conta em Dia" ✔ |
-| `CFBundleName` | "Conta em Dia" ✔ |
-| Bundle identifier no `project.pbxproj` | `br.com.gabrielkozuki.contaemdia` ✔ |
-| `AppIcon.appiconset` | 15 arquivos (20 a 1024 px) gerados por `gerar_icone.py`, em RGB ✔ |
+| `CFBundleDisplayName` / `CFBundleName` | "Conta em Dia" ✔ |
+| Bundle identifier | `br.com.gabrielkozuki.contaemdia` ✔ |
+| `AppIcon.appiconset` | 15 arquivos (20 a 1024 px), em RGB ✔ |
 | `LaunchImage.imageset` | A marca em 128/256/384 px ✔ |
-| `LaunchScreen.storyboard` | Fundo `#F7F9F9`, a mesma superfície do app ✔ |
+| `LaunchScreen.storyboard` | Fundo `#F7F9F9` ✔ |
+| Launch screen no modo escuro | Pendente — exige Xcode |
+| `flutterfire configure` com iOS | Pendente |
 
-**Ícone de iOS não pode ter canal alfa** — o envio é recusado. É o inverso do adaptativo do
-Android, que exige transparência na camada de frente; por isso `gerar_ios()` faz
-`convert('RGB')`. Também não arredonde os cantos: o sistema aplica a máscara, e um PNG já
-arredondado fica com halo.
-
-### Pendências de iOS que exigem o Mac
-
-- **Launch screen no modo escuro.** No Android isso saiu com `drawable-night-v21/`; no iOS a
-  cor de fundo mora no storyboard, que não acompanha o tema sozinho. O caminho é um *Color Set*
-  no catálogo (`LaunchBackground.colorset`, com variante `luminosity: dark`) referenciado por
-  nome no storyboard, mais variantes escuras na `LaunchImage.imageset`. Ficou para o Mac de
-  propósito: é edição de arquivo do Xcode que não dá para validar sem abrir o Xcode, e um
-  storyboard malformado quebra o build sem dar erro de lint antes.
-- **Conferir o ícone no simulador.** A máscara do iOS corta mais que a do Android; se ficar
-  apertado, o ajuste é o parâmetro `escala` do gerador.
-- **Firebase no iOS.** O `flutterfire configure` precisa ser rodado marcando iOS, gerando
-  `GoogleService-Info.plist`. O Google Sign-In no iOS usa *URL scheme* com o reversed client ID
-  no `Info.plist` — mecanismo diferente do SHA-1 do Android.
-- **`sign_in_with_apple`** só entra quando houver conta paga no Apple Developer Program.
+**Ícone de iOS não pode ter canal alfa** — é o inverso do adaptativo do Android, que exige
+transparência na camada de frente. Por isso `gerar_ios()` faz `convert('RGB')`.
 
 ## Versionamento
 
-`pubspec.yaml` → `version: 1.0.0+1`. O `+1` vira `CFBundleVersion`: **precisa aumentar a cada
-envio**, mesmo que o `1.0.0` não mude. A Apple recusa um build com número já usado — inclusive
-builds rejeitados na revisão consomem o número.
+`pubspec.yaml` → `version: 1.0.0+1`. O `+1` vira `versionCode`: **precisa aumentar a cada
+envio**, mesmo que o `1.0.0` não mude, e inclusive entre builds do teste fechado. O Play
+recusa um `versionCode` já usado, e o número não pode ser reaproveitado nem depois de
+descartar o build.
 
 ## Checklist final
 
+- [ ] Conta Google Play Developer criada e identidade verificada
+- [ ] Keystore de upload gerado, `key.properties` e `build.gradle.kts` ajustados
+- [ ] Teste fechado aberto e os 14 dias **em andamento**
 - [ ] M9 fechado, sem nada `enabled: false` visível
-- [ ] Mac com Xcode e conta no Apple Developer Program ativa
-- [ ] `flutterfire configure` rodado com iOS marcado
-- [ ] Launch screen com variante escura
-- [ ] Ícone conferido no simulador
-- [ ] Política de privacidade publicada e a URL acessível sem login
-- [ ] Nutrition labels preenchidas, batendo com a política
-- [ ] Capturas de tela nos tamanhos exigidos
+- [ ] SHA-1 **da chave de assinatura do app** (não o de upload) registrado no Firebase
+- [ ] Política de privacidade publicada, com a seção de exclusão de conta
+- [ ] Formulário de segurança de dados batendo com a política
+- [ ] Classificação indicativa respondida
+- [ ] Ficha da loja: descrição, capturas, gráfico de destaque
 - [ ] `version` incrementada
-- [ ] `flutter build ipa` e envio pelo Xcode/Transporter
+- [ ] `flutter build appbundle --release` e envio

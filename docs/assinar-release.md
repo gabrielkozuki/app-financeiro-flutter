@@ -1,11 +1,7 @@
 # Assinar o release (Android)
 
-> **Fora do caminho atual.** Desde 14/08/2026 o destino é a App Store, sem Play Store e sem
-> APK por GitHub Releases — nada aqui é necessário para publicar. O documento fica porque a
-> decisão pode voltar atrás e porque o projeto continua compilando para Android.
->
-> **Assinatura de iOS não tem relação com isto.** Lá são certificados e perfis de
-> provisionamento da Apple, gerenciados pelo Xcode; ver [`distribuicao.md`](distribuicao.md).
+**No caminho crítico.** Desde 19/08/2026 o destino é a Google Play Store, e nada é enviado
+sem uma chave própria.
 
 Hoje o `build.gradle.kts` ainda tem o bloco do template:
 
@@ -18,7 +14,7 @@ buildTypes {
 }
 ```
 
-Ou seja, `flutter build apk --release` produz um APK assinado com a chave de debug.
+Ou seja, `flutter build appbundle --release` produz um artefato assinado com a chave de debug.
 Dá para conferir a qualquer momento:
 
 ```bash
@@ -27,50 +23,55 @@ apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk
 ```
 
 A chave de debug é gerada automaticamente por máquina e é pública — qualquer um pode assinar
-um APK com ela. Não serve para distribuir.
+com ela. O Play recusa.
 
-## Por que isso é o passo mais irreversível do projeto
+## O que esta chave é (e o que ela não é)
 
-O Android identifica uma atualização pelo par (`applicationId`, **certificado**). Como o
-`applicationId` já está congelado em `br.com.gabrielkozuki.contaemdia`, é o certificado que
-decide se a próxima versão instala por cima ou é recusada.
+Com **Play App Signing** — o padrão para apps novos, e o que vamos usar — existem duas chaves:
 
-**Perder o keystore depois de publicar significa que nenhuma versão futura instala por cima.**
-O usuário teria que desinstalar — e como o app usa `android:allowBackup="false"` (deliberado:
-o backup dele é o da nuvem, não o do sistema), o banco local vai junto.
+| | Chave de **upload** | Chave de **assinatura do app** |
+|---|---|---|
+| Quem tem | Você, neste keystore | O Google |
+| Para que serve | Provar que o envio é seu | Assinar o que chega ao aparelho |
+| Se perder | **Recuperável** — pede substituição no console | Não se aplica; você nunca a teve |
 
-Guarde o `.jks` e a senha **fora do repositório e fora desta máquina**.
+A chave gerada abaixo é a de **upload**. Isso muda o tamanho do risco: fora de loja, perder o
+keystore significa nunca mais atualizar o app, porque o Android identifica a atualização pelo
+par (`applicationId`, certificado). Dentro do Play, o Google guarda a chave que importa e a de
+upload é substituível.
+
+Guardar bem continua valendo — recuperação envolve suporte e demora. Mas não é catastrófico.
 
 ## 1. Gerar o keystore
 
 `keytool` vem com o JDK que o Android Studio instala. No PowerShell, da raiz do projeto:
 
 ```powershell
-keytool -genkey -v -keystore $HOME\conta-em-dia.jks `
+keytool -genkey -v -keystore $HOME\conta-em-dia-upload.jks `
   -keyalg RSA -keysize 2048 -validity 10000 `
-  -alias conta-em-dia
+  -alias upload
 ```
 
-- `-validity 10000` são ~27 anos. O Google Play recusa certificado que expire antes de
-  22/10/2033; use um prazo folgado e não pense nisso de novo.
-- Ele pede uma senha e alguns dados de identificação (nome, organização, país). Podem ser os
-  seus; aparecem só no certificado.
-- **Fora do repositório de propósito** — `$HOME`, não a pasta do projeto. O
-  `android/.gitignore` já ignora `key.properties`, `*.keystore` e `*.jks`, mas um arquivo
-  fora do projeto não depende de o `.gitignore` estar certo.
+- `-validity 10000` são ~27 anos. O Play recusa certificado que expire antes de 22/10/2033;
+  use prazo folgado e não pense nisso de novo.
+- Pede uma senha e alguns dados de identificação. Podem ser os seus; aparecem só no
+  certificado.
+- **Fora do repositório de propósito** — `$HOME`, não a pasta do projeto. O `android/.gitignore`
+  já ignora `key.properties`, `*.keystore` e `*.jks`, mas um arquivo fora do projeto não
+  depende de o `.gitignore` estar certo.
 
 ## 2. Criar `android/key.properties`
 
 ```properties
 storePassword=<a senha que você digitou>
 keyPassword=<a mesma, se não definiu outra para a chave>
-keyAlias=conta-em-dia
-storeFile=C:/Users/<voce>/conta-em-dia.jks
+keyAlias=upload
+storeFile=C:/Users/<voce>/conta-em-dia-upload.jks
 ```
 
 Use **barras normais** (`/`) mesmo no Windows — o Gradle interpreta `\` como escape.
 
-Este arquivo já é ignorado pelo `android/.gitignore`. Confira antes de commitar:
+Confira antes de commitar:
 
 ```bash
 git check-ignore -v android/key.properties   # deve responder com a linha do .gitignore
@@ -128,29 +129,32 @@ O `certificate DN` tem que refletir o que você digitou no passo 1. Se ainda apa
 `CN=Android Debug`, o Gradle não achou o `key.properties` e caiu no bloco vazio — confira o
 caminho e as barras.
 
-## 5. Guardar
+O APK aqui é só para conferir a assinatura. **O que vai para o Play é o AAB**
+(`flutter build appbundle --release`); ver [`distribuicao.md`](distribuicao.md).
 
-Três coisas, no mesmo lugar seguro (gerenciador de senhas com anexo, ou cofre offline):
+## 5. Depois do primeiro envio: o SHA-1 que importa
+
+Com Play App Signing existem dois SHA-1, e o Google Sign-In em produção usa o **da chave de
+assinatura do app**, não o da sua chave de upload. Ele aparece em **Play Console → Configurar
+→ Integridade do app**, e só existe depois do primeiro envio.
+
+Registrar só o de upload faz o login funcionar em desenvolvimento e falhar em silêncio para
+quem baixar da loja. Ver o passo 1.6 de [`m9-auth-backup.md`](m9-auth-backup.md).
+
+## 6. Guardar
 
 | O quê | Por quê |
 |---|---|
-| `conta-em-dia.jks` | Sem ele não há atualização, nunca mais |
+| `conta-em-dia-upload.jks` | Substituível pelo console, mas com burocracia e espera |
 | A senha do store e da chave | O `.jks` sozinho é inútil |
 | O `keyAlias` | Está no `key.properties`, que não vai para o git |
 
-Se um dia publicar no Google Play, ative o **Play App Signing**: o Google passa a guardar a
-chave de assinatura final e o seu keystore vira apenas a chave de *upload*, que pode ser
-substituída em caso de perda. Para distribuição fora da loja (APK avulso) essa rede de
-proteção não existe.
+## Se um dia distribuir fora de loja
 
-## Se a decisão voltar atrás
+Duas coisas que o Play resolve sozinho e voltariam a ser problema seu:
 
-Duas coisas que só aparecem quando o Android volta ao caminho:
-
-- **O APK sai com 58 MB** porque empacota `arm64-v8a`, `armeabi-v7a` e `x86_64`. Fora do Play
-  não existe intermediário montando o pacote por aparelho, então a divisão tem que acontecer
-  no build: `flutter build apk --release --split-per-abi`, publicando o `arm64-v8a` (~20 MB).
-  O `x86_64` é emulador e não serve a nenhum celular.
-- **O SHA-1 do keystore de release** precisa ser registrado no Firebase, além do de debug
-  (passo 1.6 de [`m9-auth-backup.md`](m9-auth-backup.md)). Esquecer faz o Google Sign-In
-  funcionar em desenvolvimento e falhar em silêncio no APK publicado.
+- **O APK sai com 58 MB** porque empacota `arm64-v8a`, `armeabi-v7a` e `x86_64`. Sem
+  intermediário montando o pacote por aparelho, a divisão vira
+  `flutter build apk --release --split-per-abi`, publicando o `arm64-v8a` (~20 MB).
+- **O risco do keystore volta a ser total** — sem Play App Signing, perder a chave significa
+  nunca mais atualizar o app instalado.

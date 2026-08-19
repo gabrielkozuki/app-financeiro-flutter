@@ -25,7 +25,7 @@ O app **não** é um registrador de transações nem se conecta a bancos. Ele tr
 
 ### 1.4 Objetivos do projeto (estudo/portfólio)
 
-- Exercitar o ciclo completo de produto: descoberta, requisitos, design, implementação e publicação na App Store.
+- Exercitar o ciclo completo de produto: descoberta, requisitos, design, implementação e publicação em loja.
 - Produzir um case de portfólio com documentação de produto e código limpo e testável.
 - Praticar modelagem de domínio com regras de negócio reais (ciclos mensais, recorrência, rateio percentual).
 
@@ -228,8 +228,10 @@ Como projeto de estudo, as métricas servem para simular a visão de produto:
 
 ## 13. Definição técnica
 
-- **Framework:** Flutter. **Publicação na App Store** (decidido em 14/08/2026, revertendo o plano anterior de publicar antes no Android). **Não há plano de Play Store**, e a distribuição de APK por GitHub Releases foi descartada — o app é um só produto, e dois canais de distribuição para o mesmo binário só multiplicam manutenção. O desenvolvimento continua no Windows e o projeto **continua compilando e sendo testado no Android** (é onde `integration_test/` roda); o que mudou é o destino, não o alvo de build.
-  - **Consequência aceita:** CE-03 e CE-04 passam a depender de Mac com Xcode, conta Apple Developer (US$ 99/**ano**, recorrente) e revisão da Apple. Eram os dois critérios que um APK no GitHub Releases fecharia sem custo e sem revisor. Publicar deixa de ser um passo de meia hora e vira um marco com dependência externa.
+- **Framework:** Flutter. **Publicação na Google Play Store** (decidido em 19/08/2026, por custo). O destino passou por três versões: APK em GitHub Releases (plano original) → App Store (14/08) → Play Store. O motivo desta é preço: **US$ 25 de taxa única** contra **US$ 99/ano recorrentes** da Apple, e sem necessidade de Mac. O desenvolvimento é no Windows, que é onde o app já compila, roda e é testado (`integration_test/` em emulador Android).
+  - **App Store fica para depois**, se e quando a anuidade se justificar. Os assets de iOS que não exigem Xcode já estão prontos (`Info.plist`, `AppIcon.appiconset`, `LaunchImage`, storyboard) e o projeto segue compilando para iOS — retomar é questão de ter o Mac, não de refazer trabalho.
+  - **Distribuição de APK avulso (GitHub Releases) segue descartada.** Uma loja já cumpre CE-03; um segundo canal para o mesmo binário multiplica manutenção sem multiplicar alcance.
+  - **Consequência de calendário:** conta pessoal nova no Play exige um período de **teste fechado antes de liberar produção** (à data desta decisão: 12 testadores por 14 dias corridos). Isso não é trabalho, é espera — e por isso precisa começar cedo, não no fim. Confirmar a exigência vigente no Play Console, que muda de tempos em tempos.
 - **Persistência local:** SQLite via **drift** (type-safe, com migrações e boa testabilidade) — alinhado ao offline-first (RNF-01). Uma conta tem no máximo uma ocorrência por mês (e um cartão, uma fatura), garantido por restrição de unicidade no banco: é o que torna a virada do mês idempotente (RF-16/RN-05).
 - **Estado:** **Riverpod**, com os repositórios expostos por interface (o domínio declara o contrato, a camada de dados implementa). Nos testes o *test double* é o próprio banco em memória, não um fake: o SQL faz parte da regra testada.
 - **Navegação:** **exatamente 3 menus fixos** (Contas | Gráfico | Configurações). Formulários e detalhes abrem sobrepostos com `Navigator` nativo, folhas modais e diálogos — nunca viram um 4º menu. Sem pacote de rotas (`go_router`), por simplicidade (CE-02 é atendido pelo `Navigator`).

@@ -1,7 +1,7 @@
 # M9 — Autenticação e backup na nuvem
 
 Fecha o **CE-06** (login social) e dá ao app o backup de verdade. É o último marco funcional;
-depois dele só resta a publicação ([`distribuicao.md`](distribuicao.md)).
+depois dele só resta a publicação na Play Store ([`distribuicao.md`](distribuicao.md)).
 
 Substitui o antigo `configurar-firebase.md`, que descrevia o login como porta de entrada —
 decisão revertida (ver abaixo).
@@ -38,15 +38,19 @@ a fronteira foi rompida.
   Entrar mora em Configurações → "Conta e backup", e também no botão "Já uso o app" da
   primeira tela do onboarding — sem essa segunda porta, um aparelho recém-instalado não
   alcança a restauração sem antes cadastrar dados que a restauração vai apagar.
-- **"Entrar com a Apple" vem ACIMA de "Entrar com o Google".** Não é preferência visual: a
-  diretriz 4.8 da App Store exige alternativa equivalente e com privacidade quando há login de
-  terceiros, e as HIG pedem destaque. Reordenar arrisca rejeição.
+- **"Entrar com a Apple" vem ACIMA de "Entrar com o Google".** A exigência é da diretriz 4.8
+  da App Store (alternativa equivalente e com privacidade quando há login de terceiros), então
+  **não vale para o Play** — mas a ordem fica. Custa zero manter, e reordenar depois, quando a
+  App Store voltar ao mapa, seria retrabalho com risco de rejeição.
 - **Backup é blob JSON por UID, *last-wins*.** Sem merge, sem resolução de conflito por campo.
 - **Não existe "restaurar de arquivo".** O backup real é o da nuvem; um segundo canal seria
   uma segunda fonte para o mesmo dado. O JSON exportado em Configurações é portabilidade
   (RF-19), não canal de restauração.
-- **Excluir conta** (diretriz 5.1.1(v) da App Store) é diferente de "apagar dados locais":
-  precisa remover `backups/{uid}` **e** a conta no Firebase Auth, não só o banco.
+- **Excluir conta** é diferente de "apagar dados locais": precisa remover `backups/{uid}`
+  **e** a conta no Firebase Auth, não só o banco. As duas lojas exigem, com uma diferença: a
+  Apple quer o caminho dentro do app (5.1.1(v)); o **Play quer isso e mais uma URL pública**,
+  para quem já desinstalou conseguir pedir. A URL é uma seção da página de privacidade —
+  ver [`politica-privacidade.md`](politica-privacidade.md).
 
 ---
 
@@ -123,9 +127,23 @@ cd android && ./gradlew signingReport
 Copie o **SHA-1** e cole em **Configurações do projeto → Seus apps (Android) → Adicionar
 impressão digital**. Baixe o `google-services.json` de novo se o console pedir.
 
-São **dois** SHA-1 quando o release estiver assinado ([`assinar-release.md`](assinar-release.md)):
-o da variante `debug` e o do keystore de release. Esquecer o segundo faz o login funcionar em
-desenvolvimento e falhar em silêncio no APK publicado — é o erro clássico aqui.
+São **três** SHA-1 ao todo, e a ordem em que eles passam a existir importa:
+
+| Origem | Quando existe | Para que |
+|---|---|---|
+| Variante `debug` | Agora | `flutter run` e o emulador |
+| Keystore de **upload** | Depois de [`assinar-release.md`](assinar-release.md) | Buildar release na sua máquina |
+| Chave de **assinatura do app** (do Google) | **Só depois do primeiro envio ao Play** | O login de quem baixa da loja |
+
+O terceiro é o que quebra em produção. Com Play App Signing o Google re-assina o AAB com uma
+chave própria, então o app que chega ao aparelho **não** carrega o seu certificado de upload —
+e o Google Sign-In valida contra o certificado real. Ele aparece em **Play Console →
+Configurar → Integridade do app**.
+
+Registrar só os dois primeiros faz o login funcionar em desenvolvimento, funcionar no APK que
+você mesmo instala, e falhar em silêncio para quem baixar da loja. É o erro clássico aqui, e
+como o terceiro SHA-1 só nasce depois do primeiro envio, ele é fácil de esquecer: volte ao
+Firebase **depois** de enviar.
 
 ---
 
@@ -157,7 +175,10 @@ Apple acima de Google. Estado da sessão num provider, com o e-mail/nome exibido
 ## 2.4 Excluir conta
 
 Item explícito, com confirmação. Remove `backups/{uid}`, chama `delete()` no usuário do
-Firebase Auth e só então oferece apagar o banco local. Exigência da diretriz 5.1.1(v).
+Firebase Auth e só então oferece apagar o banco local.
+
+O Play exige **também** uma URL pública de solicitação de exclusão, para quem já desinstalou
+— não substitui o caminho dentro do app, soma-se a ele. Mora na página de privacidade.
 
 ## 2.5 Cobertura
 

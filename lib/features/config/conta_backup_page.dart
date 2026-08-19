@@ -40,12 +40,12 @@ class ContaBackupPage extends ConsumerWidget {
                         ?.copyWith(color: context.colors.onSurfaceVariant),
                   ),
                 ),
-                // ORDEM IMPORTA, não é preferência visual: a diretriz 4.8 de
-                // revisão da App Store exige uma opção de login equivalente e
-                // com privacidade quando há login de terceiros (Google), e as
-                // HIG da Apple pedem o "Entrar com a Apple" em posição de
-                // destaque. Manter Apple ACIMA de Google evita rejeição na
-                // publicação. Não reordene ao implementar o M8.
+                // ORDEM IMPORTA. A diretriz 4.8 da App Store exige uma opção de
+                // login equivalente e com privacidade quando há login de
+                // terceiros (Google), e as HIG pedem o "Entrar com a Apple" em
+                // destaque. O destino atual é o Play, que não exige nada disso —
+                // mas manter a ordem custa zero e evita retrabalho se a App Store
+                // voltar ao mapa. Não reordene ao implementar o M9.
                 _Grupo(children: [
                   ListTile(
                     leading: const Icon(Icons.apple),

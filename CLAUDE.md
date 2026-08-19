@@ -93,12 +93,13 @@ passados. É um desenho deliberado, aprovado, não um descuido. Consequências a
   alcançável de Configurações **e** do botão "Já uso o app" na primeira tela do
   onboarding — sem essa porta, um aparelho recém-instalado não chega à
   restauração. O `RootGate` continua binário.
-- **"Entrar com a Apple" vem ACIMA de "Entrar com o Google".** Não é preferência
-  visual: a diretriz 4.8 da App Store exige alternativa equivalente e com
-  privacidade quando há login de terceiros, e as HIG pedem destaque. Reordenar
-  arrisca rejeição na publicação.
-- **Excluir conta** (diretriz 5.1.1(v) da App Store) é diferente de "apagar dados locais":
-  precisa remover o `backups/{uid}` e a conta no Firebase, não só o banco.
+- **"Entrar com a Apple" vem ACIMA de "Entrar com o Google".** A exigência é da
+  diretriz 4.8 da App Store, então **não vale para o Play**, o destino atual —
+  mas a ordem fica: custa zero manter, e reordenar quando a App Store voltar ao
+  mapa seria retrabalho com risco de rejeição.
+- **Excluir conta** é diferente de "apagar dados locais": precisa remover o
+  `backups/{uid}` e a conta no Firebase, não só o banco. As duas lojas exigem;
+  o Play pede **também uma URL pública** de solicitação, para quem já desinstalou.
 - **Não existe "restaurar de arquivo".** O backup de verdade é o da nuvem; um
   segundo canal de restauração seria uma segunda fonte para a mesma coisa. O
   JSON exportado em Configurações é portabilidade do dado (RF-19), não canal de
@@ -137,8 +138,9 @@ precisa justificar o ganho.
 - `.claude/plano-mvp.md` — plano dos marcos M0–M10, status atual e onde a execução divergiu.
 - `docs/m9-auth-backup.md` — o M9 inteiro: o que só o usuário faz no console do Firebase e o
   que fica para implementar. Substitui o antigo `configurar-firebase.md`.
-- `docs/assinar-release.md` — keystore do Android. **Fora do caminho atual**, mantido caso a
-  decisão de publicar só na App Store volte atrás.
-- `docs/distribuicao.md` — o passo final: App Store. Destino único desde 14/08/2026 (sem
-  Play Store, sem APK avulso); o projeto segue compilando e sendo testado no Android.
+- `docs/assinar-release.md` — keystore de upload e o bloco de assinatura do Gradle.
+  **No caminho crítico**: nada é enviado ao Play sem ele.
+- `docs/distribuicao.md` — publicação na **Google Play Store**, destino desde 19/08/2026
+  (por custo: US$ 25 único vs US$ 99/ano da Apple). App Store fica para depois, com os assets
+  de iOS prontos; APK avulso descartado.
 - `docs/politica-privacidade.md` — o que a página precisa responder e onde ela mora.

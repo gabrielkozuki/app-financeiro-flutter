@@ -6,31 +6,43 @@
 
 ## O caminho crítico até publicar
 
-**Destino: App Store** (decidido em 14/08/2026). Sem Play Store e sem APK por GitHub Releases.
-O projeto **continua compilando e sendo testado no Android** — `integration_test/` roda em
-emulador Android; o que mudou é o destino, não o alvo de build.
+**Destino: Google Play Store** (decidido em 19/08/2026, por custo — US$ 25 de taxa única
+contra US$ 99/ano da Apple, e sem precisar de Mac). A App Store fica para depois, com os
+assets de iOS já prontos e congelados. APK avulso segue descartado.
 
-Toda a **preparação** está feita: identidade, ícone, splash, tradução, acessibilidade, os
-assets de iOS que não exigem Xcode e os roteiros em `docs/`. Restam quatro coisas.
+Toda a **preparação** está feita: identidade, ícone, splash, tradução, acessibilidade, assets
+de iOS e os roteiros em `docs/`.
 
-| # | O quê | Quem começa | Bloqueia |
+### A ordem mudou por causa de um prazo, não de uma dependência
+
+Conta pessoal nova no Play exige **teste fechado com 12 testadores por 14 dias corridos**
+antes de liberar produção. Isso é espera de calendário — a única coisa do projeto que não
+acelera com esforço. Então ela **começa primeiro**, não por último.
+
+| # | O quê | Quem começa | Observação |
 |---|---|---|---|
-| 1 | Configurar o Firebase (`docs/m9-auth-backup.md`, Parte 1) | **Você** — console + `flutterfire configure` | O M9 inteiro, e o CE-06 |
-| 2 | Mac com Xcode + Apple Developer Program (US$ 99/ano) | **Você** | Todo o resto de iOS |
-| 3 | Política de privacidade (`docs/politica-privacidade.md`) | Depois do M9 | Envio à loja |
-| 4 | Envio (`docs/distribuicao.md`) | Depois de 1–3 | — |
+| 1 | Keystore de upload (`docs/assinar-release.md`) | **Você** — um `keytool`, ~2 min | Destrava o primeiro build enviável |
+| 2 | Conta Google Play Developer (US$ 25) | **Você** | Verificação de identidade leva dias |
+| 3 | **Abrir o teste fechado** | Depois de 1 e 2 | Com o app incompleto mesmo. Os 14 dias correm em paralelo ao M9 |
+| 4 | Configurar o Firebase (`docs/m9-auth-backup.md`, Parte 1) | **Você** — console + `flutterfire configure` | Destrava o M9 e o CE-06 |
+| 5 | Política de privacidade + seção de exclusão (`docs/politica-privacidade.md`) | Depois do M9 | O Play exige URL pública de exclusão |
+| 6 | Produção (`docs/distribuicao.md`) | Depois de tudo | AAB, não APK |
 
-**1 e 2 são independentes** e podem correr em paralelo, mas o `flutterfire configure` precisa
-ser rodado **de novo com iOS marcado** quando o Mac existir — o `GoogleService-Info.plist` e o
-*URL scheme* do Google Sign-In no iOS não saem da configuração de Android.
+**1, 2 e 4 são independentes** e podem correr juntos. O acoplamento real está no fim: o
+**SHA-1 da chave de assinatura do app** — a que o Google gera, não a sua de upload — só existe
+depois do primeiro envio, e é ela que o Google Sign-In valida em produção. Registrar só o de
+upload faz o login funcionar em desenvolvimento e falhar em silêncio para quem baixa da loja.
 
-**Consequência aceita da decisão:** CE-03 e CE-04 passam a depender de hardware Apple,
-mensalidade anual e revisão humana. Eram os dois critérios que um APK no GitHub Releases
-fecharia sem custo. Publicar deixou de ser um passo de meia hora e virou um marco com
-dependência externa.
+### O que a troca de loja mudou de verdade
 
-O caminho Android está preservado em `docs/assinar-release.md`, marcado como fora do caminho
-atual, caso a decisão volte atrás.
+- **CE-03/CE-04 ficaram muito mais baratos.** Sem Mac, sem anuidade. Era a objeção que a
+  decisão anterior tinha criado.
+- **Perder o keystore deixou de ser catastrófico.** Com Play App Signing o Google guarda a
+  chave de assinatura e a sua é só de upload, substituível pelo console. Fora de loja, perder
+  a chave significava nunca mais atualizar o app.
+- **Apareceu uma exigência nova:** URL pública de exclusão de conta, que a Apple não pede.
+- **"Entrar com a Apple" deixou de ser obrigatório** (diretriz 4.8 é da Apple), mas fica no
+  layout, acima do Google — custa zero e evita retrabalho se a App Store voltar.
 
 ## Status da execução
 
@@ -51,18 +63,22 @@ qualidade e distribuição; virou três marcos com um propósito cada):
 - **M9 — Auth Firebase + backup na nuvem (CE-05/CE-06).** Bloqueado pela configuração do
   projeto Firebase, que depende da conta do usuário — guia em `docs/m9-auth-backup.md`
   (as dependências foram REMOVIDAS do `pubspec.yaml` até aqui; ver o passo 1.4 do guia).
-  Inclui a exclusão de conta que a diretriz 5.1.1(v) da App Store exige: apagar o
-  `backups/{uid}` e a conta em si, não só o dado local. **Restaurar só da nuvem**
+  Inclui a exclusão de conta que as duas lojas exigem: apagar o `backups/{uid}` e a conta em
+  si, não só o dado local — e, no Play, também uma URL pública para quem já
+  desinstalou. **Restaurar só da nuvem**
   — a restauração por arquivo foi descartada em 04/08/2026 (duas fontes para o
   mesmo backup), e o `file_picker` saiu do projeto: nem a v11 nem a v12-beta
   convivem com o Kotlin embutido do Flutter 3.44 e o `share_plus`.
-- **M10 — Publicação na App Store (CE-03/CE-04).** Ícone, splash, identidade visual
-  (`assets/marca/`) e os assets de iOS que não exigem Xcode estão **prontos**. Falta a
-  política de privacidade (`docs/politica-privacidade.md`) e o envio em si
-  (`docs/distribuicao.md`), que por decisão é o **último passo**: sai só depois do M9, senão
-  o app iria à loja com "Entrar" desabilitado, reprovando na diretriz 2.1. Depende de Mac com
-  Xcode e de conta no Apple Developer Program. A acessibilidade do antigo M8 já foi antecipada
-  (contraste ≥4,5:1, alvos ≥44dp, rótulos semânticos).
+- **M10 — Publicação na Google Play Store (CE-03/CE-04).** Ícone, splash e identidade visual
+  (`assets/marca/`) estão **prontos**, e os assets de iOS também — congelados até haver Mac.
+  Falta a assinatura de upload (`docs/assinar-release.md`, hoje o build sai com
+  `CN=Android Debug`), a política de privacidade com seção de exclusão
+  (`docs/politica-privacidade.md`) e o envio (`docs/distribuicao.md`).
+  **A produção é o último passo**, depois do M9 — senão o app iria à loja com "Entrar"
+  desabilitado. **O teste fechado, porém, é o primeiro**: são 12 testadores por 14 dias
+  corridos, espera de calendário que corre em paralelo ao desenvolvimento.
+  A acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos ≥44dp, rótulos
+  semânticos).
 
 Identidade definida: **`br.com.gabrielkozuki.contaemdia`** (permanente — é a chave de
 atualização do Android), nome exibido "Conta em Dia".
