@@ -1,5 +1,19 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+// Credenciais do keystore de upload. Ficam FORA do repositório
+// (`android/.gitignore` cobre key.properties, *.jks e *.keystore).
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -27,11 +41,28 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        // Só existe quando há key.properties. Sem essa guarda, um clone do
+        // repositório sem o arquivo falha ao ABRIR o projeto no Gradle, não
+        // apenas ao buildar em release.
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String?
+                keyPassword = keystoreProperties["keyPassword"] as String?
+                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+                storePassword = keystoreProperties["storePassword"] as String?
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Cai no debug enquanto não houver keystore, para `flutter run
+            // --release` continuar funcionando. O que vai ao Play NUNCA pode
+            // sair por esse caminho — confira com:
+            //   apksigner verify --print-certs <apk>
+            signingConfig = signingConfigs.findByName("release")
+                ?: signingConfigs.getByName("debug")
         }
     }
 }

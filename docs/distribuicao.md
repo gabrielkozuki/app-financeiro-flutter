@@ -17,20 +17,59 @@ canal para o mesmo binário multiplica manutenção sem multiplicar alcance.
 
 ## Comece pelo prazo, não pelo build
 
-Uma conta pessoal nova no Play precisa passar por um **teste fechado antes de liberar a
-produção** — na política vigente na data desta decisão: **12 testadores por 14 dias
-corridos**, ininterruptos. Isso não é trabalho, é **espera de calendário**, e é a única coisa
-do projeto que não acelera com esforço.
+Conta **pessoal** criada depois de 13/11/2023 precisa passar por um **teste fechado com 12
+testadores por 14 dias corridos** antes de poder pedir acesso à produção. Verificado em
+19/08/2026 na documentação do Play.
 
-Consequência prática: **crie a conta e abra o teste fechado assim que houver um build
-assinado**, mesmo com o M9 incompleto. Os 14 dias correm em paralelo ao desenvolvimento. Se
-você deixar para o fim, adiciona duas semanas mortas depois de tudo pronto.
+**14 dias é o piso de uma etapa, não do total:**
 
-> Confirme a exigência vigente no Play Console — essa política mudou algumas vezes desde 2023
-> e pode ter mudado de novo.
+| Etapa | Prazo |
+|---|---|
+| Criar conta + verificação de identidade | Alguns dias, variável |
+| Teste fechado | 14 dias corridos, 12 testadores |
+| Solicitar acesso à produção | Revisão de até 7 dias |
+| Revisão do app | Mais alguns dias |
 
-Precisa também de 12 pessoas reais com conta Google dispostas a instalar. Vale começar a
-juntar a lista agora.
+Na prática, **~3 semanas no mínimo**.
+
+### Três detalhes que custam a janela inteira
+
+- **"Opted in" = aceitou o convite E instalou** com a conta Google correspondente. Convidado
+  que não instalou não conta para os 12.
+- **Os 14 dias são contínuos, com os 12 simultaneamente ativos.** Um testador que desinstala
+  no dia 10 pode zerar a contagem. **Convide mais de 12** — a folga é barata, reiniciar não é.
+- **O relógio só começa quando o 12º instalar**, não quando você abre o teste.
+
+### Não existe atalho por outra faixa
+
+O teste fechado é a **única** faixa que o Google aceita como prova de teste por usuários reais:
+
+| Faixa | Serve como prova? |
+|---|---|
+| Interna (até 100 testadores, sem revisão) | Não |
+| **Fechada** | **Sim** — é a exigida |
+| Aberta (link público) | Não — e **só fica disponível depois** do acesso à produção |
+
+A faixa aberta parece a saída óbvia e não é: ela vem *depois*, não antes. Consequência para o
+CE-03: **não há link público de Play antes das ~3 semanas.**
+
+### As duas isenções
+
+1. **Conta de organização** — publica direto em produção. Exige número **D-U-N-S**, que
+   pressupõe pessoa jurídica. Para portfólio pessoal raramente compensa; se já houver CNPJ e
+   fizer sentido publicar por ele, corta as 3 semanas.
+2. **Conta pessoal criada antes de 13/11/2023** — isenta pela data. **Conferir primeiro:** uma
+   conta antiga, de um app publicado há anos ou de uma tentativa abandonada, elimina a
+   exigência inteira.
+
+### Por que isso é o passo 3 e não o último
+
+Os 14 dias **não se somam ao desenvolvimento**. Abra o teste fechado assim que houver um build
+assinado, mesmo com o M9 incompleto — a espera corre em paralelo. Deixar para o fim é o que
+transforma 14 dias de relógio em 14 dias de atraso.
+
+> Reconferir no Play Console antes de começar: o requisito já foi **20 testadores** e caiu para
+> 12 em 11/12/2024. Guia que cite 20 está desatualizado — e pode mudar de novo.
 
 ## Pré-requisitos
 

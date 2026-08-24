@@ -579,5 +579,39 @@
         "type": "String"
       }
     }
-  }
+  },
+  "backupSair": "Sair da conta",
+  "backupSairPergunta": "Enviar backup antes de sair?",
+  "backupSairTexto": "Suas alterações desde o último envio ainda não estão na nuvem.",
+  "backupSairEnviarESair": "Enviar e sair",
+  "backupSairSoSair": "Sair sem enviar",
+  "backupEnviar": "Enviar backup agora",
+  "backupEnviarSubtitulo": "Substitui o backup guardado na sua conta",
+  "backupEnviado": "Backup enviado.",
+  "backupErroEnviar": "Não foi possível enviar o backup.",
+  "backupRestaurarDaNuvem": "Restaurar da nuvem",
+  "backupRestaurarDaNuvemSubtitulo": "Substitui os dados deste aparelho",
+  "backupSemBackup": "Nenhum backup nesta conta ainda",
+  "backupErroEntrar": "Não foi possível entrar na conta.",
+  "backupErroSair": "Não foi possível sair da conta.",
+  "backupIndisponivel": "Serviço indisponível",
+  "backupIndisponivelTexto": "Não foi possível conectar ao serviço de conta. Verifique sua conexão e reabra o app. O restante do app funciona normalmente.",
+  "backupConflitoTitulo": "Qual versão manter?",
+  "backupConflitoTexto": "Este aparelho tem dados, e sua conta tem um backup de {data}. Escolher uma substitui a outra.",
+  "@backupConflitoTexto": {
+    "placeholders": {
+      "data": {
+        "type": "String"
+      }
+    }
+  },
+  "backupConflitoUsarAparelho": "Usar os deste aparelho",
+  "backupConflitoUsarNuvem": "Restaurar os da conta",
+  "backupExcluirConta": "Excluir conta",
+  "backupExcluirContaSubtitulo": "Remove a conta e o backup na nuvem",
+  "backupExcluirContaTitulo": "Excluir sua conta?",
+  "backupExcluirContaTexto": "A conta e o backup guardado nela serão apagados definitivamente. Os dados deste aparelho continuam onde estão.",
+  "backupContaExcluida": "Conta excluída.",
+  "backupErroExcluirConta": "Não foi possível excluir a conta.",
+  "excluir": "Excluir"
 }

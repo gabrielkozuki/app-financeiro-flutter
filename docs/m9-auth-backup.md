@@ -110,13 +110,40 @@ flutter pub add firebase_core firebase_auth firebase_database google_sign_in
 
 ## 1.5 Conectar o app
 
+**São DOIS CLIs, com nomes parecidos e papéis diferentes.** Faltar o segundo é a causa de
+`flutterfire configure` abortar sem escrever arquivo nenhum — nem `firebase.json`:
+
+| Ferramenta | O que é | Papel |
+|---|---|---|
+| `flutterfire_cli` | Pacote Dart | Gera `firebase_options.dart`, registra os apps |
+| `firebase-tools` | CLI oficial do Google, em Node | **Autentica** e conversa com a API |
+
+O `flutterfire` delega login e listagem de projetos ao `firebase`. Sem ele, não há o que listar.
+
+```bash
+npm install -g firebase-tools     # exige Node instalado
+firebase login                    # abre o navegador — use a conta DONA do projeto
+```
+
+> Logar com a conta Google errada é o erro seguinte: o comando lista projetos, o seu não
+> aparece, e parece que o projeto sumiu.
+
+Depois:
+
 ```bash
 dart pub global activate flutterfire_cli
-flutterfire configure
+dart pub global run flutterfire_cli:flutterfire configure
 ```
+
+O `activate` instala em `%LOCALAPPDATA%\Pub\Cache\bin`, que **não entra no PATH
+automaticamente** no Windows. Por isso o `dart pub global run ...`, que resolve pelo cache de
+pacotes e dispensa mexer no PATH para um comando que se roda uma vez por projeto.
 
 Selecione o projeto e marque **Android** (iOS depois). Gera `lib/firebase_options.dart` e
 `android/app/google-services.json`.
+
+> **`google-services.json` contém identificadores do seu projeto Firebase.** Ele é embutido no
+> APK e não é segredo — mas confira se você quer versioná-lo antes de commitar.
 
 ## 1.6 Registrar o SHA-1 (Google Sign-In no Android)
 
@@ -124,8 +151,59 @@ Selecione o projeto e marque **Android** (iOS depois). Gera `lib/firebase_option
 cd android && ./gradlew signingReport
 ```
 
-Copie o **SHA-1** e cole em **Configurações do projeto → Seus apps (Android) → Adicionar
-impressão digital**. Baixe o `google-services.json` de novo se o console pedir.
+O comando imprime várias variantes (`debug`, `release`, `profile`, `debugAndroidTest`). A que
+interessa é a **`debug`** — confira o `Store:` apontando para `~/.android/debug.keystore`.
+
+Cole o SHA-1 no console. Link direto, trocando pelo seu `projectId` (está no `firebase.json`):
+
+```
+https://console.firebase.google.com/project/<projectId>/settings/general
+```
+
+Lá: role até **"Seus apps"** no fim da página → clique no card do app Android → seção
+**"Impressões digitais do certificado SHA"** → **Adicionar impressão digital** → colar →
+Salvar. O botão de baixar o `google-services.json` está no mesmo card.
+
+> A seção de fingerprints fica dentro do card do app, **não** em Authentication — que é onde a
+> intuição manda procurar, já que o sintoma é "o login não funciona". O fingerprint identifica
+> o *app*, não o método de login.
+
+**Depois, baixe o `google-services.json` de novo e substitua** o de `android/app/`. Este é o
+passo mais esquecido: o arquivo gerado ANTES do fingerprint existir não tem o `oauth_client`
+do Google Sign-In, e o login falha com `ApiException: 10` — que parece bug de código.
+
+Dá para conferir sem abrir o console. Em `android/app/google-services.json`, olhe os
+`client_type` dentro de `oauth_client`:
+
+| `client_type` | O que é | Quando aparece |
+|---|---|---|
+| `3` | Client **web** | Criado pelo `flutterfire configure`. Já vem no arquivo |
+| `1` | Client **Android** | **Só depois de registrar o SHA-1** — é ele que falta |
+
+Ter apenas o tipo `3` significa que o fingerprint ainda não foi registrado, ou que o arquivo
+não foi rebaixado depois. É o estado em que o `configure` deixa tudo.
+
+### Ao trocar de computador
+
+Três chaves, comportamentos opostos:
+
+| Chave | Onde vive | Ao trocar de PC |
+|---|---|---|
+| **Debug** | `~/.android/debug.keystore` | **Gerada por máquina.** SHA-1 novo → login quebra em debug |
+| **Upload** | O `.jks` de `assinar-release.md` | **Não se recria.** Tem que ir junto |
+| **Assinatura do app** | Servidores do Google | Nada a fazer |
+
+Para a debug: registre o SHA-1 da máquina nova **também** (o Firebase aceita vários
+fingerprints e adicionar não invalida os anteriores), ou copie o `debug.keystore` para
+`~/.android/` na máquina nova.
+
+Para a upload: `key.properties` e o `.jks` estão fora do repositório de propósito, então
+**`git clone` não os traz**. Sem eles a máquina nova compila, mas o release cai na assinatura
+de debug e o Play recusa.
+
+> A keystore de debug ser por máquina é o que torna "funcionava no meu PC" literal aqui: o
+> Google Sign-In valida o certificado que assinou o APK contra a lista registrada no Firebase,
+> e um PC novo assina com um certificado que a lista não conhece.
 
 São **três** SHA-1 ao todo, e a ordem em que eles passam a existir importa:
 

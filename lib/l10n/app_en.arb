@@ -573,5 +573,39 @@
         "type": "String"
       }
     }
-  }
+  },
+  "backupSair": "Sign out",
+  "backupSairPergunta": "Back up before signing out?",
+  "backupSairTexto": "Your changes since the last upload are not in the cloud yet.",
+  "backupSairEnviarESair": "Back up and sign out",
+  "backupSairSoSair": "Sign out without backing up",
+  "backupEnviar": "Back up now",
+  "backupEnviarSubtitulo": "Replaces the backup stored in your account",
+  "backupEnviado": "Backup uploaded.",
+  "backupErroEnviar": "Couldn't upload the backup.",
+  "backupRestaurarDaNuvem": "Restore from cloud",
+  "backupRestaurarDaNuvemSubtitulo": "Replaces the data on this device",
+  "backupSemBackup": "No backup in this account yet",
+  "backupErroEntrar": "Couldn't sign in.",
+  "backupErroSair": "Couldn't sign out.",
+  "backupIndisponivel": "Service unavailable",
+  "backupIndisponivelTexto": "Couldn't reach the account service. Check your connection and reopen the app. The rest of the app works normally.",
+  "backupConflitoTitulo": "Which version do you want to keep?",
+  "backupConflitoTexto": "This device has data, and your account has a backup from {data}. Choosing one replaces the other.",
+  "@backupConflitoTexto": {
+    "placeholders": {
+      "data": {
+        "type": "String"
+      }
+    }
+  },
+  "backupConflitoUsarAparelho": "Keep this device's",
+  "backupConflitoUsarNuvem": "Restore the account's",
+  "backupExcluirConta": "Delete account",
+  "backupExcluirContaSubtitulo": "Removes the account and its cloud backup",
+  "backupExcluirContaTitulo": "Delete your account?",
+  "backupExcluirContaTexto": "The account and the backup stored in it will be permanently erased. The data on this device stays where it is.",
+  "backupContaExcluida": "Account deleted.",
+  "backupErroExcluirConta": "Couldn't delete the account.",
+  "excluir": "Delete"
 }

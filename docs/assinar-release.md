@@ -3,19 +3,11 @@
 **No caminho crítico.** Desde 19/08/2026 o destino é a Google Play Store, e nada é enviado
 sem uma chave própria.
 
-Hoje o `build.gradle.kts` ainda tem o bloco do template:
+O lado do código **já está feito** (passo 3). Falta só o que depende de você: gerar a chave
+e criar o `key.properties`. Enquanto eles não existirem, o build cai no debug — e um artefato
+assinado com a chave de debug o Play recusa.
 
-```kotlin
-buildTypes {
-    release {
-        // TODO: Add your own signing config for the release build.
-        signingConfig = signingConfigs.getByName("debug")
-    }
-}
-```
-
-Ou seja, `flutter build appbundle --release` produz um artefato assinado com a chave de debug.
-Dá para conferir a qualquer momento:
+Confira a qualquer momento em que pé está:
 
 ```bash
 apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk
@@ -77,46 +69,21 @@ Confira antes de commitar:
 git check-ignore -v android/key.properties   # deve responder com a linha do .gitignore
 ```
 
-## 3. Trocar o bloco no `android/app/build.gradle.kts`
+## 3. O Gradle já está pronto
 
-No topo do arquivo, **antes** de `plugins { ... }`:
-
-```kotlin
-import java.util.Properties
-import java.io.FileInputStream
-
-val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-}
-```
-
-Dentro de `android { ... }`, antes de `buildTypes`:
+**Feito em 19/08/2026** — `android/app/build.gradle.kts` já lê o `key.properties` e usa a
+chave de release quando ele existe, caindo no debug quando não existe:
 
 ```kotlin
-signingConfigs {
-    create("release") {
-        keyAlias = keystoreProperties["keyAlias"] as String?
-        keyPassword = keystoreProperties["keyPassword"] as String?
-        storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-        storePassword = keystoreProperties["storePassword"] as String?
-    }
-}
+signingConfig = signingConfigs.findByName("release")
+    ?: signingConfigs.getByName("debug")
 ```
 
-E substitua o `buildTypes`:
+A guarda `if (keystorePropertiesFile.exists())` em volta do `create("release")` não é zelo
+excessivo: sem ela, um clone do repositório sem o arquivo **falha ao abrir o projeto no
+Gradle**, não só ao buildar em release.
 
-```kotlin
-buildTypes {
-    release {
-        signingConfig = signingConfigs.getByName("release")
-    }
-}
-```
-
-O `if (keystorePropertiesFile.exists())` importa: sem ele, um clone do repositório sem o
-`key.properties` **falha ao abrir o projeto no Gradle**, não só ao buildar em release.
+Nada a fazer aqui. Criar o `key.properties` do passo 2 já troca a assinatura sozinho.
 
 ## 4. Verificar
 

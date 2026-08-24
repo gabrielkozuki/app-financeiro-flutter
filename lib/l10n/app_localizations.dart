@@ -1511,6 +1511,168 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'A renda \"{nome}\" sai do cálculo deste mês e dos próximos. Meses já fechados não são afetados.'**
   String rendaExcluirTexto(String nome);
+
+  /// No description provided for @backupSair.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair da conta'**
+  String get backupSair;
+
+  /// No description provided for @backupSairPergunta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar backup antes de sair?'**
+  String get backupSairPergunta;
+
+  /// No description provided for @backupSairTexto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suas alterações desde o último envio ainda não estão na nuvem.'**
+  String get backupSairTexto;
+
+  /// No description provided for @backupSairEnviarESair.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar e sair'**
+  String get backupSairEnviarESair;
+
+  /// No description provided for @backupSairSoSair.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair sem enviar'**
+  String get backupSairSoSair;
+
+  /// No description provided for @backupEnviar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar backup agora'**
+  String get backupEnviar;
+
+  /// No description provided for @backupEnviarSubtitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substitui o backup guardado na sua conta'**
+  String get backupEnviarSubtitulo;
+
+  /// No description provided for @backupEnviado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Backup enviado.'**
+  String get backupEnviado;
+
+  /// No description provided for @backupErroEnviar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível enviar o backup.'**
+  String get backupErroEnviar;
+
+  /// No description provided for @backupRestaurarDaNuvem.
+  ///
+  /// In pt, this message translates to:
+  /// **'Restaurar da nuvem'**
+  String get backupRestaurarDaNuvem;
+
+  /// No description provided for @backupRestaurarDaNuvemSubtitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substitui os dados deste aparelho'**
+  String get backupRestaurarDaNuvemSubtitulo;
+
+  /// No description provided for @backupSemBackup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum backup nesta conta ainda'**
+  String get backupSemBackup;
+
+  /// No description provided for @backupErroEntrar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível entrar na conta.'**
+  String get backupErroEntrar;
+
+  /// No description provided for @backupErroSair.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível sair da conta.'**
+  String get backupErroSair;
+
+  /// No description provided for @backupIndisponivel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Serviço indisponível'**
+  String get backupIndisponivel;
+
+  /// No description provided for @backupIndisponivelTexto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível conectar ao serviço de conta. Verifique sua conexão e reabra o app. O restante do app funciona normalmente.'**
+  String get backupIndisponivelTexto;
+
+  /// No description provided for @backupConflitoTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qual versão manter?'**
+  String get backupConflitoTitulo;
+
+  /// No description provided for @backupConflitoTexto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este aparelho tem dados, e sua conta tem um backup de {data}. Escolher uma substitui a outra.'**
+  String backupConflitoTexto(String data);
+
+  /// No description provided for @backupConflitoUsarAparelho.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usar os deste aparelho'**
+  String get backupConflitoUsarAparelho;
+
+  /// No description provided for @backupConflitoUsarNuvem.
+  ///
+  /// In pt, this message translates to:
+  /// **'Restaurar os da conta'**
+  String get backupConflitoUsarNuvem;
+
+  /// No description provided for @backupExcluirConta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir conta'**
+  String get backupExcluirConta;
+
+  /// No description provided for @backupExcluirContaSubtitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remove a conta e o backup na nuvem'**
+  String get backupExcluirContaSubtitulo;
+
+  /// No description provided for @backupExcluirContaTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir sua conta?'**
+  String get backupExcluirContaTitulo;
+
+  /// No description provided for @backupExcluirContaTexto.
+  ///
+  /// In pt, this message translates to:
+  /// **'A conta e o backup guardado nela serão apagados definitivamente. Os dados deste aparelho continuam onde estão.'**
+  String get backupExcluirContaTexto;
+
+  /// No description provided for @backupContaExcluida.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta excluída.'**
+  String get backupContaExcluida;
+
+  /// No description provided for @backupErroExcluirConta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível excluir a conta.'**
+  String get backupErroExcluirConta;
+
+  /// No description provided for @excluir.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir'**
+  String get excluir;
 }
 
 class _AppLocalizationsDelegate

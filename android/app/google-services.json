@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "548283748086",
+    "firebase_url": "https://conta-em-dia-c954a-default-rtdb.firebaseio.com",
+    "project_id": "conta-em-dia-c954a",
+    "storage_bucket": "conta-em-dia-c954a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548283748086:android:d91e96796fb764eac566d7",
+        "android_client_info": {
+          "package_name": "br.com.gabrielkozuki.contaemdia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548283748086-nag5nmo85k5jfepko74hg4ivkm4v5555.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.gabrielkozuki.contaemdia",
+            "certificate_hash": "496d2fe8fadb3c574efa9f0a2b450dfdaa3c99b3"
+          }
+        },
+        {
+          "client_id": "548283748086-ttvq6muqpo2p7s6rjh2hptorso916pa9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEC2OT_mkiYHHS15d8YmMP9kyHxZZTGYc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548283748086-ttvq6muqpo2p7s6rjh2hptorso916pa9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "548283748086-bsh058lir5ql1ia1gemslfo4l3or25jv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.com.gabrielkozuki.contaemdia"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

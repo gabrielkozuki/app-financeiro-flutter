@@ -834,4 +834,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String rendaExcluirTexto(String nome) {
     return 'The income \"$nome\" is removed from this month and the next ones. Closed months are not affected.';
   }
+
+  @override
+  String get backupSair => 'Sign out';
+
+  @override
+  String get backupSairPergunta => 'Back up before signing out?';
+
+  @override
+  String get backupSairTexto =>
+      'Your changes since the last upload are not in the cloud yet.';
+
+  @override
+  String get backupSairEnviarESair => 'Back up and sign out';
+
+  @override
+  String get backupSairSoSair => 'Sign out without backing up';
+
+  @override
+  String get backupEnviar => 'Back up now';
+
+  @override
+  String get backupEnviarSubtitulo =>
+      'Replaces the backup stored in your account';
+
+  @override
+  String get backupEnviado => 'Backup uploaded.';
+
+  @override
+  String get backupErroEnviar => 'Couldn\'t upload the backup.';
+
+  @override
+  String get backupRestaurarDaNuvem => 'Restore from cloud';
+
+  @override
+  String get backupRestaurarDaNuvemSubtitulo =>
+      'Replaces the data on this device';
+
+  @override
+  String get backupSemBackup => 'No backup in this account yet';
+
+  @override
+  String get backupErroEntrar => 'Couldn\'t sign in.';
+
+  @override
+  String get backupErroSair => 'Couldn\'t sign out.';
+
+  @override
+  String get backupIndisponivel => 'Service unavailable';
+
+  @override
+  String get backupIndisponivelTexto =>
+      'Couldn\'t reach the account service. Check your connection and reopen the app. The rest of the app works normally.';
+
+  @override
+  String get backupConflitoTitulo => 'Which version do you want to keep?';
+
+  @override
+  String backupConflitoTexto(String data) {
+    return 'This device has data, and your account has a backup from $data. Choosing one replaces the other.';
+  }
+
+  @override
+  String get backupConflitoUsarAparelho => 'Keep this device\'s';
+
+  @override
+  String get backupConflitoUsarNuvem => 'Restore the account\'s';
+
+  @override
+  String get backupExcluirConta => 'Delete account';
+
+  @override
+  String get backupExcluirContaSubtitulo =>
+      'Removes the account and its cloud backup';
+
+  @override
+  String get backupExcluirContaTitulo => 'Delete your account?';
+
+  @override
+  String get backupExcluirContaTexto =>
+      'The account and the backup stored in it will be permanently erased. The data on this device stays where it is.';
+
+  @override
+  String get backupContaExcluida => 'Account deleted.';
+
+  @override
+  String get backupErroExcluirConta => 'Couldn\'t delete the account.';
+
+  @override
+  String get excluir => 'Delete';
 }

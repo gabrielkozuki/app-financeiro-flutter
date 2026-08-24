@@ -56,6 +56,23 @@ class BackupService {
     return jsonEncode(mapa);
   }
 
+  /// Há algo no banco que uma restauração destruiria?
+  ///
+  /// Usado logo após o login para decidir entre restaurar direto (banco vazio,
+  /// nada a perder) e perguntar ao usuário. Olha só as tabelas que o usuário
+  /// preenche: `configuracoesMetodologia` sempre tem a linha padrão e diria
+  /// "tem dados" mesmo num app recém-instalado.
+  Future<bool> temDados() async {
+    for (final consulta in [
+      _db.select(_db.contas),
+      _db.select(_db.entradas),
+      _db.select(_db.cartoes),
+    ]) {
+      if (await (consulta..limit(1)).getSingleOrNull() != null) return true;
+    }
+    return false;
+  }
+
   /// Apaga todos os dados do app (RF-20). Ordem respeita as chaves estrangeiras.
   Future<void> apagarTudo() async {
     await _db.transaction(() async {

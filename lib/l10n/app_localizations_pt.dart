@@ -836,4 +836,93 @@ class AppLocalizationsPt extends AppLocalizations {
   String rendaExcluirTexto(String nome) {
     return 'A renda \"$nome\" sai do cálculo deste mês e dos próximos. Meses já fechados não são afetados.';
   }
+
+  @override
+  String get backupSair => 'Sair da conta';
+
+  @override
+  String get backupSairPergunta => 'Enviar backup antes de sair?';
+
+  @override
+  String get backupSairTexto =>
+      'Suas alterações desde o último envio ainda não estão na nuvem.';
+
+  @override
+  String get backupSairEnviarESair => 'Enviar e sair';
+
+  @override
+  String get backupSairSoSair => 'Sair sem enviar';
+
+  @override
+  String get backupEnviar => 'Enviar backup agora';
+
+  @override
+  String get backupEnviarSubtitulo =>
+      'Substitui o backup guardado na sua conta';
+
+  @override
+  String get backupEnviado => 'Backup enviado.';
+
+  @override
+  String get backupErroEnviar => 'Não foi possível enviar o backup.';
+
+  @override
+  String get backupRestaurarDaNuvem => 'Restaurar da nuvem';
+
+  @override
+  String get backupRestaurarDaNuvemSubtitulo =>
+      'Substitui os dados deste aparelho';
+
+  @override
+  String get backupSemBackup => 'Nenhum backup nesta conta ainda';
+
+  @override
+  String get backupErroEntrar => 'Não foi possível entrar na conta.';
+
+  @override
+  String get backupErroSair => 'Não foi possível sair da conta.';
+
+  @override
+  String get backupIndisponivel => 'Serviço indisponível';
+
+  @override
+  String get backupIndisponivelTexto =>
+      'Não foi possível conectar ao serviço de conta. Verifique sua conexão e reabra o app. O restante do app funciona normalmente.';
+
+  @override
+  String get backupConflitoTitulo => 'Qual versão manter?';
+
+  @override
+  String backupConflitoTexto(String data) {
+    return 'Este aparelho tem dados, e sua conta tem um backup de $data. Escolher uma substitui a outra.';
+  }
+
+  @override
+  String get backupConflitoUsarAparelho => 'Usar os deste aparelho';
+
+  @override
+  String get backupConflitoUsarNuvem => 'Restaurar os da conta';
+
+  @override
+  String get backupExcluirConta => 'Excluir conta';
+
+  @override
+  String get backupExcluirContaSubtitulo =>
+      'Remove a conta e o backup na nuvem';
+
+  @override
+  String get backupExcluirContaTitulo => 'Excluir sua conta?';
+
+  @override
+  String get backupExcluirContaTexto =>
+      'A conta e o backup guardado nela serão apagados definitivamente. Os dados deste aparelho continuam onde estão.';
+
+  @override
+  String get backupContaExcluida => 'Conta excluída.';
+
+  @override
+  String get backupErroExcluirConta => 'Não foi possível excluir a conta.';
+
+  @override
+  String get excluir => 'Excluir';
 }

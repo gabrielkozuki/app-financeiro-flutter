@@ -293,4 +293,63 @@ void main() {
           reason: 'nada pode ter sido apagado');
     }
   });
+
+  group('temDados', _grupoTemDados);
+}
+
+/// `temDados()` é o que decide, logo depois do login, entre restaurar direto e
+/// perguntar ao usuário qual versão manter. Errar para `true` num app recém
+/// instalado transforma toda primeira entrada numa pergunta sem sentido; errar
+/// para `false` com dados reais **destrói o que o usuário digitou** sem avisar.
+void _grupoTemDados() {
+  late AppDatabase db;
+  late BackupService service;
+
+  setUp(() {
+    db = AppDatabase(NativeDatabase.memory());
+    service = BackupService(db);
+  });
+  tearDown(() => db.close());
+
+  test('banco recém-criado não tem dados', () async {
+    expect(await service.temDados(), isFalse);
+  });
+
+  test('a configuração padrão de percentuais NÃO conta como dado', () async {
+    // Esta linha nasce sozinha no primeiro uso. Se entrasse na conta, um
+    // aparelho novo pediria para o usuário escolher entre "os dados deste
+    // aparelho" (vazios) e o backup — perguntando algo que não existe.
+    await db.into(db.configuracoesMetodologia).insert(
+        ConfiguracoesMetodologiaCompanion.insert(mesVigenciaInicial: '2026-08'));
+    expect(await service.temDados(), isFalse);
+  });
+
+  test('uma única entrada já conta como dado', () async {
+    await db.into(db.entradas).insert(EntradasCompanion.insert(
+        nome: 'Salário', valorLiquido: 5000, tipo: TipoEntrada.recorrente));
+    expect(await service.temDados(), isTrue);
+  });
+
+  test('uma única conta já conta como dado', () async {
+    await db.into(db.contas).insert(ContasCompanion.insert(
+        nome: 'Aluguel',
+        grupo: Grupo.necessidade,
+        valorPlanejado: 1800,
+        diaVencimento: 5,
+        recorrencia: Recorrencia.fixa));
+    expect(await service.temDados(), isTrue);
+  });
+
+  test('um único cartão já conta como dado', () async {
+    await db.into(db.cartoes).insert(
+        CartoesCompanion.insert(nome: 'Nubank', diaVencimento: 27));
+    expect(await service.temDados(), isTrue);
+  });
+
+  test('apagar tudo volta a não ter dados', () async {
+    await db.into(db.entradas).insert(EntradasCompanion.insert(
+        nome: 'Salário', valorLiquido: 5000, tipo: TipoEntrada.recorrente));
+    await service.apagarTudo();
+    expect(await service.temDados(), isFalse);
+  });
 }

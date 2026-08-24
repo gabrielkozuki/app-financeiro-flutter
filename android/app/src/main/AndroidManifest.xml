@@ -1,4 +1,18 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- O firebase_auth declara estas duas para fluxos de biometria e MFA que
+         este app não usa: aqui o login é só Google Sign-In. Elas não pedem
+         confirmação em runtime, mas APARECEM na ficha da Play Store — e num app
+         de finanças cuja proposta é privacidade, "impressão digital" na lista
+         levanta suspeita sem contrapartida.
+
+         `tools:node="remove"` instrui o merger a descartar a declaração vinda
+         da dependência. Se algum dia houver login por biometria, estas linhas
+         precisam sair ANTES de o recurso funcionar. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" tools:node="remove" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" tools:node="remove" />
+
     <application
         android:label="Conta em Dia"
         android:name="${applicationName}"

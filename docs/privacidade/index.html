@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de Privacidade — Conta em Dia</title>
+<meta name="description" content="Política de privacidade do Conta em Dia: o app funciona offline sem conta. Backup na nuvem é opcional e só acontece se você entrar.">
+<style>
+  /* Autossuficiente de propósito: sem CDN, sem fonte externa, sem script de
+     terceiros. Uma política de privacidade que carrega recurso de terceiro
+     contradiz o próprio texto. Tokens vindos de assets/marca/identidade.html. */
+  :root {
+    --papel: #F7F9F9;
+    --carta: #FFFFFF;
+    --tinta: #16211F;
+    --meia-tinta: #5D6B68;
+    --fio: #DCE4E2;
+    --acento: #0F766E;
+    --realce: #E8F2F0;
+
+    --sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #0E1514;
+      --carta: #16211F;
+      --tinta: #E7EFED;
+      --meia-tinta: #93A29F;
+      --fio: #24322F;
+      --acento: #2FAA9E;
+      --realce: #16211F;
+    }
+  }
+  :root[data-theme="dark"] {
+    --papel: #0E1514;
+    --carta: #16211F;
+    --tinta: #E7EFED;
+    --meia-tinta: #93A29F;
+    --fio: #24322F;
+    --acento: #2FAA9E;
+    --realce: #16211F;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img, svg { display: block; max-width: 100%; }
+
+  .folha { max-width: 44rem; margin: 0 auto; padding: clamp(1.75rem, 5vw, 3.5rem) clamp(1.15rem, 5vw, 2rem) 5rem; }
+
+  header.capa { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  header.capa svg { width: 58px; height: 58px; border-radius: 14px; flex: none; }
+  h1 { font-size: clamp(1.6rem, 4.5vw, 2.15rem); line-height: 1.15; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+  h1 span { display: block; font-size: 1rem; font-weight: 400; color: var(--meia-tinta); letter-spacing: 0; margin-top: 0.2rem; }
+
+  .meta { color: var(--meia-tinta); font-size: 0.875rem; border-bottom: 1px solid var(--fio); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  .meta b { color: var(--tinta); }
+
+  h2 { font-size: 1.3rem; margin: 2.75rem 0 0.85rem; letter-spacing: -0.01em; scroll-margin-top: 1.5rem; }
+  h3 { font-size: 1.05rem; margin: 1.75rem 0 0.6rem; }
+  p, ul, ol { margin: 0 0 1rem; }
+  ul, ol { padding-left: 1.35rem; }
+  li { margin-bottom: 0.4rem; }
+  a { color: var(--acento); }
+
+  .resumo {
+    background: var(--realce);
+    border: 1px solid var(--fio);
+    border-left: 4px solid var(--acento);
+    border-radius: 12px;
+    padding: 1.15rem 1.35rem;
+    margin: 0 0 2rem;
+  }
+  .resumo p { margin: 0 0 0.6rem; }
+  .resumo p:last-child { margin: 0; }
+  .resumo strong { color: var(--acento); }
+
+  .rolagem { overflow-x: auto; margin: 0 0 1.25rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.925rem; }
+  th, td { text-align: left; padding: 0.65rem 0.9rem 0.65rem 0; border-bottom: 1px solid var(--fio); vertical-align: top; }
+  th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--meia-tinta); font-weight: 600; }
+  code { font-family: var(--mono); font-size: 0.875em; background: var(--realce); padding: 0.1em 0.35em; border-radius: 4px; }
+
+  .destaque-secao {
+    border: 1px solid var(--fio);
+    border-radius: 12px;
+    padding: 1.15rem 1.35rem;
+    background: var(--carta);
+    margin: 0 0 1.25rem;
+  }
+  .destaque-secao :last-child { margin-bottom: 0; }
+
+  .contato { font-family: var(--mono); font-size: 0.95rem; }
+
+  .idioma { display: flex; gap: 0.75rem; font-size: 0.875rem; margin-bottom: 1.75rem; }
+  .idioma a { text-decoration: none; border: 1px solid var(--fio); border-radius: 999px; padding: 0.3rem 0.85rem; color: var(--meia-tinta); }
+  .idioma a:hover { border-color: var(--acento); color: var(--acento); }
+
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--fio); color: var(--meia-tinta); font-size: 0.875rem; }
+
+  hr.divisor { border: none; border-top: 1px solid var(--fio); margin: 4rem 0 0; }
+</style>
+</head>
+<body>
+
+<div class="folha">
+
+  <header class="capa">
+    <svg viewBox="0 0 512 512" role="img" aria-label="Ícone do Conta em Dia">
+      <rect width="512" height="512" fill="#F7F9F9"/>
+      <path d="M 308.60 422.41 A 174.52 174.52 0 1 1 308.60 89.59 L 280.60 164.48 A 94.76 94.76 0 1 0 280.60 347.52 Z" fill="#0F766E" stroke="#0F766E" stroke-width="18.01" stroke-linejoin="round"/>
+      <path d="M 337.82 129.67 A 150.51 150.51 0 0 1 405.07 235.24 L 349.34 239.62 A 94.76 94.76 0 0 0 310.29 178.33 Z" fill="#8C661C" stroke="#8C661C" stroke-width="18.01" stroke-linejoin="round"/>
+      <path d="M 405.07 276.76 A 150.51 150.51 0 0 1 337.82 382.33 L 310.29 333.67 A 94.76 94.76 0 0 0 349.34 272.38 Z" fill="#497949" stroke="#497949" stroke-width="18.01" stroke-linejoin="round"/>
+    </svg>
+    <h1>Política de Privacidade<span>Conta em Dia</span></h1>
+  </header>
+
+  <div class="idioma">
+    <a href="#pt">Português</a>
+    <a href="#en">English</a>
+  </div>
+
+  <p class="meta" id="pt">
+    <b>Última atualização:</b> 24 de agosto de 2026 · <b>Versão:</b> 1.0<br>
+    Aplica-se ao aplicativo <b>Conta em Dia</b>, versão 1.0.0, distribuído no Brasil pela Google Play Store.
+  </p>
+
+  <div class="resumo">
+    <p><strong>O app funciona inteiro sem conta, e sem conta nada sai do seu aparelho.</strong> Não há cadastro obrigatório, e você nunca precisa entrar para usar qualquer funcionalidade.</p>
+    <p>Entrar é opcional e serve para uma coisa só: guardar uma cópia dos seus dados na sua conta, para recuperá-la se trocar de aparelho. Enquanto você não entrar, não recebemos absolutamente nada.</p>
+  </div>
+
+  <h2 id="quem-somos">1. Quem somos</h2>
+  <p>
+    O Conta em Dia é desenvolvido e mantido por <b>Gabriel Shiguehiro Kozuki</b>, pessoa
+    física, no Brasil.
+  </p>
+  <p>
+    Para qualquer assunto de privacidade e proteção de dados — inclusive o exercício dos
+    direitos previstos na Lei Geral de Proteção de Dados (Lei nº 13.709/2018) — este é o canal
+    de contato do encarregado:
+  </p>
+  <p class="contato"><a href="mailto:privacidade.contaemdia@gmail.com">privacidade.contaemdia@gmail.com</a></p>
+  <p>Respondemos em até 15 dias.</p>
+
+  <h2 id="o-que-fica-no-aparelho">2. O que fica no seu aparelho</h2>
+  <p>
+    Tudo o que você registra no app é gravado em um banco de dados local (SQLite), no
+    armazenamento privado do aplicativo:
+  </p>
+  <ul>
+    <li>Contas e despesas planejadas, com valores, vencimentos e classificação</li>
+    <li>Rendas recorrentes e pontuais</li>
+    <li>Cartões de crédito e faturas, com o rateio entre grupos</li>
+    <li>Percentuais da metodologia 50-30-20 que você configurar</li>
+    <li>O histórico de fechamento de cada mês</li>
+  </ul>
+  <p>
+    <b>Sem entrar na conta, essas informações nunca saem do aparelho.</b> Não há envio
+    automático, nem em segundo plano, nem em nenhuma outra circunstância.
+  </p>
+
+  <h2 id="se-voce-entrar">3. O que acontece se você entrar na conta</h2>
+  <p>
+    Entrar é uma ação deliberada sua, em <b>Configurações → Conta e backup</b>. A partir daí,
+    e somente a partir daí:
+  </p>
+  <div class="rolagem">
+    <table>
+      <thead><tr><th>Dado</th><th>Quando</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Identificador da sua conta Google (UID), nome de exibição e e-mail</td>
+          <td>Ao entrar com o Google</td>
+          <td>Identificar de quem é o backup e permitir que só você o acesse</td>
+        </tr>
+        <tr>
+          <td>Cópia completa dos seus dados do app, em JSON</td>
+          <td>Ao tocar em <b>Enviar backup</b>, ou ao confirmar o envio quando sai da conta</td>
+          <td>Restaurar os dados em outro aparelho ou depois de reinstalar</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    O backup fica guardado sob o seu identificador, e as regras do banco só permitem leitura e
+    escrita pela própria conta autenticada. <b>Não há envio automático:</b> o backup só sobe
+    quando você manda.
+  </p>
+
+  <h3>Base legal</h3>
+  <p>
+    O tratamento acontece para <b>executar o serviço que você pediu</b> ao entrar na conta e
+    solicitar o backup — art. 7º, V da LGPD (execução de contrato, a pedido do titular). Não há
+    tratamento com base em legítimo interesse, e nenhum dado é usado para finalidade diferente
+    daquela pela qual foi coletado.
+  </p>
+  <p>
+    Para deixar de ser tratado, basta excluir a conta — <a href="#exclusao-de-conta">seção 8</a>.
+  </p>
+
+  <h2 id="terceiros">4. Com quem compartilhamos</h2>
+  <p>
+    O backup e a autenticação usam serviços do <b>Google (Firebase)</b>, que atua como operador
+    — trata os dados em nosso nome, para os fins descritos aqui, e não para os próprios:
+  </p>
+  <div class="rolagem">
+    <table>
+      <thead><tr><th>Serviço</th><th>O que recebe</th></tr></thead>
+      <tbody>
+        <tr><td>Firebase Authentication</td><td>Identificador da conta, nome e e-mail</td></tr>
+        <tr><td>Firebase Realtime Database</td><td>O arquivo de backup</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    <b>Não há mais ninguém.</b> Não usamos serviços de análise, publicidade, atribuição ou
+    monitoramento, e não compartilhamos seus dados com nenhum outro terceiro.
+  </p>
+
+  <h3 id="transferencia">Transferência internacional</h3>
+  <p>
+    Os servidores do Firebase que atendem este aplicativo ficam nos <b>Estados Unidos</b>.
+    Portanto, ao usar o backup, seus dados são transferidos para fora do Brasil. Essa
+    transferência é necessária para a execução do serviço que você solicitou, nos termos do
+    art. 33 da LGPD, e é feita sob os compromissos contratuais de proteção de dados do
+    provedor.
+  </p>
+  <p>
+    Se você não quiser que seus dados saiam do país, <b>não entre na conta</b>: o app continua
+    funcionando integralmente offline.
+  </p>
+
+  <h2 id="permissoes">5. Permissões</h2>
+  <p>
+    O aplicativo pede apenas as permissões necessárias para o backup funcionar:
+  </p>
+  <div class="rolagem">
+    <table>
+      <thead><tr><th>Permissão</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td>Acesso à internet</td><td>Entrar na conta e enviar/restaurar o backup</td></tr>
+        <tr><td>Estado da conexão</td><td>Saber se há rede antes de tentar</td></tr>
+        <tr><td>Serviços do Google</td><td>Necessária para o login com a conta Google</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>O aplicativo <b>não</b> pede acesso a:</p>
+  <ul>
+    <li>Localização</li>
+    <li>Contatos</li>
+    <li>Câmera e microfone</li>
+    <li>SMS e chamadas</li>
+    <li>Arquivos e mídia</li>
+    <li>Biometria ou impressão digital</li>
+  </ul>
+  <p>
+    Você pode conferir a lista completa na própria ficha da Google Play Store, na seção de
+    permissões do aplicativo.
+  </p>
+
+  <h2 id="exportar">6. Exportar seus dados</h2>
+  <p>
+    Independentemente de ter conta, você pode exportar tudo em <b>Configurações → Exportar</b>,
+    em CSV ou JSON. O arquivo é entregue à tela de compartilhamento do Android e o destino é
+    exclusivamente sua escolha — não temos participação, cópia ou visibilidade sobre esse envio.
+    A partir daí valem as políticas do aplicativo ou serviço que você escolher.
+  </p>
+
+  <h2 id="o-que-nao-fazemos">7. O que não fazemos</h2>
+  <ul>
+    <li><b>Não conectamos ao seu banco.</b> O app não tem integração bancária, Open Finance nem importação de extrato.</li>
+    <li><b>Não usamos analytics.</b> Não há medição de uso, telemetria ou relatório de falhas.</li>
+    <li><b>Não exibimos publicidade</b> e não há rastreadores de anúncio.</li>
+    <li><b>Não vendemos seus dados</b> e não os compartilhamos com ninguém além do necessário para o backup funcionar.</li>
+    <li><b>Não lemos SMS, notificações ou sua área de transferência.</b></li>
+    <li><b>Não criamos perfis</b> nem tomamos decisões automatizadas sobre você.</li>
+    <li><b>Não exigimos conta.</b> Todas as funcionalidades do app funcionam sem entrar.</li>
+  </ul>
+
+  <h2 id="exclusao-de-conta">8. Como excluir sua conta e seus dados</h2>
+
+  <h3>Excluir a conta e o backup na nuvem</h3>
+  <p>
+    Dentro do app: <b>Configurações → Conta e backup → Excluir conta</b>. A exclusão é imediata
+    e definitiva, e remove as duas coisas:
+  </p>
+  <ul>
+    <li>O <b>arquivo de backup</b> guardado na sua conta</li>
+    <li>A <b>conta em si</b> no serviço de autenticação, com o identificador, o nome e o e-mail</li>
+  </ul>
+  <p>
+    Os dados que estão no seu aparelho <b>continuam onde estão</b> — excluir a conta não apaga o
+    app nem o que você registrou nele.
+  </p>
+
+  <h3>Se você já desinstalou o aplicativo</h3>
+  <p>
+    Escreva para
+    <a href="mailto:privacidade.contaemdia@gmail.com">privacidade.contaemdia@gmail.com</a>
+    a partir do <b>mesmo e-mail da conta Google</b> que você usou para entrar, pedindo a
+    exclusão. Apagamos a conta e o backup e confirmamos por e-mail em até 15 dias.
+  </p>
+
+  <h3>Apagar apenas os dados do aparelho</h3>
+  <p>
+    <b>Configurações → Apagar todos os dados</b> elimina tudo o que está no aparelho,
+    imediatamente e sem reversão. Desinstalar o aplicativo também apaga o banco local — o app
+    usa <code>allowBackup="false"</code>, então o Android não guarda uma cópia no backup do
+    sistema.
+  </p>
+  <div class="destaque-secao">
+    <p>
+      <b>Atenção:</b> se você nunca entrou na conta, não existe backup em lugar nenhum. Ao
+      desinstalar o aplicativo ou trocar de aparelho, <b>seus dados são perdidos
+      definitivamente</b>. Use a exportação ou o backup na nuvem se quiser preservá-los.
+    </p>
+  </div>
+
+  <h2 id="retencao">9. Por quanto tempo guardamos</h2>
+  <ul>
+    <li>
+      <b>No aparelho:</b> pelo tempo que você quiser. Não há expiração automática nem exclusão
+      programada.
+    </li>
+    <li>
+      <b>O backup na nuvem:</b> fica guardado até você enviar um novo — que substitui
+      integralmente o anterior — ou até excluir a conta. Não mantemos histórico de versões
+      anteriores.
+    </li>
+    <li>
+      <b>Os dados da conta:</b> enquanto a conta existir. Excluída a conta, são removidos junto.
+    </li>
+  </ul>
+
+  <h2 id="direitos">10. Seus direitos</h2>
+  <p>
+    A LGPD garante a você, titular dos dados, os direitos de confirmação, acesso, correção,
+    anonimização, portabilidade, eliminação e informação sobre compartilhamento (art. 18).
+  </p>
+  <div class="rolagem">
+    <table>
+      <thead><tr><th>Direito</th><th>Como exercer</th></tr></thead>
+      <tbody>
+        <tr><td>Acesso e confirmação</td><td>Seus dados estão visíveis no app a qualquer momento. Para saber o que há na sua conta, escreva para o contato acima.</td></tr>
+        <tr><td>Correção</td><td>Edite diretamente no app e envie um novo backup.</td></tr>
+        <tr><td>Portabilidade</td><td>Configurações → Exportar. CSV e JSON, formatos abertos.</td></tr>
+        <tr><td>Eliminação</td><td>Configurações → Conta e backup → Excluir conta. Ou Apagar todos os dados, para o aparelho.</td></tr>
+        <tr><td>Informação sobre compartilhamento</td><td>Está na <a href="#terceiros">seção 4</a>: Google (Firebase), e mais ninguém.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Você também pode apresentar reclamação à <b>Autoridade Nacional de Proteção de Dados
+    (ANPD)</b>, nos termos do art. 18, §1º da LGPD.
+  </p>
+
+  <h2 id="menores">11. Menores de idade</h2>
+  <p>
+    O Conta em Dia não se destina a menores de 13 anos e não coleta intencionalmente dados de
+    crianças.
+  </p>
+
+  <h2 id="mudancas">12. Mudanças nesta política</h2>
+  <p>
+    Esta política descreve <b>a versão do aplicativo que está publicada hoje</b>. Ela não fala
+    sobre funcionalidades planejadas, e é isso que a mantém verdadeira e verificável. A data no
+    topo muda a cada revisão, e mudanças relevantes serão informadas dentro do próprio
+    aplicativo.
+  </p>
+
+  <hr class="divisor">
+
+  <h1 id="en" style="margin-top:3rem">Privacy Policy<span>Conta em Dia · Bills on Track</span></h1>
+
+  <p class="meta">
+    <b>Last updated:</b> August 24, 2026 · <b>Version:</b> 1.0<br>
+    Applies to <b>Conta em Dia</b> version 1.0.0, distributed in Brazil through the Google Play Store.
+  </p>
+
+  <div class="resumo">
+    <p><strong>The app works fully without an account, and without an account nothing leaves your device.</strong> There is no mandatory sign-up, and you never need to sign in to use any feature.</p>
+    <p>Signing in is optional and serves one purpose: keeping a copy of your data in your account so you can recover it on another device. Until you sign in, we receive nothing at all.</p>
+  </div>
+
+  <p>
+    This English text is provided as a courtesy for users of the app's English interface. The
+    app is distributed in Brazil and governed by the Brazilian General Data Protection Law
+    (LGPD, Law 13.709/2018). <b>In case of any discrepancy, the Portuguese version above
+    prevails.</b>
+  </p>
+
+  <h2>Who we are</h2>
+  <p>
+    Conta em Dia is developed and maintained by <b>Gabriel Shiguehiro Kozuki</b>, an individual,
+    in Brazil. For any privacy matter, including exercising your rights under the LGPD, contact:
+  </p>
+  <p class="contato"><a href="mailto:privacidade.contaemdia@gmail.com">privacidade.contaemdia@gmail.com</a></p>
+  <p>We reply within 15 days.</p>
+
+  <h2>What stays on your device</h2>
+  <p>
+    Everything you enter — bills, income, credit cards and invoices, your 50-30-20 percentages
+    and your monthly history — is stored in a local SQLite database inside the app's private
+    storage. <b>Without signing in, none of it ever leaves your device.</b> There is no
+    automatic or background upload.
+  </p>
+
+  <h2>What happens if you sign in</h2>
+  <p>
+    Signing in is a deliberate action, under <b>Settings → Account and backup</b>. Only from
+    that point on:
+  </p>
+  <ul>
+    <li>Your <b>Google account identifier, display name and email</b> are used to identify whose backup it is and to ensure only you can access it.</li>
+    <li>A <b>full copy of your app data</b>, in JSON, is uploaded when you tap <b>Back up now</b> or confirm the upload when signing out.</li>
+  </ul>
+  <p>
+    The backup is stored under your identifier, and the database rules only allow the
+    authenticated account itself to read or write it. Nothing is uploaded automatically.
+  </p>
+  <p>
+    <b>Legal basis:</b> performance of the service you requested by signing in and asking for a
+    backup (LGPD art. 7, V). To stop this processing, delete your account.
+  </p>
+
+  <h2>Who receives data</h2>
+  <p>
+    Only <b>Google (Firebase)</b>, acting as a data processor on our behalf: Firebase
+    Authentication receives the account identifier, name and email; Firebase Realtime Database
+    stores the backup file. <b>Nobody else.</b> No analytics, advertising, attribution or
+    monitoring services are used.
+  </p>
+  <p>
+    <b>International transfer:</b> the Firebase servers used by this app are located in the
+    <b>United States</b>, so using the backup transfers your data outside Brazil. This is
+    necessary to provide the service you requested (LGPD art. 33). If you would rather your data
+    never leave the country, simply do not sign in — the app works fully offline.
+  </p>
+
+  <h2>Permissions</h2>
+  <p>
+    The app requests only internet access, network state and Google services — all needed for
+    sign-in and backup. It does <b>not</b> request location, contacts, camera, microphone, SMS,
+    files or biometrics.
+  </p>
+
+  <h2>What we do not do</h2>
+  <ul>
+    <li>No bank connection, Open Finance or statement import</li>
+    <li>No analytics, telemetry or crash reporting</li>
+    <li>No advertising and no ad trackers</li>
+    <li>No selling of data, and no sharing beyond what the backup requires</li>
+    <li>No reading of SMS, notifications or clipboard</li>
+    <li>No profiling and no automated decision-making</li>
+    <li>No mandatory account — every feature works signed out</li>
+  </ul>
+
+  <h2>Deleting your account and your data</h2>
+  <p>
+    In the app: <b>Settings → Account and backup → Delete account</b>. This immediately and
+    permanently removes both the backup stored in your account and the account itself, including
+    the identifier, name and email. Data on your device stays where it is.
+  </p>
+  <p>
+    <b>If you already uninstalled the app</b>, write to
+    <a href="mailto:privacidade.contaemdia@gmail.com">privacidade.contaemdia@gmail.com</a> from
+    the same Google account email you signed in with, asking for deletion. We erase the account
+    and the backup and confirm by email within 15 days.
+  </p>
+  <p>
+    To erase only the local data, use <b>Settings → Delete all data</b>, or uninstall the app.
+    The app sets <code>allowBackup="false"</code>, so Android keeps no copy in the system backup
+    — if you never signed in, uninstalling means the data is permanently lost.
+  </p>
+
+  <h2>Retention</h2>
+  <p>
+    On your device, for as long as you want. The cloud backup stays until you upload a new one —
+    which fully replaces the previous — or delete your account; no version history is kept.
+    Account data lasts as long as the account does.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    Under the LGPD you have the rights of confirmation, access, correction, anonymisation,
+    portability, deletion and information about sharing. In practice: your data is visible in the
+    app at all times, editable there, exportable in open formats (CSV and JSON), and erasable
+    from Settings — both on the device and in the cloud. You may also file a complaint with the
+    Brazilian data protection authority (ANPD).
+  </p>
+
+  <h2>Children</h2>
+  <p>The app is not intended for children under 13 and does not knowingly collect their data.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>
+    This policy describes the version of the app published today, not planned features — that is
+    what keeps it truthful and verifiable. The date at the top changes with every revision.
+  </p>
+
+  <footer>
+    Conta em Dia · <code>br.com.gabrielkozuki.contaemdia</code><br>
+    Política de privacidade versão 1.0 — 24 de agosto de 2026
+  </footer>
+
+</div>
+
+</body>
+</html>

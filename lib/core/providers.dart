@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/auth_service.dart';
+import '../data/backup_nuvem_service.dart';
 import '../data/db/app_database.dart';
 import '../data/backup_service.dart';
 import '../data/export_service.dart';
@@ -8,6 +10,7 @@ import '../data/repositories/drift_config_repository.dart';
 import '../data/repositories/drift_contas_repository.dart';
 import '../data/repositories/drift_entradas_repository.dart';
 import '../data/repositories/drift_fechamento_repository.dart';
+import '../domain/entities/usuario.dart';
 import '../domain/repositories/repositories.dart';
 import 'format/dates.dart';
 
@@ -57,6 +60,34 @@ final backupServiceProvider =
 
 final fechamentoRepoProvider = Provider<FechamentoRepository>(
     (ref) => DriftFechamentoRepository(ref.watch(dbProvider)));
+
+// ---------------------------------------------------------------------------
+// M9 — conta e backup na nuvem
+//
+// Nada aqui é tocado pelo uso diário: o app abre e funciona inteiro sem conta
+// (RNF-01/RNF-04). Só a tela "Conta e backup" observa estes providers.
+// ---------------------------------------------------------------------------
+
+/// `false` quando `Firebase.initializeApp` falhou no start. A tela de conta usa
+/// isso para explicar em vez de oferecer um botão que não vai funcionar — o
+/// resto do app ignora.
+///
+/// O valor real vem de um `override` no `ProviderScope` do `main`: é decidido
+/// uma vez, antes do primeiro frame, e não muda durante a sessão.
+final firebaseDisponivelProvider = Provider<bool>((_) => false);
+
+final authServiceProvider = Provider<AuthService>((_) => AuthService());
+
+final backupNuvemProvider =
+    Provider<BackupNuvemService>((_) => BackupNuvemService());
+
+/// Sessão atual. É `Stream` e não leitura pontual porque o Firebase também
+/// desloga por conta própria — token revogado, conta excluída em outro
+/// aparelho — e a tela precisa refletir isso sem o usuário tocar em nada.
+final usuarioProvider = StreamProvider<Usuario?>((ref) {
+  if (!ref.watch(firebaseDisponivelProvider)) return Stream.value(null);
+  return ref.watch(authServiceProvider).mudancas;
+});
 
 /// Meses (`YYYY-MM`) reabertos para edição nesta sessão. É estado em memória:
 /// ao reabrir, o mês volta a ser editável; ao reiniciar o app, o conjunto zera

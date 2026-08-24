@@ -13,25 +13,59 @@ assets de iOS já prontos e congelados. APK avulso segue descartado.
 Toda a **preparação** está feita: identidade, ícone, splash, tradução, acessibilidade, assets
 de iOS e os roteiros em `docs/`.
 
-### A ordem mudou por causa de um prazo, não de uma dependência
+### O que já está feito
 
-Conta pessoal nova no Play exige **teste fechado com 12 testadores por 14 dias corridos**
-antes de liberar produção. Isso é espera de calendário — a única coisa do projeto que não
-acelera com esforço. Então ela **começa primeiro**, não por último.
+Atualizado em 24/08/2026, depois da implementação do M9.
 
-| # | O quê | Quem começa | Observação |
+| | Estado |
+|---|---|
+| Identidade, ícone, splash, assets de iOS | ✅ |
+| Tradução pt-BR/en-US (262 chaves) | ✅ |
+| Conta Google Play Developer, verificada e paga | ✅ |
+| Firebase: projeto, Auth (Google), Realtime Database, SHA-1 de debug | ✅ |
+| **M9 — login, backup, restauração e exclusão de conta** | ✅ |
+| Manifesto sem permissões supérfluas | ✅ `USE_BIOMETRIC`/`USE_FINGERPRINT` removidas |
+| Política de privacidade (`docs/privacidade/index.html`) | ✅ escrita, falta o deploy |
+| Bloco de assinatura no `build.gradle.kts` | ✅ pronto, esperando o `key.properties` |
+
+`flutter analyze` 0 issues · 72 testes de regra e persistência · AAB compila.
+
+### O que falta
+
+Ordenado por dependência. **O teste fechado exige 12 testadores por 14 dias corridos** — é
+espera de calendário, a única coisa que não acelera com esforço, então tudo que a destrava vem
+primeiro.
+
+| # | O quê | Quem | Bloqueia |
 |---|---|---|---|
-| 1 | Keystore de upload (`docs/assinar-release.md`) | **Você** — um `keytool`, ~2 min | Destrava o primeiro build enviável |
-| 2 | Conta Google Play Developer (US$ 25) | **Você** | Verificação de identidade leva dias |
-| 3 | **Abrir o teste fechado** | Depois de 1 e 2 | Com o app incompleto mesmo. Os 14 dias correm em paralelo ao M9 |
-| 4 | Configurar o Firebase (`docs/m9-auth-backup.md`, Parte 1) | **Você** — console + `flutterfire configure` | Destrava o M9 e o CE-06 |
-| 5 | Política de privacidade + seção de exclusão (`docs/politica-privacidade.md`) | Depois do M9 | O Play exige URL pública de exclusão |
-| 6 | Produção (`docs/distribuicao.md`) | Depois de tudo | AAB, não APK |
+| 1 | **`keytool` + `android/key.properties`** (`docs/assinar-release.md`) | **Você** — ~2 min | Qualquer AAB assinado |
+| 2 | **Deploy de `docs/privacidade/`** no domínio | **Você** | Criar versão em QUALQUER faixa |
+| 3 | Ficha da loja: textos pt-BR, gráfico 1024×500, capturas | Eu | Envio |
+| 4 | Testar login com conta Google **em aparelho** | **Você** | — |
+| 5 | Criar o app no console, responder as declarações, subir o AAB, convidar 12+ | **Você** | **Aqui o relógio começa** |
+| 6 | Registrar o SHA-1 da **chave de assinatura do app** no Firebase | **Você** | Login de quem baixa da loja |
+| 7 | Acesso à produção + envio | **Você** | Revisão de até 7 dias |
 
-**1, 2 e 4 são independentes** e podem correr juntos. O acoplamento real está no fim: o
-**SHA-1 da chave de assinatura do app** — a que o Google gera, não a sua de upload — só existe
-depois do primeiro envio, e é ela que o Google Sign-In valida em produção. Registrar só o de
-upload faz o login funcionar em desenvolvimento e falhar em silêncio para quem baixa da loja.
+**1 e 2 são independentes** e podem correr juntos. Só o 3 é trabalho meu.
+
+#### Os dois pontos onde isso costuma falhar
+
+- **A política é portão do teste fechado, não da produção.** A seção "Conteúdo do app" do Play
+  — política, segurança de dados, classificação — bloqueia criar versão em qualquer faixa. Sem
+  a página no ar, o relógio dos 14 dias não começa.
+- **O SHA-1 que importa em produção só existe depois do primeiro envio.** Com Play App Signing
+  o Google re-assina o AAB com uma chave própria; o app que chega ao aparelho não carrega o seu
+  certificado de upload. Registrar só o de debug e o de upload faz o login funcionar em
+  desenvolvimento, funcionar no APK instalado à mão, e falhar em silêncio para quem baixa da
+  loja. Volte ao Firebase **depois** de enviar (passo 1.6 do `m9-auth-backup.md`).
+
+#### Verificar em aparelho, antes de confiar
+
+- Login com conta Google real — não dá para validar em emulador sem conta.
+- Que remover `USE_BIOMETRIC`/`USE_FINGERPRINT` não quebrou o `firebase_auth`: o build compila,
+  mas remoção de permissão só falha em runtime.
+- Enviar backup, desinstalar, reinstalar, entrar e restaurar. É o ciclo que o recurso existe
+  para atender, e o único jeito de saber se ele funciona.
 
 ### O que a troca de loja mudou de verdade
 
@@ -54,31 +88,38 @@ abas, contas e ocorrências mensais, entradas, cartões com fatura e rateio, vir
 **Os marcos** (renumerados em 04/08/2026 — o M8 original agrupava auth,
 qualidade e distribuição; virou três marcos com um propósito cada):
 
-- **M8 — Tradução (pt-BR + en-US). Feito.** `flutter_localizations` + ARB (235 chaves), as
+- **M8 — Tradução (pt-BR + en-US). Feito.** `flutter_localizations` + ARB (235 chaves na época, 262 hoje), as
   strings de UI saem dos widgets, e o nome exibido passa a ser localizado: "Conta em Dia" / "Bills on
   Track". Vem ANTES do auth de propósito: as telas de login, backup e exclusão de conta são
   as mais textuais do app e nasceriam em português para serem traduzidas depois.
   *Código, comentários e documentação seguem em pt-BR* — só o texto visível ao usuário é
   localizado.
-- **M9 — Auth Firebase + backup na nuvem (CE-05/CE-06).** Bloqueado pela configuração do
-  projeto Firebase, que depende da conta do usuário — guia em `docs/m9-auth-backup.md`
-  (as dependências foram REMOVIDAS do `pubspec.yaml` até aqui; ver o passo 1.4 do guia).
-  Inclui a exclusão de conta que as duas lojas exigem: apagar o `backups/{uid}` e a conta em
-  si, não só o dado local — e, no Play, também uma URL pública para quem já
-  desinstalou. **Restaurar só da nuvem**
-  — a restauração por arquivo foi descartada em 04/08/2026 (duas fontes para o
-  mesmo backup), e o `file_picker` saiu do projeto: nem a v11 nem a v12-beta
-  convivem com o Kotlin embutido do Flutter 3.44 e o `share_plus`.
-- **M10 — Publicação na Google Play Store (CE-03/CE-04).** Ícone, splash e identidade visual
-  (`assets/marca/`) estão **prontos**, e os assets de iOS também — congelados até haver Mac.
-  Falta a assinatura de upload (`docs/assinar-release.md`, hoje o build sai com
-  `CN=Android Debug`), a política de privacidade com seção de exclusão
-  (`docs/politica-privacidade.md`) e o envio (`docs/distribuicao.md`).
-  **A produção é o último passo**, depois do M9 — senão o app iria à loja com "Entrar"
-  desabilitado. **O teste fechado, porém, é o primeiro**: são 12 testadores por 14 dias
-  corridos, espera de calendário que corre em paralelo ao desenvolvimento.
-  A acessibilidade do antigo M8 já foi antecipada (contraste ≥4,5:1, alvos ≥44dp, rótulos
-  semânticos).
+- **M9 — Auth Firebase + backup na nuvem (CE-05/CE-06). Feito em 24/08/2026.**
+  Login só com **Google** — e-mail/senha foi recusado porque o login existe para dar backup, e
+  senha esquecida transformaria a rede de proteção na própria perda de dados. "Entrar com a
+  Apple" fica **oculto** enquanto o destino for só o Play (`sign_in_with_apple` exige conta
+  paga); volta acima do Google quando o iOS entrar.
+  Novos: `data/auth_service.dart`, `data/backup_nuvem_service.dart`,
+  `domain/entities/usuario.dart`. Blob JSON por UID em `backups/{uid}`, *last-wins*.
+  `BackupNuvemService` só move a String — não entende o JSON.
+  **Restaurar só da nuvem**: a restauração por arquivo foi descartada em 04/08/2026 e o
+  `file_picker` saiu do projeto. A exclusão de conta apaga o `backups/{uid}` **antes** do
+  `delete()` — depois não há mais `auth.uid` e a regra recusaria a escrita, deixando backup
+  órfão para sempre.
+  **Divergência da decisão original:** em vez de guardar "último uid visto", que exigiria uma
+  tabela nova contra o invariante 4, a reconciliação pergunta quando **os dois lados têm
+  conteúdo**. Banco local vazio restaura direto; conta sem backup não tem o que restaurar.
+  Cobre o caso original e mais o de aparelho diferente com o mesmo usuário. 6 testes de
+  `temDados()` em `test/persistence/`.
+
+- **M10 — Publicação na Google Play Store (CE-03/CE-04). Em andamento.**
+  Prontos: identidade, ícone, splash, assets de iOS (congelados até haver Mac), política de
+  privacidade e o bloco de assinatura do Gradle. O que falta está detalhado em
+  **"O que falta"**, no topo deste documento — em resumo: keystore de upload, deploy da
+  política, ficha da loja e o teste fechado.
+  A acessibilidade do antigo M8 foi antecipada (contraste ≥4,5:1, alvos ≥44dp, rótulos
+  semânticos), mas **leitor de tela nunca foi verificado**: há 14 usos de `Semantics` no
+  `lib/` e o RNF-05 pede as três coisas.
 
 Identidade definida: **`br.com.gabrielkozuki.contaemdia`** (permanente — é a chave de
 atualização do Android), nome exibido "Conta em Dia".

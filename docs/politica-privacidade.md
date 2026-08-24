@@ -6,32 +6,49 @@ Precisa estar no ar antes do envio e continuar no ar depois.
 O plano é uma página estática única, no seu domínio, versionada aqui no repositório e
 deployada sozinha.
 
-## Por que só faz sentido depois do M9
-
-Hoje o app **não tem rede**: zero permissões no manifesto, tudo em SQLite local, nenhum
-analytics. Uma política escrita agora diria "não coletamos nada" e ficaria falsa no dia em que
-o Firebase Auth entrar.
-
-Escreva depois de o M9 estar implementado, e escreva sobre o que o código faz — não sobre o
-que o modelo de política genérica sugere. O **formulário de segurança de dados** do Play
-Console é preenchido à parte e **precisa bater** com este texto; divergência entre os dois é
-motivo de suspensão, não só de rejeição.
-
-## Onde o arquivo mora
+## Estado: escrita em 24/08/2026 — falta só o deploy
 
 ```
-docs/privacidade/index.html      # a página, autossuficiente (mesmo padrão de assets/marca/identidade.html)
+docs/privacidade/index.html      # PRONTA, bilíngue, autossuficiente
 ```
 
-Autossuficiente de propósito: sem CDN, sem fonte externa, sem script de terceiros. Uma
-política de privacidade que carrega recurso de terceiro contradiz o próprio texto.
+Escopo: **LGPD apenas**. A distribuição foi restrita ao Brasil, então não há GDPR, não há
+representante na UE (art. 27) e não há regra de cookies da ePrivacy.
 
-Reaproveite os tokens de `assets/marca/identidade.html` (paleta, escala tipográfica, blocos
-claro/escuro) — a página é a primeira coisa que alguém vê fora do app, e vale parecer parte
-do mesmo produto.
+**Canal do encarregado:** `privacidade.contaemdia@gmail.com` (LGPD art. 41 §1º), criado em
+24/08/2026. Gmail em vez de endereço no domínio, por decisão: a lei e o Play pedem um canal que
+**funcione**, não um domínio próprio. O DNS do `gabrielkozuki.com.br` está no registro.br, e o
+Email Routing da Cloudflare exigiria migrar os nameservers — mexer nos registros que apontam
+para a VPS por causa de um endereço de contato não se paga. Encaminhamento por MX
+(ForwardEmail, ImprovMX) funciona sem migrar nada e fica como opção futura, sem urgência.
 
-**Bilíngue**, como o app: pt-BR e en-US na mesma página, com âncora para cada
-(`#pt` / `#en`), ou dois arquivos irmãos. Uma página só é mais simples de manter e de linkar.
+> **Não** subir servidor de e-mail na VPS: a Hetzner bloqueia a porta 25 por padrão, e
+> autohospedar SMTP traz SPF, DKIM, DMARC e problemas de entrega — tudo para receber poucas
+> mensagens por ano. Receber num domínio é barato; **enviar** é o que dá trabalho.
+
+## É portão do TESTE FECHADO, não só da produção
+
+**Corrigido em 19/08/2026.** A seção "Conteúdo do app" do Play Console — política de
+privacidade, formulário de segurança de dados e classificação indicativa — bloqueia a criação
+de uma versão em **qualquer** faixa, inclusive a fechada. O Google exige o formulário mesmo de
+apps que não coletam dado nenhum.
+
+Ou seja: sem esta página no ar, **o relógio dos 14 dias não começa**.
+
+### A política é versionada junto com o app
+
+A v1 (app offline, sem conta) foi escrita e **substituída antes de publicar** — o M9 entrou no
+mesmo dia e ela nunca chegou a ir ao ar. Por isso a página publicada é a **versão 1.0**
+descrevendo o app COM login e backup: expor versionamento interno numa página pública não
+ajuda ninguém.
+
+O princípio continua: cada versão descreve **o build que está no ar naquele momento**. Quando o
+que o app faz mudar, a política muda antes — junto com o formulário de segurança de dados, que
+precisa bater com ela.
+
+**Lição da v1:** ela afirmava que o app não tinha permissão de internet. Era verdade, e virou
+falso no instante em que as dependências do Firebase voltaram ao `pubspec.yaml`. Afirmação
+verificável envelhece rápido — reconfira o manifesto mesclado antes de cada publicação.
 
 ## O que a página tem que responder
 
@@ -98,7 +115,8 @@ No topo. Toda revisão muda essa data.
 Só esta pasta vai para o domínio — o resto do repositório continua local. Qualquer host
 estático serve (GitHub Pages a partir de `docs/`, Cloudflare Pages, Netlify).
 
-Sugestão de URL: `https://gabrielkozuki.com.br/conta-em-dia/privacidade`.
+Sugestão de URL: `https://gabrielkozuki.com.br/conta-em-dia/privacidade`. O domínio roda numa
+VPS Hetzner com Coolify — só esta pasta precisa ir para lá.
 
 Depois de publicar:
 

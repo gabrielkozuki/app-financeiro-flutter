@@ -41,11 +41,6 @@ dependencies:
   drift_flutter: ^0.3.1
   sqlite3_flutter_libs: ^0.6.0+eol
   path_provider: ^2.1.6
-  # As dependências do Firebase (firebase_core/auth/database, google_sign_in,
-  # sign_in_with_apple) saem daqui até o M8 começar: mesmo sem serem importadas
-  # em lib/, elas injetavam ACCESS_NETWORK_STATE, USE_BIOMETRIC, USE_FINGERPRINT
-  # e READ_GSERVICES no manifesto do APK, além de um FirebaseInitProvider no
-  # start. Ver docs/configurar-firebase.md para readicioná-las.
   # Alinhado ao que o flutter_localizations fixa — não subir sem checar.
   intl: ^0.20.2
   fl_chart: ^1.2.0
@@ -54,6 +49,16 @@ dependencies:
   # Flutter 3.44 (`:share_plus:compileDebugKotlin` falha). A API usada
   # (`SharePlus.instance.share`) é a mesma nas duas.
   share_plus: ^12.0.2
+  # M9 — readicionadas em 24/08/2026. Elas injetam ACCESS_NETWORK_STATE,
+  # USE_BIOMETRIC, USE_FINGERPRINT e READ_GSERVICES no manifesto e um
+  # FirebaseInitProvider no start: foi por isso que ficaram fora até agora.
+  # A política de privacidade precisa ser atualizada para a v2 ANTES de
+  # publicar um build com elas (ver docs/politica-privacidade.md).
+  # `sign_in_with_apple` só quando houver conta Apple Developer.
+  firebase_core: ^4.14.0
+  firebase_auth: ^6.6.0
+  firebase_database: ^12.5.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
