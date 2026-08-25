@@ -25,7 +25,7 @@ Atualizado em 24/08/2026, depois da implementação do M9.
 | Firebase: projeto, Auth (Google), Realtime Database, SHA-1 de debug | ✅ |
 | **M9 — login, backup, restauração e exclusão de conta** | ✅ |
 | Manifesto sem permissões supérfluas | ✅ `USE_BIOMETRIC`/`USE_FINGERPRINT` removidas |
-| Política de privacidade (`docs/privacidade/index.html`) | ✅ escrita, falta o deploy |
+| Política de privacidade (`docs/site/privacidade/index.html`) | ✅ escrita, falta o deploy |
 | Bloco de assinatura no `build.gradle.kts` | ✅ pronto, esperando o `key.properties` |
 
 `flutter analyze` 0 issues · 72 testes de regra e persistência · AAB compila.
@@ -39,7 +39,7 @@ primeiro.
 | # | O quê | Quem | Bloqueia |
 |---|---|---|---|
 | 1 | **`keytool` + `android/key.properties`** (`docs/assinar-release.md`) | **Você** — ~2 min | Qualquer AAB assinado |
-| 2 | **Deploy de `docs/privacidade/`** no domínio | **Você** | Criar versão em QUALQUER faixa |
+| 2 | **Deploy de `docs/site/`** no domínio | **Você** | Criar versão em QUALQUER faixa |
 | 3 | Ficha da loja: textos pt-BR, gráfico 1024×500, capturas | Eu | Envio |
 | 4 | Testar login com conta Google **em aparelho** | **Você** | — |
 | 5 | Criar o app no console, responder as declarações, subir o AAB, convidar 12+ | **Você** | **Aqui o relógio começa** |

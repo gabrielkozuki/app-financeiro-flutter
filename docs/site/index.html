@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conta em Dia</title>
+<meta name="description" content="Checklist mensal de contas e painel 50-30-20. Offline-first, sem cadastro obrigatório.">
+<style>
+  /* Placeholder mínimo: existe para a raiz não devolver 404 e para a política
+     morar em /privacidade em vez de no topo do domínio. Substituível por uma
+     landing de verdade sem afetar nada — a URL da política não passa por aqui.
+     Tema claro fixo, como a política. */
+  :root {
+    --papel: #F7F9F9;
+    --tinta: #16211F;
+    --meia-tinta: #5D6B68;
+    --fio: #DCE4E2;
+    --acento: #0F766E;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 30rem; padding: 2rem 1.25rem; text-align: center; }
+  svg { width: 84px; height: 84px; margin: 0 auto 1.5rem; border-radius: 20px; }
+  h1 { font-size: 2rem; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+  .sub { color: var(--meia-tinta); margin: 0 0 1.5rem; }
+  p { margin: 0 0 2rem; }
+  nav { border-top: 1px solid var(--fio); padding-top: 1.5rem; font-size: 0.9rem; }
+  a { color: var(--acento); }
+</style>
+</head>
+<body>
+  <main>
+    <svg viewBox="0 0 512 512" role="img" aria-label="Ícone do Conta em Dia">
+      <rect width="512" height="512" fill="#F7F9F9"/>
+      <path d="M 308.60 422.41 A 174.52 174.52 0 1 1 308.60 89.59 L 280.60 164.48 A 94.76 94.76 0 1 0 280.60 347.52 Z" fill="#0F766E" stroke="#0F766E" stroke-width="18.01" stroke-linejoin="round"/>
+      <path d="M 337.82 129.67 A 150.51 150.51 0 0 1 405.07 235.24 L 349.34 239.62 A 94.76 94.76 0 0 0 310.29 178.33 Z" fill="#8C661C" stroke="#8C661C" stroke-width="18.01" stroke-linejoin="round"/>
+      <path d="M 405.07 276.76 A 150.51 150.51 0 0 1 337.82 382.33 L 310.29 333.67 A 94.76 94.76 0 0 0 349.34 272.38 Z" fill="#497949" stroke="#497949" stroke-width="18.01" stroke-linejoin="round"/>
+    </svg>
+    <h1>Conta em Dia</h1>
+    <p class="sub">Checklist mensal de contas e painel 50-30-20</p>
+    <p>
+      Já paguei o que devia? Estou gastando dentro do que planejei? O app responde
+      as duas em uma tela — offline, sem cadastro obrigatório.
+    </p>
+    <nav>
+      <a href="/privacidade/">Política de Privacidade</a>
+    </nav>
+  </main>
+</body>
+</html>

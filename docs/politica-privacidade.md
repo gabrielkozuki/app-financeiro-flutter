@@ -9,8 +9,13 @@ deployada sozinha.
 ## Estado: escrita em 24/08/2026 — falta só o deploy
 
 ```
-docs/privacidade/index.html      # PRONTA, bilíngue, autossuficiente
+docs/site/
+  index.html                     # placeholder da raiz (evita 404, substituível)
+  privacidade/index.html         # A POLÍTICA — pronta, bilíngue, autossuficiente
 ```
+
+A estrutura de pastas **espelha a URL**: `docs/site` é a raiz do site, então a política sai em
+`/privacidade/`. Sem isso, ela cairia no topo do domínio.
 
 Escopo: **LGPD apenas**. A distribuição foi restrita ao Brasil, então não há GDPR, não há
 representante na UE (art. 27) e não há regra de cookies da ePrivacy.
@@ -115,8 +120,27 @@ No topo. Toda revisão muda essa data.
 Só esta pasta vai para o domínio — o resto do repositório continua local. Qualquer host
 estático serve (GitHub Pages a partir de `docs/`, Cloudflare Pages, Netlify).
 
-Sugestão de URL: `https://gabrielkozuki.com.br/conta-em-dia/privacidade`. O domínio roda numa
-VPS Hetzner com Coolify — só esta pasta precisa ir para lá.
+**URL:** `https://contaemdia.gabrielkozuki.com.br/privacidade/`
+
+Hospedagem no Coolify (VPS Hetzner), a partir do próprio repositório — **sem cópia separada**,
+porque a política precisa acompanhar o que o app faz e duas cópias divergem. Configuração:
+
+| Campo | Valor |
+|---|---|
+| Build Pack | `Static` (não Nixpacks — não há o que buildar) |
+| Base Directory | `/docs/site` |
+| Publish Directory | `/` (não `/dist` — isso é convenção de frontend compilado) |
+| Port | `80` |
+| Domains | `https://contaemdia.gabrielkozuki.com.br` |
+| Install/Build/Start Command | vazios |
+
+DNS no registro.br: `A  contaemdia.gabrielkozuki.com.br → <IP da VPS>`.
+
+> **`Direction` com "Allow www & non-www" quebra o certificado** num subdomínio: o Let's
+> Encrypt tenta validar `www.contaemdia...`, que não tem registro DNS. Use a opção sem www.
+
+> O Coolify clona do GitHub — **commite e faça push antes de deployar**, senão sobe a versão
+> anterior do arquivo.
 
 Depois de publicar:
 
