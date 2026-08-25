@@ -310,14 +310,6 @@
   "graficoComprometido": "Committed",
   "graficoRendaDoMes": "Monthly income",
   "graficoLivre": "Left to spend",
-  "graficoPercentualDaRenda": "{percentual}% of your income",
-  "@graficoPercentualDaRenda": {
-    "placeholders": {
-      "percentual": {
-        "type": "int"
-      }
-    }
-  },
   "graficoSemanticaRosca": "Monthly income: {renda}, divided between {grupos} and Left to spend",
   "@graficoSemanticaRosca": {
     "placeholders": {
@@ -607,5 +599,14 @@
   "backupExcluirContaTexto": "The account and the backup stored in it will be permanently erased. The data on this device stays where it is.",
   "backupContaExcluida": "Account deleted.",
   "backupErroExcluirConta": "Couldn't delete the account.",
-  "excluir": "Delete"
+  "excluir": "Delete",
+  "graficoPercentual": "{percentual}%",
+  "@graficoPercentual": {
+    "placeholders": {
+      "percentual": {
+        "type": "int"
+      }
+    }
+  },
+  "graficoDaRenda": "of income"
 }

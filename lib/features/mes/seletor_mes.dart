@@ -69,7 +69,9 @@ class SeletorMes extends ConsumerWidget {
         ),
         const SizedBox(width: AppTheme.spaceLg),
         IconButton(
-          onPressed: () => notifier.mover(1),
+          // Desabilitada no teto (12 meses à frente). Deixar habilitada faria
+          // o toque não produzir nada, que lê como travamento.
+          onPressed: notifier.podeAvancar ? () => notifier.mover(1) : null,
           icon: const Icon(Icons.chevron_right),
           tooltip: l10n.mesProximo,
         ),
@@ -157,6 +159,11 @@ class _SeletorMesDialogState extends State<_SeletorMesDialog> {
                     selecionado:
                         _ano == widget.inicial.year && m == widget.inicial.month,
                     ehHoje: _ano == agora.year && m == agora.month,
+                    // Além do teto o notifier recusaria a mudança em silêncio,
+                    // e a folha fecharia sem nada acontecer. Melhor o botão
+                    // dizer que não dá.
+                    habilitado: !DateTime(_ano, m)
+                        .isAfter(MesSelecionadoNotifier.teto),
                     onTap: () => Navigator.pop(context, DateTime(_ano, m)),
                     scheme: scheme,
                   ),
@@ -182,11 +189,13 @@ class _BotaoMes extends StatelessWidget {
     required this.onTap,
     required this.scheme,
     this.ehHoje = false,
+    this.habilitado = true,
   });
 
   final String rotulo;
   final bool selecionado;
   final bool ehHoje;
+  final bool habilitado;
   final VoidCallback onTap;
   final ColorScheme scheme;
 
@@ -195,13 +204,17 @@ class _BotaoMes extends StatelessWidget {
     // "Hoje" era sinalizado só por um pontinho de 4x4 dependente de matiz —
     // ilegível para quem tem baixa visão de cor. Uma borda visível não
     // depende de matiz, e o rótulo semântico cobre o leitor de tela.
-    final destaqueHoje = ehHoje && !selecionado;
+    final destaqueHoje = ehHoje && !selecionado && habilitado;
     final conteudo = Material(
-      color: selecionado ? scheme.primary : scheme.surfaceContainerHighest,
+      color: !habilitado
+          ? scheme.surfaceContainerHighest.withValues(alpha: 0.4)
+          : selecionado
+              ? scheme.primary
+              : scheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(AppTheme.raio - 4),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.raio - 4),
-        onTap: onTap,
+        onTap: habilitado ? onTap : null,
         child: Container(
           decoration: destaqueHoje
               ? BoxDecoration(
@@ -214,7 +227,11 @@ class _BotaoMes extends StatelessWidget {
             rotulo,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: selecionado ? scheme.onPrimary : scheme.onSurface,
+              color: !habilitado
+                  ? scheme.onSurfaceVariant.withValues(alpha: 0.5)
+                  : selecionado
+                      ? scheme.onPrimary
+                      : scheme.onSurface,
             ),
           ),
         ),

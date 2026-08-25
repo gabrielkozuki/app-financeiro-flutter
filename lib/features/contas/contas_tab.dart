@@ -355,16 +355,17 @@ class _CardPago extends StatelessWidget {
   }
 }
 
-/// Card de linha da checklist com uma faixa colorida fina à esquerda —
-/// indicador discreto de grupo (Necessidade/Desejo/Investimento) ou de tipo
-/// (fatura de cartão), sem competir visualmente com o checkbox de "pago"
-/// (ação primária) nem com o restante do conteúdo. Reaproveitado por
-/// [_ContaTile] e [_FaturaTile] para manter o mesmo padrão visual.
+/// Card de linha da checklist.
+///
+/// A faixa colorida à esquerda foi removida em 25/08/2026: o grupo já aparece
+/// no pontinho + rótulo do subtítulo, e a faixa duplicava esse sinal enquanto
+/// apertava o conteúdo contra a borda. O que separa uma linha da outra passa a
+/// ser contorno e espaçamento, não uma marca colorida.
+///
+/// Reaproveitado por [_ContaTile] e [_FaturaTile] para manter o mesmo padrão.
 class _ChecklistCard extends StatelessWidget {
-  const _ChecklistCard({required this.cor, required this.child});
+  const _ChecklistCard({required this.child});
 
-  /// Cor da faixa: `grupo.cor` para contas, uma cor neutra para faturas.
-  final Color cor;
   final Widget child;
 
   @override
@@ -373,15 +374,11 @@ class _ChecklistCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.raio),
+        side: BorderSide(color: context.colors.outlineVariant),
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(width: 4, color: cor),
-            Expanded(child: child),
-          ],
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXs),
+        child: child,
       ),
     );
   }
@@ -429,7 +426,6 @@ class _ContaTile extends ConsumerWidget {
             brl(ocorrencia.valorEfetivo),
             paga ? l10n.estadoPaga : l10n.estadoPendente),
         child: _ChecklistCard(
-          cor: conta.grupo.cor,
           child: ListTile(
             onTap: somenteLeitura
                 ? null
@@ -442,10 +438,16 @@ class _ContaTile extends ConsumerWidget {
             // subtítulo), sem competir por atenção com o "pago". Ele não
             // herda o rótulo do Semantics externo (é um nó interativo próprio
             // para o leitor de tela), por isso recebe o seu.
-            leading: Checkbox(
-                value: paga,
-                onChanged: somenteLeitura ? null : alternar,
-                semanticLabel: l10n.contaMarcarPaga(conta.nome)),
+            leading: Transform.scale(
+              scale: 1.3,
+              child: Checkbox(
+                  value: paga,
+                  onChanged: somenteLeitura ? null : alternar,
+                  semanticLabel: l10n.contaMarcarPaga(conta.nome)),
+            ),
+            // O `Expanded` preenche até a borda e corta com reticências
+            // exatamente ali, então nome longo encostava no valor. O que separa
+            // é o SizedBox — diminuir a fonte sozinho só adiaria o encontro.
             title: Row(
               children: [
                 Expanded(
@@ -453,14 +455,16 @@ class _ContaTile extends ConsumerWidget {
                     conta.nome,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: textTheme.bodyMedium?.copyWith(
                       decoration: paga ? TextDecoration.lineThrough : null,
                       color: paga ? onSurfaceVariant : null,
                     ),
                   ),
                 ),
+                const SizedBox(width: AppTheme.spaceSm),
                 Text(brl(ocorrencia.valorEfetivo),
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                    style: textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
               ],
             ),
             subtitle: Padding(
@@ -539,19 +543,18 @@ class _FaturaTile extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: AppTheme.spaceLg, vertical: 5),
       child: _ChecklistCard(
-        // Fatura não pertence a um grupo (Necessidade/Desejo/Investimento) —
-        // usa uma faixa neutra, só para manter o mesmo padrão visual das
-        // contas (checkbox como única ação de destaque à esquerda).
-        cor: onSurfaceVariant,
         child: ListTile(
           onTap: somenteLeitura ? null : () => abrirFatura(context, item),
           // O tile de fatura não tem Semantics externo (diferente do de
           // conta), então o checkbox precisa do próprio rótulo com o nome
           // do cartão para o leitor de tela.
-          leading: Checkbox(
-              value: paga,
-              onChanged: somenteLeitura ? null : alternar,
-              semanticLabel: l10n.faturaMarcarPaga(item.cartao.nome)),
+          leading: Transform.scale(
+            scale: 1.3,
+            child: Checkbox(
+                value: paga,
+                onChanged: somenteLeitura ? null : alternar,
+                semanticLabel: l10n.faturaMarcarPaga(item.cartao.nome)),
+          ),
           title: Row(
             children: [
               Expanded(
@@ -559,15 +562,16 @@ class _FaturaTile extends ConsumerWidget {
                   l10n.faturaTitulo(item.cartao.nome),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: context.texts.bodyMedium?.copyWith(
                     decoration: paga ? TextDecoration.lineThrough : null,
                     color: paga ? onSurfaceVariant : null,
                   ),
                 ),
               ),
+              const SizedBox(width: AppTheme.spaceSm),
               Text(
                 temValor ? brl(item.valorEfetivo) : l10n.faturaInformar,
-                style: TextStyle(
+                style: context.texts.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: temValor ? null : scheme.primary,
                 ),

@@ -441,11 +441,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get graficoLivre => 'Livre';
 
   @override
-  String graficoPercentualDaRenda(int percentual) {
-    return '$percentual% da renda';
-  }
-
-  @override
   String graficoSemanticaRosca(String renda, String grupos) {
     return 'Renda do mês: $renda, dividida entre $grupos e Livre';
   }
@@ -925,4 +920,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get excluir => 'Excluir';
+
+  @override
+  String graficoPercentual(int percentual) {
+    return '$percentual%';
+  }
+
+  @override
+  String get graficoDaRenda => 'da renda';
 }

@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "548283748086-vfrhefgjt4pqjsk0f5v1oolm06j29hav.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.gabrielkozuki.contaemdia",
+            "certificate_hash": "a9f1343bd8096059df968c86f2e5e0881b2c2d4e"
+          }
+        },
+        {
           "client_id": "548283748086-ttvq6muqpo2p7s6rjh2hptorso916pa9.apps.googleusercontent.com",
           "client_type": 3
         }

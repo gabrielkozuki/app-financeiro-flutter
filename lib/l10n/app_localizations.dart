@@ -836,12 +836,6 @@ abstract class AppLocalizations {
   /// **'Livre'**
   String get graficoLivre;
 
-  /// No description provided for @graficoPercentualDaRenda.
-  ///
-  /// In pt, this message translates to:
-  /// **'{percentual}% da renda'**
-  String graficoPercentualDaRenda(int percentual);
-
   /// No description provided for @graficoSemanticaRosca.
   ///
   /// In pt, this message translates to:
@@ -1673,6 +1667,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Excluir'**
   String get excluir;
+
+  /// No description provided for @graficoPercentual.
+  ///
+  /// In pt, this message translates to:
+  /// **'{percentual}%'**
+  String graficoPercentual(int percentual);
+
+  /// No description provided for @graficoDaRenda.
+  ///
+  /// In pt, this message translates to:
+  /// **'da renda'**
+  String get graficoDaRenda;
 }
 
 class _AppLocalizationsDelegate

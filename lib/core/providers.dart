@@ -111,16 +111,50 @@ final mesesReabertosProvider =
 /// Mês de referência selecionado (primeiro dia do mês). Controla o recorte
 /// exibido nas abas Contas e Gráfico e permite navegar pelo histórico.
 class MesSelecionadoNotifier extends Notifier<DateTime> {
+  /// Teto de navegação para o futuro, em meses além do corrente.
+  ///
+  /// **Não é preferência de UI — é o que impede o banco de crescer sem limite.**
+  /// Abrir um mês futuro DISPARA a virada (`mes_panorama.dart`), gravando uma
+  /// ocorrência por conta ativa e uma fatura por cartão. Sem teto, segurar o
+  /// "›" cria meses que ninguém planejou, que ficam gravados e vão junto no
+  /// backup da nuvem.
+  ///
+  /// 12 meses cobrem o propósito do app — o mês corrente e o planejamento
+  /// próximo, incluindo parcelamentos de um ano. Orçamento de cinco anos é
+  /// outro produto.
+  ///
+  /// O passado NÃO tem teto: mês passado nunca é gerado (invariante 1), então
+  /// navegar para trás não escreve nada.
+  static const mesesFuturosMax = 12;
+
   @override
   DateTime build() {
     final agora = DateTime.now();
     return DateTime(agora.year, agora.month);
   }
 
-  /// Avança (+1) ou retrocede (-1) meses, normalizando a virada de ano.
-  void mover(int delta) => state = DateTime(state.year, state.month + delta);
+  /// Último mês navegável. Recalculado a cada consulta em vez de guardado: o
+  /// app pode ficar aberto na virada de ano, e um teto congelado no build
+  /// ficaria um mês curto.
+  static DateTime get teto {
+    final agora = DateTime.now();
+    return DateTime(agora.year, agora.month + mesesFuturosMax);
+  }
 
-  void definir(DateTime mes) => state = DateTime(mes.year, mes.month);
+  /// Para a seta "›" desabilitar em vez de virar um toque sem efeito.
+  bool get podeAvancar => state.isBefore(teto);
+
+  /// Avança (+1) ou retrocede (-1) meses, normalizando a virada de ano.
+  void mover(int delta) => definir(DateTime(state.year, state.month + delta));
+
+  /// Ponto único de escrita: a grade de mês/ano também passa por aqui, então o
+  /// teto vale para os dois caminhos. Barrar só na seta deixaria a grade
+  /// contornando a regra.
+  void definir(DateTime mes) {
+    final alvo = DateTime(mes.year, mes.month);
+    if (alvo.isAfter(teto)) return;
+    state = alvo;
+  }
 }
 
 final mesSelecionadoProvider =

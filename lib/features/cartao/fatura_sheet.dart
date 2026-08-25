@@ -150,24 +150,29 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
               titulo: l10n.faturaTitulo(widget.item.cartao.nome),
               subtitulo: mesAno(mes, l10n.localeName),
             ),
-            const SizedBox(height: AppTheme.spaceSm),
+            // Ritmo vertical em três níveis, para a folha ler como blocos e
+            // não como uma pilha uniforme: Xl separa seções, Md separa
+            // elemento de seção, Sm cola rótulo ao que ele descreve.
+            const SizedBox(height: AppTheme.spaceLg),
             CampoMoeda(
               controller: _total,
               labelText: l10n.faturaValorTotal,
               onChanged: (_) => setState(() {}),
             ),
-            const SizedBox(height: AppTheme.spaceXl),
+            const SizedBox(height: AppTheme.spaceXxl),
             Text(l10n.faturaComoDividir, style: textTheme.titleMedium),
-            const SizedBox(height: AppTheme.spaceXs),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               l10n.faturaComoDividirTexto,
-              style: textTheme.bodySmall
-                  ?.copyWith(color: context.colors.onSurfaceVariant),
+              style: textTheme.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+                height: 1.4,
+              ),
             ),
-            const SizedBox(height: AppTheme.spaceMd),
+            const SizedBox(height: AppTheme.spaceLg),
             for (final g in Grupo.values)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXs),
+                padding: const EdgeInsets.only(bottom: AppTheme.spaceMd),
                 child: CampoMoeda(
                   controller: _grupos[g]!,
                   labelText: g.rotulo(context),
@@ -175,15 +180,15 @@ class _FaturaSheetState extends ConsumerState<_FaturaSheet> {
                   onChanged: (_) => setState(() {}),
                 ),
               ),
-            const SizedBox(height: AppTheme.spaceMd),
+            const SizedBox(height: AppTheme.spaceSm),
             _feedback(validacao, textTheme),
-            const SizedBox(height: AppTheme.spaceLg),
+            const SizedBox(height: AppTheme.spaceXl),
             BotaoSalvar(
               salvando: _salvando,
               onPressed: _valido ? _salvar : null,
               rotulo: l10n.faturaSalvar,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.spaceSm),
             TextButton.icon(
               onPressed: _salvando ? null : _naoUsei,
               icon: const Icon(Icons.block_flipped, size: 18),

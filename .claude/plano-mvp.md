@@ -26,7 +26,11 @@ Atualizado em 24/08/2026, depois da implementação do M9.
 | **M9 — login, backup, restauração e exclusão de conta** | ✅ |
 | Manifesto sem permissões supérfluas | ✅ `USE_BIOMETRIC`/`USE_FINGERPRINT` removidas |
 | Política de privacidade (`docs/site/privacidade/index.html`) | ✅ escrita, falta o deploy |
-| Bloco de assinatura no `build.gradle.kts` | ✅ pronto, esperando o `key.properties` |
+| Bloco de assinatura no `build.gradle.kts` | ✅ |
+| Ficha da loja (textos, gráfico, capturas) | ✅ 25/08/2026 |
+| Login com Google, backup e restauração validados em aparelho | ✅ 25/08/2026 |
+| Keystore de upload + `key.properties` | ✅ 25/08/2026 |
+| Política no ar em `contaemdia.gabrielkozuki.com.br/privacidade/` | ✅ 25/08/2026, Coolify |
 
 `flutter analyze` 0 issues · 72 testes de regra e persistência · AAB compila.
 
@@ -38,15 +42,16 @@ primeiro.
 
 | # | O quê | Quem | Bloqueia |
 |---|---|---|---|
-| 1 | **`keytool` + `android/key.properties`** (`docs/assinar-release.md`) | **Você** — ~2 min | Qualquer AAB assinado |
-| 2 | **Deploy de `docs/site/`** no domínio | **Você** | Criar versão em QUALQUER faixa |
-| 3 | Ficha da loja: textos pt-BR, gráfico 1024×500, capturas | Eu | Envio |
-| 4 | Testar login com conta Google **em aparelho** | **Você** | — |
+| ~~1~~ | ~~`keytool` + `key.properties`~~ | — | ✅ feito |
+| ~~2~~ | ~~Deploy de `docs/site/`~~ | — | ✅ feito |
+| ~~3~~ | ~~Ficha da loja~~ | — | ✅ 25/08/2026, em `~/Desktop/conta-em-dia-play/` |
+| ~~4~~ | ~~Testar login e backup em aparelho~~ | — | ✅ 25/08/2026, emulador |
 | 5 | Criar o app no console, responder as declarações, subir o AAB, convidar 12+ | **Você** | **Aqui o relógio começa** |
 | 6 | Registrar o SHA-1 da **chave de assinatura do app** no Firebase | **Você** | Login de quem baixa da loja |
 | 7 | Acesso à produção + envio | **Você** | Revisão de até 7 dias |
 
-**1 e 2 são independentes** e podem correr juntos. Só o 3 é trabalho meu.
+**Daqui em diante tudo é seu.** Não há mais código nem asset pendente — o que falta é
+console, aparelho e calendário. O passo 5 é onde o relógio dos 14 dias começa.
 
 #### Os dois pontos onde isso costuma falhar
 

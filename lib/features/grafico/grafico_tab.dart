@@ -167,22 +167,34 @@ class _Rosca extends StatelessWidget {
                 sectionsSpace: 2,
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(estourou ? l10n.graficoComprometido : l10n.graficoRendaDoMes,
-                    style: context.texts.labelMedium
-                        ?.copyWith(color: scheme.onSurfaceVariant)),
-                const SizedBox(height: 2),
-                Text(
-                  estourou
-                      ? l10n.graficoPercentualDaRenda(
-                          percentualComprometido.round())
-                      : brl(metodologia.renda),
-                  style: context.texts.headlineSmall,
-                ),
-              ],
-            ),
+            // Três linhas quando estourou: rótulo, número e complemento. Numa
+            // linha só, "102% da renda" transborda o furo da rosca — e o furo
+            // não pode crescer sem afinar demais as fatias.
+            Builder(builder: (context) {
+              final rotulo = context.texts.labelMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                      estourou
+                          ? l10n.graficoComprometido
+                          : l10n.graficoRendaDoMes,
+                      style: rotulo),
+                  const SizedBox(height: 2),
+                  Text(
+                    estourou
+                        ? l10n.graficoPercentual(percentualComprometido.round())
+                        : brl(metodologia.renda),
+                    style: context.texts.headlineSmall,
+                  ),
+                  if (estourou) ...[
+                    const SizedBox(height: 2),
+                    Text(l10n.graficoDaRenda, style: rotulo),
+                  ],
+                ],
+              );
+            }),
           ],
         ),
       ),

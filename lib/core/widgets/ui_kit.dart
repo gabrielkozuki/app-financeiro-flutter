@@ -36,7 +36,9 @@ class SheetHeader extends StatelessWidget {
                 Text(titulo, style: context.texts.titleLarge),
                 if (subtitulo != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    // 2px colava o subtítulo no título. Vale para todas as
+                    // folhas, não só a de fatura.
+                    padding: const EdgeInsets.only(top: 4),
                     child: Text(subtitulo!,
                         style: context.texts.bodyMedium
                             ?.copyWith(color: context.colors.onSurfaceVariant)),
