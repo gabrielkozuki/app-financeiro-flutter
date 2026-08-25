@@ -6,6 +6,7 @@ import '../../core/format/dates.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/ui_kit.dart';
+import '../../data/auth_service.dart';
 import '../../data/backup_service.dart';
 import '../../domain/entities/usuario.dart';
 import '../../l10n/app_localizations.dart';
@@ -79,14 +80,21 @@ class _ContaBackupPageState extends ConsumerState<ContaBackupPage> {
         children: [
           SectionLabel(l10n.backupSecaoEntrar),
           _Texto(l10n.backupEntrarTexto),
-          // "Entrar com a Apple" fica OCULTO enquanto o destino for só o Play:
-          // `sign_in_with_apple` exige conta paga no Apple Developer Program, e
-          // exibir uma opção permanentemente desabilitada é pior que não exibir.
+          // ORDEM IMPORTA: Apple ACIMA do Google. A diretriz 4.8 da App Store
+          // exige uma alternativa equivalente e com privacidade quando há login
+          // de terceiros, e as HIG pedem destaque. É exigência de revisão, não
+          // estética — não reordene.
           //
-          // Quando o iOS entrar, ele volta ACIMA do Google — a diretriz 4.8 da
-          // App Store exige alternativa equivalente e com privacidade quando há
-          // login de terceiros. A ordem é exigência de revisão, não estética.
+          // No Android a Apple não aparece: lá o pacote cairia num fluxo web,
+          // pior que o login do Google, para atender uma exigência que não vale
+          // naquela loja.
           _Grupo(children: [
+            if (AuthService.appleDisponivel)
+              ListTile(
+                leading: const Icon(Icons.apple, size: 30),
+                title: Text(l10n.backupEntrarApple),
+                onTap: _ocupado ? null : _entrarComApple,
+              ),
             ListTile(
               leading: const Icon(Icons.g_mobiledata, size: 32),
               title: Text(l10n.backupEntrarGoogle),
@@ -166,15 +174,26 @@ class _ContaBackupPageState extends ConsumerState<ContaBackupPage> {
     }
   }
 
-  Future<void> _entrar() => _rodar(() async {
+  Future<void> _entrar() =>
+      _entrarCom((s) => s.entrarComGoogle());
+
+  Future<void> _entrarComApple() =>
+      _entrarCom((s) => s.entrarComApple());
+
+  /// Os dois provedores divergem só na obtenção da credencial. Daí para frente
+  /// — cancelamento, erro e reconciliação dos dados — o caminho é o mesmo, e
+  /// duplicá-lo seria a forma de os dois fluxos divergirem numa correção
+  /// futura.
+  Future<void> _entrarCom(Future<Usuario?> Function(AuthService) obter) =>
+      _rodar(() async {
         final l10n = AppLocalizations.of(context);
         Usuario? u;
         final ok = await executarComFeedback(
           context,
-          () async => u = await ref.read(authServiceProvider).entrarComGoogle(),
+          () async => u = await obter(ref.read(authServiceProvider)),
           mensagemErro: l10n.backupErroEntrar,
         );
-        // `u == null` com `ok == true` é o usuário fechando a folha do Google:
+        // `u == null` com `ok == true` é o usuário fechando a folha do provedor:
         // cancelar não é falha e não merece aviso nenhum.
         if (!ok || u == null || !mounted) return;
         await _reconciliar(u!);

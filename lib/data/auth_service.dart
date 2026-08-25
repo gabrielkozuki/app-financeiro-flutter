@@ -1,17 +1,23 @@
+import 'dart:convert';
+import 'dart:io' show Platform;
+
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../domain/entities/usuario.dart';
 
-/// Autenticação com a conta Google, via Firebase Auth.
+/// Autenticação via Firebase Auth: **Google** e, no iOS, **Apple**.
 ///
-/// **Só Google.** Foi decidido contra e-mail/senha porque o login aqui existe
-/// para dar backup: uma senha esquecida transformaria a rede de proteção na
-/// própria perda de dados. Com o Google, recuperar a conta é problema do
-/// Google. E, como o app sai só na Play Store, todo usuário já tem uma.
+/// **Sem e-mail/senha**, por decisão: o login aqui existe para dar backup, e
+/// uma senha esquecida transformaria a rede de proteção na própria perda de
+/// dados. Com provedor de identidade, recuperar a conta é problema dele.
 ///
-/// "Entrar com a Apple" fica para quando o iOS entrar — `sign_in_with_apple`
-/// exige conta paga no Apple Developer Program.
+/// "Entrar com a Apple" é exigência da diretriz 4.8 da App Store quando há
+/// login de terceiros — não é opcional lá. No Android fica oculto: o
+/// `sign_in_with_apple` cairia num fluxo web, e um caminho pior para uma
+/// exigência que não vale naquela loja.
 class AuthService {
   /// Client **web** (`client_type: 3` no `google-services.json`), não o Android.
   /// É a audiência do `idToken` que o Firebase valida; passar o Android aqui
@@ -30,6 +36,11 @@ class AuthService {
     await GoogleSignIn.instance.initialize(serverClientId: _serverClientId);
     _googleIniciado = true;
   }
+
+  /// Onde faz sentido oferecer "Entrar com a Apple". Fora do ecossistema
+  /// Apple o pacote cai num fluxo web, que é pior que o login do Google e não
+  /// é exigido por loja nenhuma.
+  static bool get appleDisponivel => Platform.isIOS || Platform.isMacOS;
 
   Usuario? get atual => _converter(_auth.currentUser);
 
@@ -60,8 +71,54 @@ class AuthService {
     return _converter((await _auth.signInWithCredential(credencial)).user);
   }
 
+  /// Login com Apple. Devolve `null` quando o usuário cancela.
+  ///
+  /// O `nonce` não é zelo extra: o Firebase **recusa** o token sem ele. Vai o
+  /// hash SHA-256 para a Apple e o valor cru para o Firebase, que refaz o hash
+  /// e compara — é o que impede reaproveitar um token interceptado.
+  Future<Usuario?> entrarComApple() async {
+    final cruz = generateNonce();
+    final AuthorizationCredentialAppleID credencialApple;
+    try {
+      credencialApple = await SignInWithApple.getAppleIDCredential(
+        scopes: const [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: sha256.convert(utf8.encode(cruz)).toString(),
+      );
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) return null;
+      rethrow;
+    }
+
+    final credencial = OAuthProvider('apple.com').credential(
+      idToken: credencialApple.identityToken,
+      rawNonce: cruz,
+    );
+    final usuario = (await _auth.signInWithCredential(credencial)).user;
+
+    // A Apple só manda nome e e-mail no PRIMEIRO login daquela conta; nas
+    // vezes seguintes vêm nulos. Sem gravar agora, o app fica sem nome para
+    // sempre — e não há como pedir de novo sem o usuário revogar o acesso nos
+    // ajustes do aparelho.
+    final nome = [
+      credencialApple.givenName,
+      credencialApple.familyName,
+    ].whereType<String>().join(' ').trim();
+    if (usuario != null && nome.isNotEmpty && usuario.displayName == null) {
+      await usuario.updateDisplayName(nome);
+      await usuario.reload();
+      return _converter(_auth.currentUser);
+    }
+    return _converter(usuario);
+  }
+
   /// Sai das duas pontas. Sem o `signOut` do Google, o próximo login reusa a
   /// conta anterior em silêncio e não há como trocar de usuário.
+  /// Sair da Apple não existe como operação: quem controla a sessão é o
+  /// sistema, e revogar o acesso é feito nos Ajustes do aparelho. Sair do
+  /// Firebase basta.
   Future<void> sair() async {
     await _garantirGoogle();
     await GoogleSignIn.instance.signOut();
@@ -78,8 +135,15 @@ class AuthService {
   Future<void> excluirConta() async {
     final usuario = _auth.currentUser;
     if (usuario == null) return;
-    await _garantirGoogle();
-    await GoogleSignIn.instance.disconnect();
+    // `disconnect` revoga o consentimento no lado do Google. Só faz sentido
+    // para quem entrou por lá; para a Apple, a revogação é responsabilidade do
+    // usuário nos Ajustes, e o `delete()` já remove a conta no Firebase.
+    final porGoogle = usuario.providerData
+        .any((p) => p.providerId == GoogleAuthProvider.PROVIDER_ID);
+    if (porGoogle) {
+      await _garantirGoogle();
+      await GoogleSignIn.instance.disconnect();
+    }
     await usuario.delete();
   }
 

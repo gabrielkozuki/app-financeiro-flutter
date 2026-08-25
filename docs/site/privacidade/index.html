@@ -116,7 +116,7 @@
 
   <p class="meta" id="pt">
     <b>Última atualização:</b> 24 de agosto de 2026 · <b>Versão:</b> 1.0<br>
-    Aplica-se ao aplicativo <b>Conta em Dia</b>, versão 1.0.0, distribuído no Brasil pela Google Play Store.
+    Aplica-se ao aplicativo <b>Conta em Dia</b>, versão 1.0.0, distribuído no Brasil pela Google Play Store e pela App Store.
   </p>
 
   <div class="resumo">
@@ -156,7 +156,7 @@
 
   <h2 id="se-voce-entrar">3. O que acontece se eu entrar na conta?</h2>
   <p>
-    Entrar é uma ação deliberada sua, em <b>Configurações → Conta e backup</b>. A partir daí,
+    Entrar é uma ação deliberada sua, em <b>Configurações → Conta e backup</b>, com a sua conta Google ou Apple. A partir daí,
     e somente a partir daí:
   </p>
   <div class="rolagem">
@@ -164,8 +164,8 @@
       <thead><tr><th>Dado</th><th>Quando</th><th>Para quê</th></tr></thead>
       <tbody>
         <tr>
-          <td>Identificador da sua conta Google (UID), nome de exibição e e-mail</td>
-          <td>Ao entrar com o Google</td>
+          <td>Identificador da conta (UID), nome de exibição e e-mail</td>
+          <td>Ao entrar com o Google ou com a Apple</td>
           <td>Identificar de quem é o backup e permitir que só você o acesse</td>
         </tr>
         <tr>
@@ -269,7 +269,7 @@
       <tbody>
         <tr><td>Acesso à internet</td><td>Entrar na conta e enviar/restaurar o backup</td></tr>
         <tr><td>Estado da conexão</td><td>Saber se há rede antes de tentar</td></tr>
-        <tr><td>Serviços do Google</td><td>Necessária para o login com a conta Google</td></tr>
+        <tr><td>Serviços do Google</td><td>Necessária para o login com a conta Google, no Android</td></tr>
       </tbody>
     </table>
   </div>
@@ -326,21 +326,37 @@
   <p>
     Escreva para
     <a href="mailto:privacidade.contaemdia@gmail.com">privacidade.contaemdia@gmail.com</a>
-    a partir do <b>mesmo e-mail da conta Google</b> que você usou para entrar, pedindo a
+    a partir do <b>mesmo e-mail da conta</b> que você usou para entrar, pedindo a
     exclusão. Apagamos a conta e o backup e confirmamos por e-mail em até 15 dias.
   </p>
 
   <h3>E para apagar só os dados do aparelho?</h3>
   <p>
     <b>Configurações → Apagar todos os dados</b> elimina tudo o que está no aparelho,
-    imediatamente e sem reversão. Desinstalar o aplicativo também apaga o banco local — o app
-    usa <code>allowBackup="false"</code>, então o Android não guarda uma cópia no backup do
-    sistema.
+    imediatamente e sem reversão. Desinstalar o aplicativo também apaga o banco local.
   </p>
+  <p>
+    <b>O backup do sistema operacional se comporta de forma diferente nas duas plataformas:</b>
+  </p>
+  <div class="rolagem">
+    <table>
+      <thead><tr><th>Plataforma</th><th>O sistema guarda uma cópia?</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Android</td>
+          <td><b>Não.</b> O aplicativo usa <code>allowBackup="false"</code>, então o Android não inclui seus dados no backup do sistema</td>
+        </tr>
+        <tr>
+          <td>iPhone e iPad</td>
+          <td><b>Sim.</b> Os dados ficam no diretório do aplicativo, que entra no backup do aparelho. Se você usa o backup do iCloud, restaurá-lo em outro iPhone traz seus dados de volta</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="destaque-secao">
     <p>
-      <b>Atenção:</b> se você nunca entrou na conta, não existe backup em lugar nenhum. Ao
-      desinstalar o aplicativo ou trocar de aparelho, <b>seus dados são perdidos
+      <b>Atenção, no Android:</b> se você nunca entrou na conta, não existe backup em lugar
+      nenhum. Ao desinstalar o aplicativo ou trocar de aparelho, <b>seus dados são perdidos
       definitivamente</b>. Use a exportação ou o backup na nuvem se quiser preservá-los.
     </p>
   </div>
@@ -403,12 +419,12 @@
 
   <p class="meta">
     <b>Last updated:</b> August 24, 2026 · <b>Version:</b> 1.0<br>
-    Applies to <b>Conta em Dia</b> version 1.0.0, distributed in Brazil through the Google Play Store.
+    Applies to <b>Conta em Dia</b> version 1.0.0, distributed in Brazil through the Google Play Store and the App Store.
   </p>
 
   <div class="resumo">
     <p><strong>The app works fully without an account, and without an account nothing leaves your device.</strong> There is no mandatory sign-up, and you never need to sign in to use any feature.</p>
-    <p>Signing in is optional and serves one purpose: keeping a copy of your data in your account so you can recover it on another device. Until you sign in, we receive nothing at all.</p>
+    <p>Signing in with Google or Apple is optional and serves one purpose: keeping a copy of your data in your account so you can recover it on another device. Until you sign in, we receive nothing at all.</p>
   </div>
 
   <p>
@@ -512,8 +528,10 @@
   </p>
   <p>
     To erase only the local data, use <b>Settings → Delete all data</b>, or uninstall the app.
-    The app sets <code>allowBackup="false"</code>, so Android keeps no copy in the system backup
-    — if you never signed in, uninstalling means the data is permanently lost.
+    System backup behaves differently per platform: on Android the app sets
+    <code>allowBackup="false"</code>, so no copy is kept — if you never signed in, uninstalling
+    means the data is permanently lost. On iPhone and iPad the data sits in the app's directory,
+    which is included in the device backup, so restoring an iCloud backup brings it back.
   </p>
 
   <h2>How long do you keep it?</h2>
