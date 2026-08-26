@@ -144,3 +144,5 @@ precisa justificar o ganho.
   (por custo: US$ 25 único vs US$ 99/ano da Apple). App Store fica para depois, com os assets
   de iOS prontos; APK avulso descartado.
 - `docs/politica-privacidade.md` — o que a página precisa responder e onde ela mora.
+- `docs/proximas-versoes.md` — o que vem depois da v1.0.0: sugestões vindas do teste fechado e
+  as dívidas conhecidas, cada uma com o porquê de ter sido deixada.

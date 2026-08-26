@@ -170,7 +170,14 @@ class _Rosca extends StatelessWidget {
             // Três linhas quando estourou: rótulo, número e complemento. Numa
             // linha só, "102% da renda" transborda o furo da rosca — e o furo
             // não pode crescer sem afinar demais as fatias.
-            Builder(builder: (context) {
+            // O furo tem 144px de diâmetro (centerSpaceRadius 72) e não pode
+            // crescer sem afinar as fatias, que são o dado. Então é o texto que
+            // se ajusta: a largura fica presa dentro do furo e o valor encolhe
+            // em vez de transbordar sobre o anel — "R$ 12.345,67" não cabe no
+            // mesmo corpo que "R$ 3.000,00".
+            SizedBox(
+              width: 128,
+              child: Builder(builder: (context) {
               final rotulo = context.texts.labelMedium
                   ?.copyWith(color: scheme.onSurfaceVariant);
               return Column(
@@ -182,11 +189,16 @@ class _Rosca extends StatelessWidget {
                           : l10n.graficoRendaDoMes,
                       style: rotulo),
                   const SizedBox(height: 2),
-                  Text(
-                    estourou
-                        ? l10n.graficoPercentual(percentualComprometido.round())
-                        : brl(metodologia.renda),
-                    style: context.texts.headlineSmall,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      estourou
+                          ? l10n.graficoPercentual(
+                              percentualComprometido.round())
+                          : brl(metodologia.renda),
+                      maxLines: 1,
+                      style: context.texts.headlineSmall,
+                    ),
                   ),
                   if (estourou) ...[
                     const SizedBox(height: 2),
@@ -194,7 +206,7 @@ class _Rosca extends StatelessWidget {
                   ],
                 ],
               );
-            }),
+            })),
           ],
         ),
       ),
@@ -212,7 +224,12 @@ class _LinhaGrupo extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final textTheme = context.texts;
     final scheme = context.colors;
-    final meta = item.metaPercentual.round();
+    // RF-12 pede o limite em R$ por grupo. Ele sempre foi calculado
+    // (`calcular_metodologia.dart`) e nunca exibido; agora ocupa o lugar do
+    // percentual da meta, que era redundante — o percentual realizado já
+    // aparece em corpo grande à direita, e valor em reais é acionável de um
+    // jeito que "50%" não é.
+    final meta = brl(item.limite);
     final situacaoTexto = switch (item.situacao) {
       Situacao.acima => l10n.graficoMetaAcima(meta),
       Situacao.abaixo => l10n.graficoMetaAbaixo(meta),
@@ -255,24 +272,25 @@ class _LinhaGrupo extends StatelessWidget {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('${item.percentualRealizado.round()}%',
-                      style: textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold)),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(situacaoIcone,
-                          size: 13, color: scheme.onSurfaceVariant),
-                      const SizedBox(width: 2),
-                      Text(situacaoTexto,
-                          style: textTheme.bodySmall
-                              ?.copyWith(color: scheme.onSurfaceVariant)),
-                    ],
-                  ),
-                ],
+              Text('${item.percentualRealizado.round()}%',
+                  style: textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          // A meta em reais ("meta R$ 1.500,00") é bem mais larga que a antiga
+          // em porcentagem ("meta 50%"). Empilhada à direita, ela roubava
+          // largura do `Expanded` até o nome do grupo quebrar no meio da
+          // palavra. Numa linha própria, nome e número têm o espaço inteiro e
+          // o texto cabe em qualquer tamanho de fonte.
+          const SizedBox(height: AppTheme.spaceXs),
+          Row(
+            children: [
+              Icon(situacaoIcone, size: 13, color: scheme.onSurfaceVariant),
+              const SizedBox(width: 2),
+              Expanded(
+                child: Text(situacaoTexto,
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
               ),
             ],
           ),

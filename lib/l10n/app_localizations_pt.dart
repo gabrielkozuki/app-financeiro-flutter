@@ -455,18 +455,18 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String graficoMetaAcima(int meta) {
-    return 'meta $meta% · acima da meta';
+  String graficoMetaAcima(String meta) {
+    return 'meta $meta · acima da meta';
   }
 
   @override
-  String graficoMetaAbaixo(int meta) {
-    return 'meta $meta% · abaixo da meta';
+  String graficoMetaAbaixo(String meta) {
+    return 'meta $meta · abaixo da meta';
   }
 
   @override
-  String graficoMetaDentro(int meta) {
-    return 'meta $meta% · na meta';
+  String graficoMetaDentro(String meta) {
+    return 'meta $meta · na meta';
   }
 
   @override
@@ -928,4 +928,38 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get graficoDaRenda => 'da renda';
+
+  @override
+  String contaSubtituloPaga(String grupo, String data) {
+    return '$grupo · pago em $data';
+  }
+
+  @override
+  String get onboardingOutraConta => 'Outra';
+
+  @override
+  String get onboardingOutraContaTitulo => 'Nova conta';
+
+  @override
+  String get onboardingOutraContaNome => 'Nome da conta';
+
+  @override
+  String get onboardingOutraContaAjuda =>
+      'Você ajusta grupo e vencimento depois, na aba Contas.';
+
+  @override
+  String get entradaPausar => 'Pausar';
+
+  @override
+  String get entradaRetomar => 'Retomar';
+
+  @override
+  String get entradaPausada => 'Pausada';
+
+  @override
+  String get entradaPausadaAjuda =>
+      'Não entra no cálculo dos próximos meses. O histórico continua.';
+
+  @override
+  String get entradaErroPausar => 'Não foi possível alterar esta renda.';
 }

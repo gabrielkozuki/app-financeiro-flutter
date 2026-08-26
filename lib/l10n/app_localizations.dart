@@ -855,20 +855,20 @@ abstract class AppLocalizations {
   /// No description provided for @graficoMetaAcima.
   ///
   /// In pt, this message translates to:
-  /// **'meta {meta}% · acima da meta'**
-  String graficoMetaAcima(int meta);
+  /// **'meta {meta} · acima da meta'**
+  String graficoMetaAcima(String meta);
 
   /// No description provided for @graficoMetaAbaixo.
   ///
   /// In pt, this message translates to:
-  /// **'meta {meta}% · abaixo da meta'**
-  String graficoMetaAbaixo(int meta);
+  /// **'meta {meta} · abaixo da meta'**
+  String graficoMetaAbaixo(String meta);
 
   /// No description provided for @graficoMetaDentro.
   ///
   /// In pt, this message translates to:
-  /// **'meta {meta}% · na meta'**
-  String graficoMetaDentro(int meta);
+  /// **'meta {meta} · na meta'**
+  String graficoMetaDentro(String meta);
 
   /// No description provided for @rendasTitulo.
   ///
@@ -1679,6 +1679,66 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'da renda'**
   String get graficoDaRenda;
+
+  /// No description provided for @contaSubtituloPaga.
+  ///
+  /// In pt, this message translates to:
+  /// **'{grupo} · pago em {data}'**
+  String contaSubtituloPaga(String grupo, String data);
+
+  /// No description provided for @onboardingOutraConta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outra'**
+  String get onboardingOutraConta;
+
+  /// No description provided for @onboardingOutraContaTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova conta'**
+  String get onboardingOutraContaTitulo;
+
+  /// No description provided for @onboardingOutraContaNome.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome da conta'**
+  String get onboardingOutraContaNome;
+
+  /// No description provided for @onboardingOutraContaAjuda.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ajusta grupo e vencimento depois, na aba Contas.'**
+  String get onboardingOutraContaAjuda;
+
+  /// No description provided for @entradaPausar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pausar'**
+  String get entradaPausar;
+
+  /// No description provided for @entradaRetomar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Retomar'**
+  String get entradaRetomar;
+
+  /// No description provided for @entradaPausada.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pausada'**
+  String get entradaPausada;
+
+  /// No description provided for @entradaPausadaAjuda.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não entra no cálculo dos próximos meses. O histórico continua.'**
+  String get entradaPausadaAjuda;
+
+  /// No description provided for @entradaErroPausar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível alterar esta renda.'**
+  String get entradaErroPausar;
 }
 
 class _AppLocalizationsDelegate

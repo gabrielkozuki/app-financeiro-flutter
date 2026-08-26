@@ -10,7 +10,8 @@ class Entrada {
     required this.tipo,
     this.diaRecebimento,
     this.mesReferencia,
-    this.ativa = true,
+    this.pausadaDesde,
+    this.retomadaEm,
   });
 
   final int id;
@@ -24,5 +25,29 @@ class Entrada {
   /// Mês (`YYYY-MM`) ao qual a entrada pontual pertence (só para pontuais).
   final String? mesReferencia;
 
-  final bool ativa;
+  /// Mês (`YYYY-MM`) a partir do qual a entrada deixou de contar. Nulo quando
+  /// nunca foi pausada.
+  final String? pausadaDesde;
+
+  /// Mês em que voltou a contar. Nulo quando segue pausada.
+  final String? retomadaEm;
+
+  /// Esta entrada compõe a renda de [mes]?
+  ///
+  /// A comparação é textual porque `YYYY-MM` com zero à esquerda é
+  /// cronologicamente ordenável — mesma propriedade que `ehMesPassado` usa.
+  ///
+  /// A pausa vale **do mês escolhido em diante**, nunca para trás: pausar hoje
+  /// não pode alterar o que já aconteceu. E retomar vale do mês escolhido em
+  /// diante, deixando o intervalo pausado como estava.
+  bool contaEm(String mes) {
+    final desde = pausadaDesde;
+    if (desde == null) return true;
+    if (mes.compareTo(desde) < 0) return true;
+    final volta = retomadaEm;
+    return volta != null && mes.compareTo(volta) >= 0;
+  }
+
+  /// Estado no mês exibido, para a tela decidir entre "Pausar" e "Retomar".
+  bool pausadaEm(String mes) => !contaEm(mes);
 }

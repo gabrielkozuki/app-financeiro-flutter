@@ -24,21 +24,29 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
       : super(executor ?? driftDatabase(name: 'app_financeiro'));
 
-  /// Versão única enquanto o app está em desenvolvimento: o esquema muda e o
-  /// aparelho de teste é reinstalado, então não há banco antigo a preservar e
-  /// nenhuma migração a escrever. A unicidade de (conta, mês) e (cartão, mês)
-  /// vem da constraint UNIQUE que o `uniqueKeys` de `tables.dart` emite no
-  /// CREATE TABLE — e é ela o alvo do `ON CONFLICT ... DO NOTHING` da virada.
+  /// **Regime novo desde a publicação (25/08/2026).** Enquanto o app era só
+  /// desenvolvimento, a versão era única e mudar tabela significava desinstalar
+  /// o aparelho de teste. Agora existem bancos nas mãos de testadores: toda
+  /// alteração de esquema sobe esta versão e escreve um `onUpgrade` data-safe.
   ///
-  /// **Ao publicar, isto muda de regime:** a partir da primeira versão na loja
-  /// toda alteração de tabela exige subir esta versão e escrever um `onUpgrade`
-  /// data-safe, porque aí existem bancos de usuários reais para preservar.
+  /// v2 — a pausa de renda virou vigência (`pausadaDesde`/`retomadaEm`) no
+  /// lugar do booleano `ativa`.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
+        onUpgrade: (m, de, para) async {
+          if (de < 2) {
+            // `ativa` (booleano) sai; `pausadaDesde`/`retomadaEm` entram.
+            // Nenhum build publicado chegou a gravar `ativa = false` — o
+            // recurso de pausar nasceu junto com estas colunas —, então não há
+            // valor antigo a converter: as novas nascem nulas, que é
+            // exatamente "nunca pausada".
+            await m.alterTable(TableMigration(entradas));
+          }
+        },
         // O SQLite ignora as chaves estrangeiras por padrão: as `references`
         // de `tables.dart` seriam só documentação. Ligar aqui (e não no
         // `driftDatabase`) faz valer também nos testes, que constroem o banco

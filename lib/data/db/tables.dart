@@ -14,7 +14,16 @@ class Entradas extends Table {
   IntColumn get tipo => intEnum<TipoEntrada>()();
   IntColumn get diaRecebimento => integer().nullable()();
   TextColumn get mesReferencia => text().nullable()();
-  BoolColumn get ativa => boolean().withDefault(const Constant(true))();
+  /// Vigência da pausa, em `YYYY-MM`. Substituiu o booleano `ativa` na
+  /// schemaVersion 2: pausar precisa valer **daquele mês em diante**, não
+  /// retroativamente, senão pausar hoje reescreveria meses passados que ainda
+  /// leem ao vivo (os reabertos).
+  ///
+  /// `pausadaDesde` nulo = nunca pausada. `retomadaEm` nulo = segue pausada.
+  /// Retomar em outubro deixa o intervalo [pausadaDesde, outubro) sem contar e
+  /// outubro em diante contando.
+  TextColumn get pausadaDesde => text().nullable()();
+  TextColumn get retomadaEm => text().nullable()();
 }
 
 @DataClassName('ContaRow')

@@ -24,8 +24,9 @@ class EntradasPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final async = ref.watch(entradasDoMesProvider);
+    final async = ref.watch(entradasVisiveisNoMesProvider);
     final mes = ref.watch(mesSelecionadoProvider);
+    final mesChave = ref.watch(mesReferenciaProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +46,8 @@ class EntradasPage extends ConsumerWidget {
             s,
             contexto: 'EntradasPage',
             titulo: l10n.erroCarregarRendas,
-            onTentarNovamente: () => ref.invalidate(entradasDoMesProvider),
+            onTentarNovamente: () =>
+                ref.invalidate(entradasVisiveisNoMesProvider),
           ),
           data: (entradas) {
             final recorrentes = entradas
@@ -69,12 +71,12 @@ class EntradasPage extends ConsumerWidget {
                 _CardTotal(total: total),
                 if (recorrentes.isNotEmpty) ...[
                   SectionLabel(l10n.rendasRecorrentes),
-                  for (final e in recorrentes) _tile(context, e),
+                  for (final e in recorrentes) _tile(context, ref, mesChave, e),
                 ],
                 if (pontuais.isNotEmpty) ...[
                   SectionLabel(
                       l10n.rendasPontuaisDoMes(mesAno(mes, l10n.localeName))),
-                  for (final e in pontuais) _tile(context, e),
+                  for (final e in pontuais) _tile(context, ref, mesChave, e),
                 ],
               ],
             );
@@ -84,8 +86,11 @@ class EntradasPage extends ConsumerWidget {
     );
   }
 
-  Widget _tile(BuildContext context, Entrada e) {
+  Widget _tile(
+      BuildContext context, WidgetRef ref, String mesChave, Entrada e) {
     final l10n = AppLocalizations.of(context);
+    final pausada = e.pausadaEm(mesChave);
+    final recorrente = e.tipo == TipoEntrada.recorrente;
     return Padding(
       padding: const EdgeInsets.symmetric(
           horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceXs),
@@ -97,16 +102,81 @@ class EntradasPage extends ConsumerWidget {
             cor: context.colors.primary,
             tamanho: 36,
           ),
-          title: Text(e.nome),
-          subtitle: Text(e.tipo == TipoEntrada.recorrente
-              ? l10n.rendaRecebeDia('${e.diaRecebimento ?? '-'}')
-              : l10n.rendaSoEm(e.mesReferencia ?? '-')),
-          trailing: Text(brl(e.valorLiquido),
-              style: const TextStyle(fontWeight: FontWeight.w600)),
+          title: Text(e.nome,
+              style: TextStyle(
+                  color: pausada ? context.colors.onSurfaceVariant : null)),
+          // Renda pausada anuncia o estado no lugar do dia de recebimento —
+          // que deixou de valer enquanto ela não conta.
+          subtitle: Text(pausada
+              ? l10n.entradaPausada
+              : recorrente
+                  ? l10n.rendaRecebeDia('${e.diaRecebimento ?? '-'}')
+                  : l10n.rendaSoEm(e.mesReferencia ?? '-')),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(brl(e.valorLiquido),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: pausada ? context.colors.onSurfaceVariant : null,
+                      decoration:
+                          pausada ? TextDecoration.lineThrough : null)),
+              // Só recorrente: pontual pertence a um mês e já não conta nos
+              // seguintes. A ação fica NA LISTA, e não no formulário, porque
+              // ela depende do mês exibido — e o seletor de mês está logo
+              // acima, na mesma tela.
+              if (recorrente)
+                IconButton(
+                  onPressed: () => _alternarPausa(context, ref, mesChave, e),
+                  icon: Icon(pausada
+                      ? Icons.play_arrow_outlined
+                      : Icons.pause_outlined),
+                  tooltip:
+                      pausada ? l10n.entradaRetomar : l10n.entradaPausar,
+                ),
+            ],
+          ),
           onTap: () => _abrirForm(context, entrada: e),
         ),
       ),
     );
+  }
+
+  /// Pausa ou retoma **a partir do mês exibido**, nunca retroativamente.
+  ///
+  /// Pausar em agosto: `pausadaDesde = '2026-08'` e `retomadaEm` limpo — de
+  /// agosto em diante para de contar. Retomar em outubro: `retomadaEm =
+  /// '2026-10'` — agosto e setembro seguem sem contar, outubro em diante volta.
+  ///
+  /// Retomar num mês anterior ao da pausa desfaz a pausa inteira: é o gesto de
+  /// "eu não queria ter pausado", e não faria sentido gravar um intervalo que
+  /// termina antes de começar.
+  Future<void> _alternarPausa(
+      BuildContext context, WidgetRef ref, String mesChave, Entrada e) async {
+    final l10n = AppLocalizations.of(context);
+    final pausada = e.pausadaEm(mesChave);
+    final desfaz =
+        pausada && (e.pausadaDesde == null || mesChave.compareTo(e.pausadaDesde!) <= 0);
+
+    final atualizada = Entrada(
+      id: e.id,
+      nome: e.nome,
+      valorLiquido: e.valorLiquido,
+      tipo: e.tipo,
+      diaRecebimento: e.diaRecebimento,
+      mesReferencia: e.mesReferencia,
+      pausadaDesde: pausada ? (desfaz ? null : e.pausadaDesde) : mesChave,
+      retomadaEm: pausada ? (desfaz ? null : mesChave) : null,
+    );
+
+    final ok = await executarComFeedback(
+      context,
+      () => ref.read(entradasRepoProvider).atualizar(atualizada),
+      mensagemErro: l10n.entradaErroPausar,
+    );
+    // A renda entra no cálculo do painel: invalidar só a lista deixaria o
+    // gráfico e a checklist mostrando a renda antiga.
+    if (ok && context.mounted) aposMudancaAmpla(ref);
   }
 
   Future<void> _abrirForm(BuildContext context, {Entrada? entrada}) {
@@ -207,6 +277,10 @@ class _EntradaFormState extends ConsumerState<_EntradaForm> {
       tipo: _tipo,
       diaRecebimento: recorrente ? int.tryParse(_dia.text) : null,
       mesReferencia: recorrente ? null : (widget.entrada?.mesReferencia ?? mes),
+      // A vigência da pausa é preservada: editar nome ou valor não pode
+      // despausar. Quem altera a pausa é o botão da lista, que sabe o mês.
+      pausadaDesde: widget.entrada?.pausadaDesde,
+      retomadaEm: widget.entrada?.retomadaEm,
     );
 
     final ok = await executarComFeedback(

@@ -46,7 +46,10 @@ primeiro.
 | ~~2~~ | ~~Deploy de `docs/site/`~~ | — | ✅ feito |
 | ~~3~~ | ~~Ficha da loja~~ | — | ✅ 25/08/2026, em `~/Desktop/conta-em-dia-play/` |
 | ~~4~~ | ~~Testar login e backup em aparelho~~ | — | ✅ 25/08/2026, emulador |
-| 5 | Criar o app no console, responder as declarações, subir o AAB, convidar 12+ | **Você** | **Aqui o relógio começa** |
+| ~~5a~~ | ~~Console: declarações, ficha, AAB enviado~~ | — | ✅ |
+| ~~5b~~ | ~~Revisão do teste fechado~~ | — | ✅ **aprovado em 25/08/2026** |
+| 5c | **Juntar 12 testadores** (2 até agora) | **Você** | **O relógio só começa no 12º** |
+| 5d | 14 dias corridos com os 12 ativos e usando | — | Espera pura |
 | 6 | Registrar o SHA-1 da **chave de assinatura do app** no Firebase | **Você** | Login de quem baixa da loja |
 | 7 | Acesso à produção + envio | **Você** | Revisão de até 7 dias |
 

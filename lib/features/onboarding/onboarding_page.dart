@@ -40,6 +40,10 @@ class _RendaRascunho {
   final double valor;
 }
 
+/// Dia herdado pela conta criada em "+ Outra": o vencimento mais comum entre
+/// as sugestões. Ajustável depois, na aba Contas.
+const _diaPadrao = 10;
+
 /// Sugestões prontas para reduzir o atrito do cadastro inicial (risco #4 da
 /// seção 12): o usuário toca e ajusta o valor. O nome traduzido é o que vai
 /// para o banco — a conta nasce com o rótulo que o usuário tocou.
@@ -107,6 +111,72 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     if (valor == null) return;
     setState(() =>
         _contas.add(_ContaRascunho(sugestaoNome, valor, grupo, dia)));
+  }
+
+  /// Conta que não está entre as sugestões — financiamento, plano de saúde,
+  /// pensão. Sem ela, quem tem a maior despesa fora da lista termina o
+  /// onboarding sem cadastrá-la.
+  ///
+  /// **Só nome e valor, de propósito.** O onboarding existe para reduzir o
+  /// atrito do cadastro inicial (risco #4 da seção 12); abrir o formulário
+  /// completo aqui — com grupo, recorrência, parcelas e vencimento — devolveria
+  /// exatamente o atrito que os chips removem. Grupo e dia herdam o padrão e
+  /// são ajustáveis depois, na aba Contas.
+  Future<void> _adicionarOutraConta() async {
+    final l10n = AppLocalizations.of(context);
+    var nome = '';
+    var valor = 0.0;
+
+    final confirmou = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, refazer) => AlertDialog(
+          title: Text(l10n.onboardingOutraContaTitulo),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                decoration:
+                    InputDecoration(labelText: l10n.onboardingOutraContaNome),
+                onChanged: (t) => refazer(() => nome = t.trim()),
+              ),
+              const SizedBox(height: AppTheme.spaceMd),
+              CampoMoeda(
+                labelText: l10n.campoValor,
+                onChanged: (t) => refazer(() => valor = parseMoeda(t)),
+              ),
+              const SizedBox(height: AppTheme.spaceMd),
+              Text(l10n.onboardingOutraContaAjuda,
+                  style: context.texts.bodySmall
+                      ?.copyWith(color: context.colors.onSurfaceVariant)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.acaoCancelar),
+            ),
+            // Desabilitado até haver nome E valor: adicionar uma conta sem
+            // nome deixaria uma linha em branco na lista, e sem valor ela não
+            // entraria em cálculo nenhum. Daí o StatefulBuilder — o botão
+            // precisa reagir ao que está sendo digitado.
+            FilledButton(
+              onPressed: nome.isEmpty || valor <= 0
+                  ? null
+                  : () => Navigator.pop(ctx, true),
+              child: Text(l10n.acaoAdicionar),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmou != true || !mounted) return;
+    setState(() => _contas
+        .add(_ContaRascunho(nome, valor, Grupo.necessidade, _diaPadrao)));
   }
 
   /// Diálogo "quanto custa?" das sugestões de conta. Sem controller: o valor é
@@ -506,6 +576,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   label: Text(nome),
                   onPressed: () => _adicionarConta(nome, grupo, dia),
                 ),
+              // Último da fila: as sugestões resolvem o caso comum, e este
+              // atende quem não se encontrou nelas.
+              ActionChip(
+                avatar: const Icon(Icons.add, size: 18),
+                label: Text(l10n.onboardingOutraConta),
+                onPressed: _adicionarOutraConta,
+              ),
             ],
           ),
           const Divider(height: 32),

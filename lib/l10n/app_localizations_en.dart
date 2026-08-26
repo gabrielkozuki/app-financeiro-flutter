@@ -454,18 +454,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String graficoMetaAcima(int meta) {
-    return '$meta% target · above';
+  String graficoMetaAcima(String meta) {
+    return 'target $meta · above target';
   }
 
   @override
-  String graficoMetaAbaixo(int meta) {
-    return '$meta% target · below';
+  String graficoMetaAbaixo(String meta) {
+    return 'target $meta · below target';
   }
 
   @override
-  String graficoMetaDentro(int meta) {
-    return '$meta% target · on target';
+  String graficoMetaDentro(String meta) {
+    return 'target $meta · on target';
   }
 
   @override
@@ -926,4 +926,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get graficoDaRenda => 'of income';
+
+  @override
+  String contaSubtituloPaga(String grupo, String data) {
+    return '$grupo · paid on $data';
+  }
+
+  @override
+  String get onboardingOutraConta => 'Other';
+
+  @override
+  String get onboardingOutraContaTitulo => 'New bill';
+
+  @override
+  String get onboardingOutraContaNome => 'Bill name';
+
+  @override
+  String get onboardingOutraContaAjuda =>
+      'You can adjust group and due date later, in the Bills tab.';
+
+  @override
+  String get entradaPausar => 'Pause';
+
+  @override
+  String get entradaRetomar => 'Resume';
+
+  @override
+  String get entradaPausada => 'Paused';
+
+  @override
+  String get entradaPausadaAjuda =>
+      'Doesn\'t count toward the coming months. History is kept.';
+
+  @override
+  String get entradaErroPausar => 'Couldn\'t change this income.';
 }

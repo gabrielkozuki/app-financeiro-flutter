@@ -338,27 +338,27 @@
       }
     }
   },
-  "graficoMetaAcima": "meta {meta}% · acima da meta",
+  "graficoMetaAcima": "meta {meta} · acima da meta",
   "@graficoMetaAcima": {
     "placeholders": {
       "meta": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
-  "graficoMetaAbaixo": "meta {meta}% · abaixo da meta",
+  "graficoMetaAbaixo": "meta {meta} · abaixo da meta",
   "@graficoMetaAbaixo": {
     "placeholders": {
       "meta": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
-  "graficoMetaDentro": "meta {meta}% · na meta",
+  "graficoMetaDentro": "meta {meta} · na meta",
   "@graficoMetaDentro": {
     "placeholders": {
       "meta": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -614,5 +614,25 @@
       }
     }
   },
-  "graficoDaRenda": "da renda"
+  "graficoDaRenda": "da renda",
+  "contaSubtituloPaga": "{grupo} · pago em {data}",
+  "@contaSubtituloPaga": {
+    "placeholders": {
+      "grupo": {
+        "type": "String"
+      },
+      "data": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingOutraConta": "Outra",
+  "onboardingOutraContaTitulo": "Nova conta",
+  "onboardingOutraContaNome": "Nome da conta",
+  "onboardingOutraContaAjuda": "Você ajusta grupo e vencimento depois, na aba Contas.",
+  "entradaPausar": "Pausar",
+  "entradaRetomar": "Retomar",
+  "entradaPausada": "Pausada",
+  "entradaPausadaAjuda": "Não entra no cálculo dos próximos meses. O histórico continua.",
+  "entradaErroPausar": "Não foi possível alterar esta renda."
 }

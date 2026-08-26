@@ -335,27 +335,27 @@
       }
     }
   },
-  "graficoMetaAcima": "{meta}% target · above",
+  "graficoMetaAcima": "target {meta} · above target",
   "@graficoMetaAcima": {
     "placeholders": {
       "meta": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
-  "graficoMetaAbaixo": "{meta}% target · below",
+  "graficoMetaAbaixo": "target {meta} · below target",
   "@graficoMetaAbaixo": {
     "placeholders": {
       "meta": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
-  "graficoMetaDentro": "{meta}% target · on target",
+  "graficoMetaDentro": "target {meta} · on target",
   "@graficoMetaDentro": {
     "placeholders": {
       "meta": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -608,5 +608,25 @@
       }
     }
   },
-  "graficoDaRenda": "of income"
+  "graficoDaRenda": "of income",
+  "contaSubtituloPaga": "{grupo} · paid on {data}",
+  "@contaSubtituloPaga": {
+    "placeholders": {
+      "grupo": {
+        "type": "String"
+      },
+      "data": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingOutraConta": "Other",
+  "onboardingOutraContaTitulo": "New bill",
+  "onboardingOutraContaNome": "Bill name",
+  "onboardingOutraContaAjuda": "You can adjust group and due date later, in the Bills tab.",
+  "entradaPausar": "Pause",
+  "entradaRetomar": "Resume",
+  "entradaPausada": "Paused",
+  "entradaPausadaAjuda": "Doesn't count toward the coming months. History is kept.",
+  "entradaErroPausar": "Couldn't change this income."
 }

@@ -10,6 +10,7 @@ import '../data/repositories/drift_config_repository.dart';
 import '../data/repositories/drift_contas_repository.dart';
 import '../data/repositories/drift_entradas_repository.dart';
 import '../data/repositories/drift_fechamento_repository.dart';
+import '../domain/entities/enums.dart';
 import '../domain/entities/usuario.dart';
 import '../domain/repositories/repositories.dart';
 import 'format/dates.dart';
@@ -173,6 +174,21 @@ final entradasProvider = FutureProvider(
 /// pontuais daquele mês. Base da tela de Rendas.
 final entradasDoMesProvider = FutureProvider((ref) =>
     ref.watch(entradasRepoProvider).doMes(ref.watch(mesReferenciaProvider)));
+
+/// O que a TELA de rendas mostra: as recorrentes (contando ou pausadas) mais as
+/// pontuais do mês.
+///
+/// Diferente de [entradasDoMesProvider], que é o que **conta** na renda. Usar
+/// aquele na tela fazia a renda pausada sumir da lista — e sem ela na tela não
+/// havia como retomar.
+final entradasVisiveisNoMesProvider = FutureProvider((ref) async {
+  final mes = ref.watch(mesReferenciaProvider);
+  final todas = await ref.watch(entradasRepoProvider).todas();
+  return todas
+      .where((e) =>
+          e.tipo == TipoEntrada.recorrente || e.mesReferencia == mes)
+      .toList();
+});
 
 /// Lista de cartões ativos (tela de gestão de cartões).
 final cartoesProvider = FutureProvider(

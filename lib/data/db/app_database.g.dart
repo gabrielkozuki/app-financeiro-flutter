@@ -73,18 +73,27 @@ class $EntradasTable extends Entradas
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _ativaMeta = const VerificationMeta('ativa');
+  static const VerificationMeta _pausadaDesdeMeta = const VerificationMeta(
+    'pausadaDesde',
+  );
   @override
-  late final GeneratedColumn<bool> ativa = GeneratedColumn<bool>(
-    'ativa',
+  late final GeneratedColumn<String> pausadaDesde = GeneratedColumn<String>(
+    'pausada_desde',
     aliasedName,
-    false,
-    type: DriftSqlType.bool,
+    true,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("ativa" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _retomadaEmMeta = const VerificationMeta(
+    'retomadaEm',
+  );
+  @override
+  late final GeneratedColumn<String> retomadaEm = GeneratedColumn<String>(
+    'retomada_em',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -94,7 +103,8 @@ class $EntradasTable extends Entradas
     tipo,
     diaRecebimento,
     mesReferencia,
-    ativa,
+    pausadaDesde,
+    retomadaEm,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -148,10 +158,19 @@ class $EntradasTable extends Entradas
         ),
       );
     }
-    if (data.containsKey('ativa')) {
+    if (data.containsKey('pausada_desde')) {
       context.handle(
-        _ativaMeta,
-        ativa.isAcceptableOrUnknown(data['ativa']!, _ativaMeta),
+        _pausadaDesdeMeta,
+        pausadaDesde.isAcceptableOrUnknown(
+          data['pausada_desde']!,
+          _pausadaDesdeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('retomada_em')) {
+      context.handle(
+        _retomadaEmMeta,
+        retomadaEm.isAcceptableOrUnknown(data['retomada_em']!, _retomadaEmMeta),
       );
     }
     return context;
@@ -189,10 +208,14 @@ class $EntradasTable extends Entradas
         DriftSqlType.string,
         data['${effectivePrefix}mes_referencia'],
       ),
-      ativa: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}ativa'],
-      )!,
+      pausadaDesde: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pausada_desde'],
+      ),
+      retomadaEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}retomada_em'],
+      ),
     );
   }
 
@@ -212,7 +235,17 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
   final TipoEntrada tipo;
   final int? diaRecebimento;
   final String? mesReferencia;
-  final bool ativa;
+
+  /// Vigência da pausa, em `YYYY-MM`. Substituiu o booleano `ativa` na
+  /// schemaVersion 2: pausar precisa valer **daquele mês em diante**, não
+  /// retroativamente, senão pausar hoje reescreveria meses passados que ainda
+  /// leem ao vivo (os reabertos).
+  ///
+  /// `pausadaDesde` nulo = nunca pausada. `retomadaEm` nulo = segue pausada.
+  /// Retomar em outubro deixa o intervalo [pausadaDesde, outubro) sem contar e
+  /// outubro em diante contando.
+  final String? pausadaDesde;
+  final String? retomadaEm;
   const EntradaRow({
     required this.id,
     required this.nome,
@@ -220,7 +253,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
     required this.tipo,
     this.diaRecebimento,
     this.mesReferencia,
-    required this.ativa,
+    this.pausadaDesde,
+    this.retomadaEm,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -237,7 +271,12 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
     if (!nullToAbsent || mesReferencia != null) {
       map['mes_referencia'] = Variable<String>(mesReferencia);
     }
-    map['ativa'] = Variable<bool>(ativa);
+    if (!nullToAbsent || pausadaDesde != null) {
+      map['pausada_desde'] = Variable<String>(pausadaDesde);
+    }
+    if (!nullToAbsent || retomadaEm != null) {
+      map['retomada_em'] = Variable<String>(retomadaEm);
+    }
     return map;
   }
 
@@ -253,7 +292,12 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
       mesReferencia: mesReferencia == null && nullToAbsent
           ? const Value.absent()
           : Value(mesReferencia),
-      ativa: Value(ativa),
+      pausadaDesde: pausadaDesde == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pausadaDesde),
+      retomadaEm: retomadaEm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(retomadaEm),
     );
   }
 
@@ -271,7 +315,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
       ),
       diaRecebimento: serializer.fromJson<int?>(json['diaRecebimento']),
       mesReferencia: serializer.fromJson<String?>(json['mesReferencia']),
-      ativa: serializer.fromJson<bool>(json['ativa']),
+      pausadaDesde: serializer.fromJson<String?>(json['pausadaDesde']),
+      retomadaEm: serializer.fromJson<String?>(json['retomadaEm']),
     );
   }
   @override
@@ -286,7 +331,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
       ),
       'diaRecebimento': serializer.toJson<int?>(diaRecebimento),
       'mesReferencia': serializer.toJson<String?>(mesReferencia),
-      'ativa': serializer.toJson<bool>(ativa),
+      'pausadaDesde': serializer.toJson<String?>(pausadaDesde),
+      'retomadaEm': serializer.toJson<String?>(retomadaEm),
     };
   }
 
@@ -297,7 +343,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
     TipoEntrada? tipo,
     Value<int?> diaRecebimento = const Value.absent(),
     Value<String?> mesReferencia = const Value.absent(),
-    bool? ativa,
+    Value<String?> pausadaDesde = const Value.absent(),
+    Value<String?> retomadaEm = const Value.absent(),
   }) => EntradaRow(
     id: id ?? this.id,
     nome: nome ?? this.nome,
@@ -309,7 +356,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
     mesReferencia: mesReferencia.present
         ? mesReferencia.value
         : this.mesReferencia,
-    ativa: ativa ?? this.ativa,
+    pausadaDesde: pausadaDesde.present ? pausadaDesde.value : this.pausadaDesde,
+    retomadaEm: retomadaEm.present ? retomadaEm.value : this.retomadaEm,
   );
   EntradaRow copyWithCompanion(EntradasCompanion data) {
     return EntradaRow(
@@ -325,7 +373,12 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
       mesReferencia: data.mesReferencia.present
           ? data.mesReferencia.value
           : this.mesReferencia,
-      ativa: data.ativa.present ? data.ativa.value : this.ativa,
+      pausadaDesde: data.pausadaDesde.present
+          ? data.pausadaDesde.value
+          : this.pausadaDesde,
+      retomadaEm: data.retomadaEm.present
+          ? data.retomadaEm.value
+          : this.retomadaEm,
     );
   }
 
@@ -338,7 +391,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
           ..write('tipo: $tipo, ')
           ..write('diaRecebimento: $diaRecebimento, ')
           ..write('mesReferencia: $mesReferencia, ')
-          ..write('ativa: $ativa')
+          ..write('pausadaDesde: $pausadaDesde, ')
+          ..write('retomadaEm: $retomadaEm')
           ..write(')'))
         .toString();
   }
@@ -351,7 +405,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
     tipo,
     diaRecebimento,
     mesReferencia,
-    ativa,
+    pausadaDesde,
+    retomadaEm,
   );
   @override
   bool operator ==(Object other) =>
@@ -363,7 +418,8 @@ class EntradaRow extends DataClass implements Insertable<EntradaRow> {
           other.tipo == this.tipo &&
           other.diaRecebimento == this.diaRecebimento &&
           other.mesReferencia == this.mesReferencia &&
-          other.ativa == this.ativa);
+          other.pausadaDesde == this.pausadaDesde &&
+          other.retomadaEm == this.retomadaEm);
 }
 
 class EntradasCompanion extends UpdateCompanion<EntradaRow> {
@@ -373,7 +429,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
   final Value<TipoEntrada> tipo;
   final Value<int?> diaRecebimento;
   final Value<String?> mesReferencia;
-  final Value<bool> ativa;
+  final Value<String?> pausadaDesde;
+  final Value<String?> retomadaEm;
   const EntradasCompanion({
     this.id = const Value.absent(),
     this.nome = const Value.absent(),
@@ -381,7 +438,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
     this.tipo = const Value.absent(),
     this.diaRecebimento = const Value.absent(),
     this.mesReferencia = const Value.absent(),
-    this.ativa = const Value.absent(),
+    this.pausadaDesde = const Value.absent(),
+    this.retomadaEm = const Value.absent(),
   });
   EntradasCompanion.insert({
     this.id = const Value.absent(),
@@ -390,7 +448,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
     required TipoEntrada tipo,
     this.diaRecebimento = const Value.absent(),
     this.mesReferencia = const Value.absent(),
-    this.ativa = const Value.absent(),
+    this.pausadaDesde = const Value.absent(),
+    this.retomadaEm = const Value.absent(),
   }) : nome = Value(nome),
        valorLiquido = Value(valorLiquido),
        tipo = Value(tipo);
@@ -401,7 +460,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
     Expression<int>? tipo,
     Expression<int>? diaRecebimento,
     Expression<String>? mesReferencia,
-    Expression<bool>? ativa,
+    Expression<String>? pausadaDesde,
+    Expression<String>? retomadaEm,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -410,7 +470,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
       if (tipo != null) 'tipo': tipo,
       if (diaRecebimento != null) 'dia_recebimento': diaRecebimento,
       if (mesReferencia != null) 'mes_referencia': mesReferencia,
-      if (ativa != null) 'ativa': ativa,
+      if (pausadaDesde != null) 'pausada_desde': pausadaDesde,
+      if (retomadaEm != null) 'retomada_em': retomadaEm,
     });
   }
 
@@ -421,7 +482,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
     Value<TipoEntrada>? tipo,
     Value<int?>? diaRecebimento,
     Value<String?>? mesReferencia,
-    Value<bool>? ativa,
+    Value<String?>? pausadaDesde,
+    Value<String?>? retomadaEm,
   }) {
     return EntradasCompanion(
       id: id ?? this.id,
@@ -430,7 +492,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
       tipo: tipo ?? this.tipo,
       diaRecebimento: diaRecebimento ?? this.diaRecebimento,
       mesReferencia: mesReferencia ?? this.mesReferencia,
-      ativa: ativa ?? this.ativa,
+      pausadaDesde: pausadaDesde ?? this.pausadaDesde,
+      retomadaEm: retomadaEm ?? this.retomadaEm,
     );
   }
 
@@ -457,8 +520,11 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
     if (mesReferencia.present) {
       map['mes_referencia'] = Variable<String>(mesReferencia.value);
     }
-    if (ativa.present) {
-      map['ativa'] = Variable<bool>(ativa.value);
+    if (pausadaDesde.present) {
+      map['pausada_desde'] = Variable<String>(pausadaDesde.value);
+    }
+    if (retomadaEm.present) {
+      map['retomada_em'] = Variable<String>(retomadaEm.value);
     }
     return map;
   }
@@ -472,7 +538,8 @@ class EntradasCompanion extends UpdateCompanion<EntradaRow> {
           ..write('tipo: $tipo, ')
           ..write('diaRecebimento: $diaRecebimento, ')
           ..write('mesReferencia: $mesReferencia, ')
-          ..write('ativa: $ativa')
+          ..write('pausadaDesde: $pausadaDesde, ')
+          ..write('retomadaEm: $retomadaEm')
           ..write(')'))
         .toString();
   }
@@ -3669,7 +3736,8 @@ typedef $$EntradasTableCreateCompanionBuilder =
       required TipoEntrada tipo,
       Value<int?> diaRecebimento,
       Value<String?> mesReferencia,
-      Value<bool> ativa,
+      Value<String?> pausadaDesde,
+      Value<String?> retomadaEm,
     });
 typedef $$EntradasTableUpdateCompanionBuilder =
     EntradasCompanion Function({
@@ -3679,7 +3747,8 @@ typedef $$EntradasTableUpdateCompanionBuilder =
       Value<TipoEntrada> tipo,
       Value<int?> diaRecebimento,
       Value<String?> mesReferencia,
-      Value<bool> ativa,
+      Value<String?> pausadaDesde,
+      Value<String?> retomadaEm,
     });
 
 class $$EntradasTableFilterComposer
@@ -3722,8 +3791,13 @@ class $$EntradasTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get ativa => $composableBuilder(
-    column: $table.ativa,
+  ColumnFilters<String> get pausadaDesde => $composableBuilder(
+    column: $table.pausadaDesde,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get retomadaEm => $composableBuilder(
+    column: $table.retomadaEm,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3767,8 +3841,13 @@ class $$EntradasTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get ativa => $composableBuilder(
-    column: $table.ativa,
+  ColumnOrderings<String> get pausadaDesde => $composableBuilder(
+    column: $table.pausadaDesde,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get retomadaEm => $composableBuilder(
+    column: $table.retomadaEm,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -3806,8 +3885,15 @@ class $$EntradasTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get ativa =>
-      $composableBuilder(column: $table.ativa, builder: (column) => column);
+  GeneratedColumn<String> get pausadaDesde => $composableBuilder(
+    column: $table.pausadaDesde,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get retomadaEm => $composableBuilder(
+    column: $table.retomadaEm,
+    builder: (column) => column,
+  );
 }
 
 class $$EntradasTableTableManager
@@ -3847,7 +3933,8 @@ class $$EntradasTableTableManager
                 Value<TipoEntrada> tipo = const Value.absent(),
                 Value<int?> diaRecebimento = const Value.absent(),
                 Value<String?> mesReferencia = const Value.absent(),
-                Value<bool> ativa = const Value.absent(),
+                Value<String?> pausadaDesde = const Value.absent(),
+                Value<String?> retomadaEm = const Value.absent(),
               }) => EntradasCompanion(
                 id: id,
                 nome: nome,
@@ -3855,7 +3942,8 @@ class $$EntradasTableTableManager
                 tipo: tipo,
                 diaRecebimento: diaRecebimento,
                 mesReferencia: mesReferencia,
-                ativa: ativa,
+                pausadaDesde: pausadaDesde,
+                retomadaEm: retomadaEm,
               ),
           createCompanionCallback:
               ({
@@ -3865,7 +3953,8 @@ class $$EntradasTableTableManager
                 required TipoEntrada tipo,
                 Value<int?> diaRecebimento = const Value.absent(),
                 Value<String?> mesReferencia = const Value.absent(),
-                Value<bool> ativa = const Value.absent(),
+                Value<String?> pausadaDesde = const Value.absent(),
+                Value<String?> retomadaEm = const Value.absent(),
               }) => EntradasCompanion.insert(
                 id: id,
                 nome: nome,
@@ -3873,7 +3962,8 @@ class $$EntradasTableTableManager
                 tipo: tipo,
                 diaRecebimento: diaRecebimento,
                 mesReferencia: mesReferencia,
-                ativa: ativa,
+                pausadaDesde: pausadaDesde,
+                retomadaEm: retomadaEm,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

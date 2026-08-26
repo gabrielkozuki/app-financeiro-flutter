@@ -15,7 +15,8 @@ Entrada toEntrada(EntradaRow r) => Entrada(
       tipo: r.tipo,
       diaRecebimento: r.diaRecebimento,
       mesReferencia: r.mesReferencia,
-      ativa: r.ativa,
+      pausadaDesde: r.pausadaDesde,
+      retomadaEm: r.retomadaEm,
     );
 
 Conta toConta(ContaRow r) => Conta(

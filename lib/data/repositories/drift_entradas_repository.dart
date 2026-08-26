@@ -15,12 +15,15 @@ class DriftEntradasRepository implements EntradasRepository {
   Future<List<Entrada>> doMes(String mesReferencia) async {
     final rows = await (_db.select(_db.entradas)
           ..where((e) =>
-              e.ativa.equals(true) &
-              (e.tipo.equalsValue(TipoEntrada.recorrente) |
-                  (e.tipo.equalsValue(TipoEntrada.pontual) &
-                      e.mesReferencia.equals(mesReferencia)))))
+              e.tipo.equalsValue(TipoEntrada.recorrente) |
+              (e.tipo.equalsValue(TipoEntrada.pontual) &
+                  e.mesReferencia.equals(mesReferencia))))
         .get();
-    return rows.map(toEntrada).toList();
+    // A pausa é filtrada em Dart, não em SQL: a regra tem vigência (ver
+    // `Entrada.contaEm`) e exprimi-la em `where` deixaria a condição espalhada
+    // entre o domínio e o banco. São poucas entradas por usuário — a diferença
+    // de custo não existe, e a regra fica num lugar só, testável isolada.
+    return rows.map(toEntrada).where((e) => e.contaEm(mesReferencia)).toList();
   }
 
   @override
@@ -43,7 +46,8 @@ class DriftEntradasRepository implements EntradasRepository {
           tipo: entrada.tipo,
           diaRecebimento: Value(entrada.diaRecebimento),
           mesReferencia: Value(entrada.mesReferencia),
-          ativa: Value(entrada.ativa),
+          pausadaDesde: Value(entrada.pausadaDesde),
+          retomadaEm: Value(entrada.retomadaEm),
         ));
   }
 
@@ -56,7 +60,8 @@ class DriftEntradasRepository implements EntradasRepository {
       tipo: Value(entrada.tipo),
       diaRecebimento: Value(entrada.diaRecebimento),
       mesReferencia: Value(entrada.mesReferencia),
-      ativa: Value(entrada.ativa),
+      pausadaDesde: Value(entrada.pausadaDesde),
+      retomadaEm: Value(entrada.retomadaEm),
     ));
   }
 

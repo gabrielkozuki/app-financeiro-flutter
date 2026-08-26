@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/feedback.dart';
+import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
@@ -482,14 +483,24 @@ class _ContaTile extends ConsumerWidget {
                   const SizedBox(width: AppTheme.spaceXs + 2),
                   Expanded(
                     child: Text(
-                      ocorrencia.parcelaAtual != null
-                          ? l10n.contaSubtituloParcela(
+                      // Conta paga troca o vencimento pela data do pagamento:
+                      // "vence dia 5" deixa de informar depois que já foi pago,
+                      // e `dataPagamento` era gravado sem nunca ser lido.
+                      // `desmarcar` limpa o campo, então o nulo volta a valer.
+                      ocorrencia.dataPagamento != null
+                          ? l10n.contaSubtituloPaga(
                               conta.grupo.rotulo(context),
-                              conta.diaVencimento,
-                              ocorrencia.parcelaAtual!,
-                              conta.totalParcelas ?? 0)
-                          : l10n.contaSubtitulo(
-                              conta.grupo.rotulo(context), conta.diaVencimento),
+                              dataCurta(ocorrencia.dataPagamento!,
+                                  l10n.localeName))
+                          : ocorrencia.parcelaAtual != null
+                              ? l10n.contaSubtituloParcela(
+                                  conta.grupo.rotulo(context),
+                                  conta.diaVencimento,
+                                  ocorrencia.parcelaAtual!,
+                                  conta.totalParcelas ?? 0)
+                              : l10n.contaSubtitulo(
+                                  conta.grupo.rotulo(context),
+                                  conta.diaVencimento),
                       style:
                           textTheme.bodyMedium?.copyWith(color: onSurfaceVariant),
                       overflow: TextOverflow.ellipsis,
