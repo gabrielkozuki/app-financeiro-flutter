@@ -12,8 +12,11 @@
 iOS foi perdido: `Info.plist`, `AppIcon.appiconset`, `LaunchImage` e o storyboard já estão
 prontos, e o projeto segue compilando para iOS. Retomar é ter o Mac, não refazer trabalho.
 
-**APK avulso por GitHub Releases segue descartado.** Uma loja já cumpre CE-03; um segundo
-canal para o mesmo binário multiplica manutenção sem multiplicar alcance.
+**Atualização de 30/08/2026: a decisão acima foi reaberta.** Passa a existir um segundo canal
+— ver [Canal extra: GitHub Releases](#canal-extra-github-releases) — para dar acesso imediato
+(portfólio, testadores, amigos) enquanto o teste fechado do Play corre em paralelo. O Play
+continua sendo o destino principal e o único que cumpre o CE-03 de fato; o GitHub é um extra,
+não substituto.
 
 ## Comece pelo prazo, não pelo build
 
@@ -174,3 +177,79 @@ descartar o build.
 - [ ] Ficha da loja: descrição, capturas, gráfico de destaque
 - [ ] `version` incrementada
 - [ ] `flutter build appbundle --release` e envio
+
+## Canal extra: GitHub Releases
+
+Fluxo **manual** — sem GitHub Actions, sem guardar o keystore em segredo de CI. Cada release é
+um build feito na sua máquina e publicado com `gh release create`. Menos conveniente que
+automatizar, mas nenhuma superfície de segredo nova, e o volume de releases de um app pessoal
+não justifica manter um workflow.
+
+### Pré-requisito único: o mesmo keystore de upload
+
+Usa o **mesmo** keystore e `key.properties` de [`assinar-release.md`](assinar-release.md) — não
+existe uma chave separada "para o GitHub". Se `android/key.properties` ainda não existir, gere-o
+primeiro seguindo aquele documento; sem ele o build de release cai na chave de debug (pública),
+e distribuir fora de loja com chave de debug é o único cenário realmente inseguro aqui — qualquer
+um pode assinar uma atualização falsa com a mesma chave.
+
+### 1. Build (split por ABI, sem AAB)
+
+Fora do Play não há quem monte o pacote por aparelho, então o split é manual:
+
+```bash
+flutter build apk --release --split-per-abi
+```
+
+Gera três APKs em `build/app/outputs/flutter-apk/`; o que importa é
+`app-arm64-v8a-release.apk` (~20 MB, cobre praticamente todo aparelho Android atual). Confira a
+assinatura antes de publicar:
+
+```bash
+apksigner verify --print-certs build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
+
+Se o `certificate DN` mostrar `CN=Android Debug`, o `key.properties` não foi encontrado — não
+publique esse arquivo.
+
+### 2. Instalar e autenticar o GitHub CLI (uma vez)
+
+Este ambiente não tem `gh` instalado. No Windows:
+
+```powershell
+winget install --id GitHub.cli
+```
+
+Depois, autentique (é interativo — abre o navegador):
+
+```powershell
+gh auth login
+```
+
+### 3. Tag e release
+
+A tag acompanha o `pubspec.yaml` (hoje `version: 1.0.1+2` → tag `v1.0.1`):
+
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+
+gh release create v1.0.1 \
+  build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
+  --title "v1.0.1" \
+  --notes "Baixe o APK abaixo e instale (é preciso permitir 'fontes desconhecidas' no Android)."
+```
+
+Repita as três etapas — tag nova, build novo, `gh release create` — a cada versão. O
+`versionCode` (`+N` do `pubspec.yaml`) não precisa satisfazer o Play nesse canal, mas mantenha o
+hábito de incrementá-lo mesmo assim: as duas distribuições compartilham o mesmo binário-base.
+
+### O que este canal não resolve
+
+- **Sem atualização automática.** Quem instalou pelo GitHub não é avisado de versão nova; é
+  preciso baixar o APK seguinte manualmente por cima (mesmo `applicationId` e certificado, então
+  atualiza em vez de duplicar o app).
+- **"Fontes desconhecidas".** O Android exige essa permissão explícita para instalar fora de
+  loja — vale avisar na descrição da release.
+- **Não conta para o CE-03.** Esse critério pede loja; o link do GitHub é conveniência, não
+  substitui o teste fechado do Play em andamento.
